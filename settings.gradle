@@ -1,1 +1,1 @@
-include ':app', 'appDaoGenerator'
+include ':app', 'appDaoGenerator', ':mqtt-client'
