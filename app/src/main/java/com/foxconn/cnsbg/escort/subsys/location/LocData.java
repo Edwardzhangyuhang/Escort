@@ -2,14 +2,14 @@ package com.foxconn.cnsbg.escort.subsys.location;
 
 import java.util.Date;
 
-public final class GPSData {
+public final class LocData {
     public int uLatitude = 0, uLongitude = 0;//The latitude and longitude
     public Date datetimestamp = null;
     public String UDID = null;
 
     @Override
     public boolean equals(Object other) {
-        GPSData loc = GPSData.class.cast(other);
+        LocData loc = LocData.class.cast(other);
         if ((loc.UDID == UDID || loc.UDID.equals(UDID))
                 && loc.datetimestamp.getTime() == datetimestamp.getTime()
                 && loc.uLatitude == uLatitude

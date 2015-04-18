@@ -2,7 +2,7 @@ package com.foxconn.cnsbg.escort.subsys.location;
 
 import java.util.Date;
 
-public class Accelerometer {
+public class AccelData {
     public float accelX_avg = 0;
     public float accelY_avg = 0;
     public float accelZ_avg = 0;
@@ -14,7 +14,7 @@ public class Accelerometer {
 
     @Override
     public boolean equals(Object other) {
-        Accelerometer acc = Accelerometer.class.cast(other);
+        AccelData acc = AccelData.class.cast(other);
         if ((acc.UDID == UDID || acc.UDID.equals(UDID))
                 && acc.datetimestamp.getTime() == datetimestamp.getTime()
                 && acc.accelX_avg == accelX_avg

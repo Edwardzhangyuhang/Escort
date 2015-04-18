@@ -9,8 +9,8 @@ import com.foxconn.cnsbg.escort.common.SysUtil;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-public abstract class ComPublishTask extends Thread {
-    private final String TAG = ComPublishTask.class.getSimpleName();
+public abstract class ComDataTxTask extends Thread {
+    private static final String TAG = ComDataTxTask.class.getSimpleName();
 
     protected volatile int runInterval = 1000; //Default wait time of 1 sec
     protected volatile boolean requestShutdown = false;
@@ -62,4 +62,7 @@ public abstract class ComPublishTask extends Thread {
     protected abstract boolean sendCachedData();
     protected abstract void saveCachedData(String date);
     protected abstract void checkTask();
+
+    public abstract void activeTask();
+    public abstract void deactiveTask();
 }

@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class ComMQ {
-    private final String TAG = ComMQ.class.getSimpleName();
+    private static final String TAG = ComMQ.class.getSimpleName();
 
     private Context mContext;
     private FutureConnection mConn;

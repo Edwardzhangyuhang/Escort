@@ -16,8 +16,8 @@ import com.foxconn.cnsbg.escort.subsys.dao.LocationEntityDao;
 import com.foxconn.cnsbg.escort.subsys.dao.MainUserEntityDao;
 import com.foxconn.cnsbg.escort.subsys.dao.UserEntity;
 import com.foxconn.cnsbg.escort.subsys.dao.UserEntityDao;
-import com.foxconn.cnsbg.escort.subsys.location.Accelerometer;
-import com.foxconn.cnsbg.escort.subsys.location.GPSData;
+import com.foxconn.cnsbg.escort.subsys.location.AccelData;
+import com.foxconn.cnsbg.escort.subsys.location.LocData;
 
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
@@ -326,14 +326,14 @@ public class CacheDao {
         return convertEntityDaoLocation(locationList);
     }
 
-    public synchronized List<GPSData> queryCachedLocationData() {
-        List<GPSData> cachedLocationList = new ArrayList<GPSData>();
+    public synchronized List<LocData> queryCachedLocationData() {
+        List<LocData> cachedLocationList = new ArrayList<LocData>();
         int offset = 0;
         cachedLocationQb.setOffset(offset);
         List<CachedLocationEntity> queryList = cachedLocationQb.list();
         while (queryList != null && !queryList.isEmpty()) {
             for (CachedLocationEntity cachedLocation : queryList) {
-                GPSData newLoc = new GPSData();
+                LocData newLoc = new LocData();
                 newLoc.UDID = cachedLocation.getUDID();
                 newLoc.datetimestamp = new Date(cachedLocation.getDatetimestamp());
                 newLoc.uLatitude = cachedLocation.getLatitudeE6();
@@ -349,7 +349,7 @@ public class CacheDao {
         return cachedLocationList;
     }
 
-    public synchronized void saveCachedLocationData(GPSData data) {
+    public synchronized void saveCachedLocationData(LocData data) {
         if (data == null)
             return;
 
@@ -364,7 +364,7 @@ public class CacheDao {
         return;
     }
 
-    public synchronized void deleteCachedLocationData(List<GPSData> data) {
+    public synchronized void deleteCachedLocationData(List<LocData> data) {
         if (data == null || data.isEmpty())
             return;
 
@@ -385,7 +385,7 @@ public class CacheDao {
 
         List<CachedLocationEntity> deleteList = new ArrayList<CachedLocationEntity>();
         for (CachedLocationEntity cachedLocation : cachedLocationList) {
-            GPSData deleteLoc = new GPSData();
+            LocData deleteLoc = new LocData();
             deleteLoc.UDID = cachedLocation.getUDID();
             deleteLoc.datetimestamp = new Date(cachedLocation.getDatetimestamp());
             deleteLoc.uLatitude = cachedLocation.getLatitudeE6();
@@ -402,14 +402,14 @@ public class CacheDao {
         return;
     }
 
-    public synchronized List<Accelerometer> queryCachedAccelerationData() {
-        List<Accelerometer> cachedAccelerationList = new ArrayList<Accelerometer>();
+    public synchronized List<AccelData> queryCachedAccelerationData() {
+        List<AccelData> cachedAccelerationList = new ArrayList<AccelData>();
         int offset = 0;
         cachedAccelerationQb.setOffset(offset);
         List<CachedAccelerationEntity> queryList = cachedAccelerationQb.list();
         while (queryList != null && !queryList.isEmpty()) {
             for (CachedAccelerationEntity cachedAcceleration : queryList) {
-                Accelerometer newAcc = new Accelerometer();
+                AccelData newAcc = new AccelData();
                 newAcc.UDID = cachedAcceleration.getUDID();
                 newAcc.datetimestamp = new Date(cachedAcceleration.getDatetimestamp());
                 newAcc.accelX_avg = cachedAcceleration.getAccelX_avg();
@@ -429,7 +429,7 @@ public class CacheDao {
         return cachedAccelerationList;
     }
 
-    public synchronized void saveCachedAccelerationData(Accelerometer data) {
+    public synchronized void saveCachedAccelerationData(AccelData data) {
         if (data == null)
             return;
 
@@ -448,7 +448,7 @@ public class CacheDao {
         return;
     }
 
-    public synchronized void deleteCachedAccelerationData(List<Accelerometer> data) {
+    public synchronized void deleteCachedAccelerationData(List<AccelData> data) {
         if (data == null || data.isEmpty())
             return;
 
@@ -469,7 +469,7 @@ public class CacheDao {
 
         List<CachedAccelerationEntity> deleteList = new ArrayList<CachedAccelerationEntity>();
         for (CachedAccelerationEntity cachedAcceleration : cachedAccelerationList) {
-            Accelerometer deleteAcc = new Accelerometer();
+            AccelData deleteAcc = new AccelData();
             deleteAcc.UDID = cachedAcceleration.getUDID();
             deleteAcc.datetimestamp = new Date(cachedAcceleration.getDatetimestamp());
             deleteAcc.accelX_avg = cachedAcceleration.getAccelX_avg();

@@ -1,6 +1,7 @@
 package com.foxconn.cnsbg.escort.subsys.location;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -14,51 +15,51 @@ import com.foxconn.cnsbg.escort.BuildConfig;
 import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
 import com.foxconn.cnsbg.escort.common.SysConst;
 import com.foxconn.cnsbg.escort.common.SysUtil;
+import com.foxconn.cnsbg.escort.subsys.communication.ComDataTxTask;
 import com.foxconn.cnsbg.escort.subsys.communication.ComMQ;
-import com.foxconn.cnsbg.escort.subsys.communication.ComPublishTask;
 import com.google.gson.JsonParseException;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class GPSTask extends ComPublishTask {
-    private final String TAG = GPSTask.class.getSimpleName();
+public class LocTask extends ComDataTxTask {
+    private static final String TAG = LocTask.class.getSimpleName();
 
-    //change these to fine tune the power consumption
-    private final static float MIN_ACCURACY = 101.0f;
-    private final static float MIN_DISTANCE_IN_METER = 10.0f;//Only care about updates greater than 10 meters apart
-    private final static long MIN_TIME_IN_MS = 60000L;//Only update every 1min or so.
-    private final static long MAX_PROVIDER_CHECK_TIME_IN_MS = 300000L;//try to switch network every 5min
+    private LocationManager locManager;
+    private LocationUpdateHandler locHandler;
+    private long curMinTime;
+    private float curMinDistance;
+    private float curAccuracy;
+    private String curProvider;
+    private long lastProviderCheckTime;
+    private boolean isProviderChanged;
 
-    private final static long MAX_IDLE_TIME_IN_MS = 600000L;//stop location tracking if no motion is detected in 10min
+    private long lastLocTime = 0;
 
-    private static LocationManager locManager;
-    private static LocationUpdateHandler locHandler;
-    private static long curMinTime;
-    private static float curMinDistance;
-    private static float curAccuracy;
-    private static String curProvider;
-    private static long lastProviderCheckTime;
-    private static boolean isProviderChanged;
+    private boolean locDataUpdated = false;
+    private LocData locData = new LocData();
 
-    private static long lastLocTime = 0;
-
-    private static boolean updated = false;
-    private static GPSData curLoc = new GPSData();
-
-    public GPSTask(Context context, ComMQ mq) {
+    public LocTask(Context context, ComMQ mq) {
         mContext = context;
         mComMQ = mq;
-        runInterval = 10000;
 
-        setAccuracyLevel(CtrlCenter.getPrefs().getInt(SysConst.MV_SETTING_GPS_ACCURACY_LEVEL, 50));
+        if (!context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_LOCATION)) {
+            SysUtil.showToast(context, "FEATURE_LOCATION is not supported!", Toast.LENGTH_SHORT);
+            requestShutdown = true;
+            return;
+        }
 
-        curLoc.UDID = CtrlCenter.getUDID();
+        runInterval = SysConst.LOC_TASK_RUN_INTERVAL;
+
+        //context.getSharedPreferences(SysConst.APP_PREF_NAME, Context.MODE_PRIVATE);
+        setAccuracyLevel(SysConst.LOC_ACCURACY_LEVEL);
+
+        locData.UDID = CtrlCenter.getUDID();
 
         //get a handle on the location manager
         locHandler = new LocationUpdateHandler();
-        locManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
+        locManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         curProvider = LocationManager.NETWORK_PROVIDER;//used to trigger the notification
         curProvider = findAvailableProvider(Criteria.ACCURACY_COARSE);
         lastProviderCheckTime = new Date().getTime();
@@ -67,15 +68,6 @@ public class GPSTask extends ComPublishTask {
         //don't setup LocationUpdates at this point
         //locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, curMinTime, curMinDistance, locHandler);
         //locManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, curMinTime, curMinDistance, locHandler);
-
-        Log.i(TAG, "Starting up location collection...");
-        //Send our last known location to the database
-        List<String> matchingProviders = locManager.getAllProviders();
-        for (String provider : matchingProviders) {
-            Location location = locManager.getLastKnownLocation(provider);
-            if (location != null)
-                handleLastKnownLocation(location);
-        }
     }
 
     public void restartLocationUpdates() {
@@ -108,29 +100,20 @@ public class GPSTask extends ComPublishTask {
     private void setAccuracyLevel(int percentage) {
         float accuracyLevel = (5.0f - (percentage/20.0f));
 
-        curMinTime = (long)(MIN_TIME_IN_MS * accuracyLevel);
-        curMinDistance = (MIN_DISTANCE_IN_METER * accuracyLevel);
+        curMinTime = (long)(SysConst.LOC_UPDATE_MIN_TIME * accuracyLevel);
+        curMinDistance = (SysConst.LOC_UPDATE_MIN_DISTANCE * accuracyLevel);
         if (accuracyLevel < 1.0f)
-            curAccuracy = (MIN_ACCURACY);
+            curAccuracy = (SysConst.LOC_MIN_ACCURACY);
         else
-            curAccuracy = (MIN_ACCURACY * accuracyLevel);
-    }
-
-    public void applyAccuracyLevel(int percentage) {
-        setAccuracyLevel(percentage);
-
-        if (CtrlCenter.isTrackingLocation()) {
-            stopLocationUpdates();
-            startLocationUpdates();
-        }
+            curAccuracy = (SysConst.LOC_MIN_ACCURACY * accuracyLevel);
     }
 
     @Override
     protected String collectData() {
-        //updated means new loc have been constructed and be ready to send
-        if (updated) {
-            updated = false;
-            return gson.toJson(curLoc, GPSData.class);
+        //new loc have been constructed and be ready to send
+        if (locDataUpdated) {
+            locDataUpdated = false;
+            return gson.toJson(locData, LocData.class);
         }
         return null;
     }
@@ -160,17 +143,17 @@ public class GPSTask extends ComPublishTask {
         }
 
         public void onProviderDisabled(String provider) {
-            Log.i("onProviderDisabled", "Status changed. Provider: " + provider + " Status: Disabled");
+            Log.i(TAG + ":onProviderDisabled", "Status changed. Provider: " + provider + " Status: Disabled");
             curProvider = findAvailableProvider(Criteria.ACCURACY_COARSE);
         }
 
         public void onProviderEnabled(String provider) {
-            Log.i("onProviderEnabled", "Status changed. Provider: " + provider + " Status: Enabled");
+            Log.i(TAG + ":onProviderEnabled", "Status changed. Provider: " + provider + " Status: Enabled");
             curProvider = findAvailableProvider(Criteria.ACCURACY_COARSE);
         }
 
         public void onStatusChanged(String provider, int status, Bundle extras) {
-            Log.i("onStatusChanged", "Status changed. Provider: " + provider + " Status: " + String.valueOf(status));
+            Log.i(TAG + ":onStatusChanged", "Status changed. Provider: " + provider + " Status: " + String.valueOf(status));
             curProvider = findAvailableProvider(Criteria.ACCURACY_COARSE);
         }
     }
@@ -196,20 +179,6 @@ public class GPSTask extends ComPublishTask {
         return provider;
     }
 
-    private void handleLastKnownLocation(Location loc) {
-        if (loc == null)
-            return;
-
-        if (!loc.hasAccuracy())
-            return;
-
-        if(loc.getAccuracy() > curAccuracy)
-            return;
-
-        lastLocTime = loc.getTime();
-        handleLocation(loc);
-    }
-
     private void handleLocation(Location loc) {
         if (loc == null)
             return;
@@ -220,11 +189,11 @@ public class GPSTask extends ComPublishTask {
         int newLat = (int) (loc.getLatitude()*1E6);
         int newLng = (int) (loc.getLongitude()*1E6);
 
-        curLoc.uLatitude = newLat;
-        curLoc.uLongitude = newLng;
-        curLoc.datetimestamp = new Date(loc.getTime());
-        curLoc.UDID = CtrlCenter.getUDID();
-        updated = true;
+        locData.uLatitude = newLat;
+        locData.uLongitude = newLng;
+        locData.datetimestamp = new Date(loc.getTime());
+        locData.UDID = CtrlCenter.getUDID();
+        locDataUpdated = true;
     }
 
     @Override
@@ -238,13 +207,13 @@ public class GPSTask extends ComPublishTask {
         long currentTime = new Date().getTime();
         long motionDetectTime = CtrlCenter.getMotionDetectionTime();
 
-        if (currentTime - motionDetectTime > MAX_IDLE_TIME_IN_MS
-                && curProvider != LocationManager.PASSIVE_PROVIDER) {
+        if (currentTime - motionDetectTime > SysConst.LOC_UPDATE_PAUSE_IDLE_TIME
+                && !curProvider.equals(LocationManager.PASSIVE_PROVIDER)) {
             System.out.println("Pause location tracking...");
             curProvider = LocationManager.PASSIVE_PROVIDER;
             locManager.removeUpdates(locHandler);
         } else if (motionDetectTime > lastProviderCheckTime
-                && currentTime - lastProviderCheckTime > MAX_PROVIDER_CHECK_TIME_IN_MS) {
+                && currentTime - lastProviderCheckTime > SysConst.LOC_PROVIDER_CHECK_TIME) {
             if (curProvider != null
                     && curProvider.equals(LocationManager.PASSIVE_PROVIDER))
                 System.out.println("Resume location tracking...");
@@ -282,13 +251,13 @@ public class GPSTask extends ComPublishTask {
 
     @Override
     protected boolean sendCachedData() {
-        List<GPSData> dataList = CtrlCenter.getDao().queryCachedLocationData();
+        List<LocData> dataList = CtrlCenter.getDao().queryCachedLocationData();
         if (dataList == null || dataList.isEmpty())
             return true;
 
-        List<GPSData> sentList = new ArrayList<GPSData>();
-        for (GPSData data : dataList) {
-            String dataString = gson.toJson(data, GPSData.class);
+        List<LocData> sentList = new ArrayList<LocData>();
+        for (LocData data : dataList) {
+            String dataString = gson.toJson(data, LocData.class);
             if (sendData(dataString))
                 sentList.add(data);
             else
@@ -310,14 +279,22 @@ public class GPSTask extends ComPublishTask {
             return;
 
         try {
-            GPSData data = gson.fromJson(dataString, GPSData.class);
+            LocData data = gson.fromJson(dataString, LocData.class);
             CtrlCenter.getDao().saveCachedLocationData(data);
         } catch (JsonParseException e) {
-            Log.w("saveCachedData", "JsonParseException");
+            Log.w(TAG + ":saveCachedData", "JsonParseException");
         } catch (NullPointerException e) {
-            Log.w("saveCachedData", "NullPointerException");
+            Log.w(TAG + ":saveCachedData", "NullPointerException");
         }
+    }
 
-        return;
+    @Override
+    public void activeTask() {
+        startLocationUpdates();
+    }
+
+    @Override
+    public void deactiveTask() {
+        stopLocationUpdates();
     }
 }

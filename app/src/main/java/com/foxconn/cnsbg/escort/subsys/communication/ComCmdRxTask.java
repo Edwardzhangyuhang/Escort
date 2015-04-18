@@ -8,8 +8,8 @@ import com.foxconn.cnsbg.escort.common.SysUtil;
 import com.foxconn.cnsbg.escort.subsys.usbserial.SerialCode;
 import com.foxconn.cnsbg.escort.subsys.usbserial.SerialCtrl;
 
-public class ComSubscribeTask extends Thread {
-    private final String TAG = ComSubscribeTask.class.getSimpleName();
+public class ComCmdRxTask extends Thread {
+    private static final String TAG = ComCmdRxTask.class.getSimpleName();
 
     protected boolean requestShutdown = false;
 
@@ -18,7 +18,7 @@ public class ComSubscribeTask extends Thread {
     private ComMQ mComMQ;
     private boolean mMQReady = false;
 
-    public ComSubscribeTask(Context context, SerialCtrl sc, ComMQ mq) {
+    public ComCmdRxTask(Context context, SerialCtrl sc, ComMQ mq) {
         mContext = context;
         mSerialCtrl = sc;
         mComMQ = mq;
@@ -27,9 +27,10 @@ public class ComSubscribeTask extends Thread {
     @Override
     public void run() {
         while (!requestShutdown) {
-            if (mMQReady != mComMQ.isConnected()) {
-                mMQReady = mComMQ.isConnected();
-                SysUtil.showToast(mContext, "MQ Ready:" + mMQReady, Toast.LENGTH_LONG);
+            boolean ready = mComMQ.isConnected();
+            if (mMQReady != ready) {
+                mMQReady = ready;
+                SysUtil.showToast(mContext, "MQ Ready:" + ready, Toast.LENGTH_LONG);
             }
             String cmd = mComMQ.receive(SysConst.MQ_RECV_MAX_TIMEOUT);
             handleCmd(cmd);
