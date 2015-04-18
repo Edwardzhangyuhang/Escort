@@ -1,4 +1,4 @@
-package com.foxconn.cnsbg.escort.subsys.common;
+package com.foxconn.cnsbg.escort.common;
 
 public interface SysConst {
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -69,11 +69,24 @@ public interface SysConst {
     public static final String MQ_SERVER_HOST = "61.129.93.20";
     public static final String MQ_SERVER_INTERNAL_HOST = "10.116.57.136";
     public static final int MQ_SERVER_PORT = 1883;
-    public static final short MQ_KEEP_ALIVE = 10;
+    public static final short MQ_KEEP_ALIVE = 10; /* seconds */
+    public static final long MQ_CONNECT_ATTEMPTS = -1;
+    public static final long MQ_RECONNECT_ATTEMPTS = -1;
+    public static final long MQ_RECONNECT_DELAY = 5000; /* milliseconds */
+    public static final long MQ_RECONNECT_MAX_DELAY = 15000; /* milliseconds */
+    public static final long MQ_SEND_MAX_TIMEOUT = 10000; /* milliseconds */
+    public static final long MQ_RECV_MAX_TIMEOUT = 10000; /* milliseconds */
+
+    public static final String MQ_TOPIC_GPS_DATA = "data/dev/";
+    public static final String MQ_TOPIC_BLE_DATA = "data/dev/";
+    public static final String MQ_TOPIC_COMMAND = "control/dev/";
+    public static final String MQ_TOPIC_RESPONSE = "response/dev/";
+    public static final String MQ_TOPIC_ALERT = "alerts/dev/";
 
     //Filenames
     public static final String APP_DB_NAME = "escort-db";
-    public static final String APP_PREF_NAME = "escort";
+    public static final String APP_PREF_NAME = "escort-perf";
+    public static final String APP_CRASH_LOG_PATH = "/mnt/sdcard/escort_crash_log.txt";
 
     //Error Strings
     public static final String MV_ERROR_STRING_SERVER_ERROR = "Server returns error...";
@@ -83,10 +96,6 @@ public interface SysConst {
     public static final String MV_SETTING_ACCEPTED_CONSENT = "MV_SETTING_ACCEPTED_CONSENT";
     public static final String MV_SETTING_GPS_ACCURACY_LEVEL = "MV_SETTING_GPS_ACCURACY_LEVEL";
     public static final String MV_SETTING_HIDDEN_MODE = "MV_SETTING_HIDDEN_MODE";
-
-    public static final String MQ_TOPIC_GPS_DATA = "GPS-DATA";
-    public static final String MQ_TOPIC_BLE_DATA = "BLE-DATA";
-    public static final String MQ_TOPIC_LOCK_DATA = "LOCK-DATA";
 
     //Keys to pass arguments
     public static final String MV_ARG_USERNAME = "MV_ARG_USERNAME";

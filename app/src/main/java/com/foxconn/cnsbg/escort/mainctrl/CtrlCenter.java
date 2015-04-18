@@ -8,15 +8,18 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import com.foxconn.cnsbg.escort.subsys.cache.CacheDao;
-import com.foxconn.cnsbg.escort.subsys.common.SysConst;
+import com.foxconn.cnsbg.escort.common.SysConst;
 import com.foxconn.cnsbg.escort.subsys.communication.ComMQ;
-import com.foxconn.cnsbg.escort.subsys.communication.ComTask;
+import com.foxconn.cnsbg.escort.subsys.communication.ComPublishTask;
+import com.foxconn.cnsbg.escort.subsys.communication.ComSubscribeTask;
 import com.foxconn.cnsbg.escort.subsys.location.BLETask;
 import com.foxconn.cnsbg.escort.subsys.location.GPSTask;
 import com.foxconn.cnsbg.escort.subsys.usbserial.SerialCtrl;
-import com.foxconn.cnsbg.escort.subsys.usbserial.USBTask;
+import com.foxconn.cnsbg.escort.subsys.usbserial.SerialTask;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class CtrlCenter {
     private final String TAG = CtrlCenter.class.getSimpleName();
@@ -26,9 +29,10 @@ public class CtrlCenter {
     private static CacheDao mDao;
     private static String UDID;
 
-    private static ComTask mGPSTask;
-    private static ComTask mBLETask;
-    private static USBTask mUSBTask;
+    private static SerialTask mSerialTask;
+    private static ComSubscribeTask mCmdTask;
+    private static ComPublishTask mGPSTask;
+    private static ComPublishTask mBLETask;
 
     private static boolean isTrackingLocation = false;
     private static boolean isAppVisible = false;
@@ -96,15 +100,18 @@ public class CtrlCenter {
 
         isTrackingLocation = true;
 
+        SerialCtrl sc = new SerialCtrl(context);
         ComMQ mq = new ComMQ(context);
 
+        mSerialTask = new SerialTask(context, sc, mq);
+        mCmdTask = new ComSubscribeTask(context, sc, mq);
         mGPSTask = new GPSTask(context, mq);
         mBLETask = new BLETask(context, mq);
 
-        SerialCtrl sc = new SerialCtrl(context);
-        mUSBTask = new USBTask(context, sc, mq);
-
-        if (mq.init())
+        List<String> subscribes = new ArrayList<String>();
+        subscribes.add(SysConst.MQ_TOPIC_COMMAND + UDID);
+        subscribes.add("yg1"); //debug
+        if (mq.init(subscribes))
             startTask();
     }
 
@@ -114,40 +121,34 @@ public class CtrlCenter {
     }
 
     private void startTask() {
+        mSerialTask.start();
+        mCmdTask.start();
         mGPSTask.start();
         mBLETask.start();
-
-        mUSBTask.start();
     }
 
     private void stopTask() {
+        boolean serialTaskAlive = mSerialTask.isAlive();
+        boolean cmdTaskAlive = mCmdTask.isAlive();
+        boolean gpsTaskAlive = mGPSTask.isAlive();
+        boolean bleTaskAlive = mBLETask.isAlive();
+
+        mSerialTask.requestShutdown();
+        mCmdTask.requestShutdown();
         mGPSTask.requestShutdown();
         mBLETask.requestShutdown();
 
-        mUSBTask.requestShutdown();
-
-        while (mGPSTask.isAlive()) {
+        while (serialTaskAlive || cmdTaskAlive || gpsTaskAlive || bleTaskAlive) {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        }
 
-        while (mBLETask.isAlive()) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-        while (mUSBTask.isAlive()) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            serialTaskAlive = mSerialTask.isAlive();
+            cmdTaskAlive = mCmdTask.isAlive();
+            gpsTaskAlive = mGPSTask.isAlive();
+            bleTaskAlive = mBLETask.isAlive();
         }
     }
 }

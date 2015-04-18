@@ -3,9 +3,9 @@ package com.foxconn.cnsbg.escort.subsys.location;
 import android.content.Context;
 
 import com.foxconn.cnsbg.escort.subsys.communication.ComMQ;
-import com.foxconn.cnsbg.escort.subsys.communication.ComTask;
+import com.foxconn.cnsbg.escort.subsys.communication.ComPublishTask;
 
-public class BLETask extends ComTask {
+public class BLETask extends ComPublishTask {
 
     public BLETask(Context context, ComMQ mq) {
         mContext = context;

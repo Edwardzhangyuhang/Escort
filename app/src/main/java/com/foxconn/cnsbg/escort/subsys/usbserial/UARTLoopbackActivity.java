@@ -27,6 +27,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.foxconn.cnsbg.escort.R;
+import com.foxconn.cnsbg.escort.common.SysUtil;
 
 public class UARTLoopbackActivity extends Activity {
 
@@ -687,7 +688,7 @@ public class UARTLoopbackActivity extends Activity {
 	
     void msgToast(String str, int showTime)
     {
-    	Toast.makeText(global_context, str, showTime).show();
+        SysUtil.showToast(global_context, str, showTime);
     }
     
     public void appendData(String s)

@@ -2,12 +2,15 @@ package com.foxconn.cnsbg.escort.subsys.communication;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.foxconn.cnsbg.escort.BuildConfig;
+import com.foxconn.cnsbg.escort.common.SysUtil;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-public abstract class ComTask extends Thread {
-    private final String TAG = ComTask.class.getSimpleName();
+public abstract class ComPublishTask extends Thread {
+    private final String TAG = ComPublishTask.class.getSimpleName();
 
     protected volatile int runInterval = 1000; //Default wait time of 1 sec
     protected volatile boolean requestShutdown = false;
@@ -23,6 +26,9 @@ public abstract class ComTask extends Thread {
             //collect data
             String data = collectData();
             //Log.d("TAG", "CollectedData:" + data);
+
+            if (BuildConfig.DEBUG && data != null)
+                SysUtil.showToast(mContext, "MQ Tx:" + data, Toast.LENGTH_SHORT);
 
             //then send it to the server
             if (sendData(data)) {

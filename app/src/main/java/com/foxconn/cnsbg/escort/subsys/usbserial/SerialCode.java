@@ -1,6 +1,8 @@
 package com.foxconn.cnsbg.escort.subsys.usbserial;
 
 public interface SerialCode {
+    public static final String CMD_NOOP = "";
+
     public static final String CMD_SET_KEEP_UNLOCK = "kf\r\n";
     public static final String ACK_SET_KEEP_UNLOCK_OK = "A\r\n";
     public static final String ACK_SET_KEEP_UNLOCK_ERROR = "C\r\n";

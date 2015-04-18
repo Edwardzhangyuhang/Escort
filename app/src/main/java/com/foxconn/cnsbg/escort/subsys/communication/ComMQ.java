@@ -1,104 +1,99 @@
 package com.foxconn.cnsbg.escort.subsys.communication;
 
 import android.content.Context;
-import android.util.Log;
 
-import com.foxconn.cnsbg.escort.subsys.common.SysConst;
+import com.foxconn.cnsbg.escort.common.SysConst;
 
-import org.fusesource.mqtt.client.BlockingConnection;
+import org.fusesource.mqtt.client.Future;
+import org.fusesource.mqtt.client.FutureConnection;
 import org.fusesource.mqtt.client.MQTT;
 import org.fusesource.mqtt.client.Message;
 import org.fusesource.mqtt.client.QoS;
 import org.fusesource.mqtt.client.Topic;
 
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 public class ComMQ {
     private final String TAG = ComMQ.class.getSimpleName();
 
-    private static Context mContext;
-    private static BlockingConnection mConn;
+    private Context mContext;
+    private FutureConnection mConn;
+    Future<Message> mReceive = null;
 
     public ComMQ(Context context) {
         mContext = context;
     }
 
-    public boolean init() {
+    public boolean init(List<String> subscribes) {
+        MQTT mqtt = new MQTT();
+
         try {
-            MQTT mqtt = new MQTT();
             mqtt.setHost(SysConst.MQ_SERVER_HOST, SysConst.MQ_SERVER_PORT);
-            mqtt.setKeepAlive(SysConst.MQ_KEEP_ALIVE);
-            //mqtt.setReconnectDelayMax(10000);
-
-            mConn = mqtt.blockingConnection();
         } catch (Exception e) {
-            Log.e(TAG, "init fail!");
+            return false;
+        }
+
+        //setClientId(CtrlCenter.getUDID());
+        //setCleanSession(false);
+        mqtt.setKeepAlive(SysConst.MQ_KEEP_ALIVE);
+        mqtt.setConnectAttemptsMax(SysConst.MQ_CONNECT_ATTEMPTS);
+        mqtt.setReconnectAttemptsMax(SysConst.MQ_RECONNECT_ATTEMPTS);
+        mqtt.setReconnectDelay(SysConst.MQ_RECONNECT_DELAY);
+        mqtt.setReconnectDelayMax(SysConst.MQ_RECONNECT_MAX_DELAY);
+
+        mConn = mqtt.futureConnection();
+        mConn.connect();
+
+        if (subscribes != null) {
+            for (String topic : subscribes)
+                subscribe(topic, QoS.EXACTLY_ONCE);
+        }
+
+        mReceive = mConn.receive();
+
+        return true;
+    }
+
+    public boolean isConnected() {
+        return mConn.isConnected();
+    }
+
+    public boolean publish(String topic, String payload, long milliseconds) {
+        try {
+            mConn.publish(topic, payload.getBytes(), QoS.AT_MOST_ONCE, false)
+                    .await(milliseconds, TimeUnit.MILLISECONDS);
+        } catch (Exception e) {
             return false;
         }
 
         return true;
     }
 
-    public boolean publish(String topic, String payload) {
-        try {
-            if (!mConn.isConnected())
-                mConn.connect();
-
-            if (mConn.isConnected())
-                mConn.publish(topic, payload.getBytes(), QoS.AT_LEAST_ONCE, false);
-        } catch (Exception e) {
-            Log.w(TAG, "publish fail!");
-            return false;
-        }
+    public boolean subscribe(String topic, QoS qos) {
+        Topic[] topics = {new Topic(topic, qos)};
+        mConn.subscribe(topics);
 
         return true;
     }
 
-    public boolean subscribe(String topic) {
-        Topic[] topics = {new Topic(topic, QoS.AT_LEAST_ONCE)};
-        try {
-            if (!mConn.isConnected())
-                mConn.connect();
-
-            if (mConn.isConnected())
-                mConn.subscribe(topics);
-        } catch (Exception e) {
-            Log.w(TAG, "subscribe fail!");
-            return false;
-        }
-
-        return true;
-    }
-
-    public boolean receive(ComCallback<byte[]> cb) {
-        Message msg = null;
+    public String receive(long milliseconds) {
+        String result;
 
         try {
-            if (!mConn.isConnected())
-                mConn.connect();
-
-            if (mConn.isConnected())
-                msg = mConn.receive();
-
-            if (msg != null) {
-                cb.onSuccess(msg.getPayload());
-                msg.ack();
-            }
+            Message msg = mReceive.await(milliseconds, TimeUnit.MILLISECONDS);
+            result = new String(msg.getPayload());
+            msg.ack();
+            mReceive = mConn.receive();
         } catch (Exception e) {
-            Log.w(TAG, "receive fail!");
-            cb.onFailure(e);
-            return false;
+            return null;
         }
 
-        return true;
+        return result;
     }
 
     public boolean disconnect() {
-        try {
-            if (mConn.isConnected())
-                mConn.disconnect();
-        } catch (Exception e) {
-            Log.w(TAG, "disconnect fail!");
-            return false;
-        }
+        mConn.disconnect();
 
         return true;
     }

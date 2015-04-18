@@ -10,7 +10,8 @@ import android.os.Bundle;
 import android.os.IBinder;
 
 import com.foxconn.cnsbg.escort.subsys.cache.CacheDao;
-import com.foxconn.cnsbg.escort.subsys.common.SysConst;
+import com.foxconn.cnsbg.escort.common.CrashHandler;
+import com.foxconn.cnsbg.escort.common.SysConst;
 import com.foxconn.cnsbg.escort.subsys.usbserial.UARTLoopbackActivity;
 
 public class MainActivity extends Activity {
@@ -102,7 +103,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        CrashHandler.getInstance().init(SysConst.APP_CRASH_LOG_PATH);
         startBindServiceThread();
     }
 

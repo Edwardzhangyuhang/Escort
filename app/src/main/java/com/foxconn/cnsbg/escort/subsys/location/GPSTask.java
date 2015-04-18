@@ -12,16 +12,17 @@ import android.widget.Toast;
 
 import com.foxconn.cnsbg.escort.BuildConfig;
 import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
-import com.foxconn.cnsbg.escort.subsys.common.SysConst;
+import com.foxconn.cnsbg.escort.common.SysConst;
+import com.foxconn.cnsbg.escort.common.SysUtil;
 import com.foxconn.cnsbg.escort.subsys.communication.ComMQ;
-import com.foxconn.cnsbg.escort.subsys.communication.ComTask;
+import com.foxconn.cnsbg.escort.subsys.communication.ComPublishTask;
 import com.google.gson.JsonParseException;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class GPSTask extends ComTask {
+public class GPSTask extends ComPublishTask {
     private final String TAG = GPSTask.class.getSimpleName();
 
     //change these to fine tune the power consumption
@@ -152,7 +153,7 @@ public class GPSTask extends ComTask {
             if (BuildConfig.DEBUG) {
                 String text = "Provider:" + loc.getProvider() + ", Accuracy:" + loc.getAccuracy()
                         + ", Interval:" + (loc.getTime() - lastLocTime)/1000;
-                Toast.makeText(mContext, "Updated Location:" + text, Toast.LENGTH_LONG).show();
+                SysUtil.showToast(mContext, "Updated Location:" + text, Toast.LENGTH_LONG);
             }
 
             lastLocTime = loc.getTime();
@@ -260,12 +261,11 @@ public class GPSTask extends ComTask {
             final Runnable providerUpdateThread = new Runnable() {
                 public void run() {
                     restartLocationUpdates();
-                    if (BuildConfig.DEBUG) {
-                        Toast.makeText(mContext, "Updated Provider:" + curProvider, Toast.LENGTH_LONG).show();
-                    }
                 }
             };
             handler.post(providerUpdateThread);
+
+            SysUtil.showToast(mContext, "Updated Provider:" + curProvider, Toast.LENGTH_LONG);
         }
     }
 
@@ -274,7 +274,7 @@ public class GPSTask extends ComTask {
         if (data == null)
             return false;
 
-        if (!mComMQ.publish(SysConst.MQ_TOPIC_GPS_DATA, data))
+        if (!mComMQ.publish(SysConst.MQ_TOPIC_GPS_DATA, data, SysConst.MQ_SEND_MAX_TIMEOUT))
             return false;
 
         return true;

@@ -12,7 +12,7 @@ import android.os.Binder;
 import android.os.IBinder;
 
 import com.foxconn.cnsbg.escort.subsys.cache.CacheDao;
-import com.foxconn.cnsbg.escort.subsys.common.SysUtil;
+import com.foxconn.cnsbg.escort.common.SysUtil;
 
 public class MainService extends Service {
     public MainService() {

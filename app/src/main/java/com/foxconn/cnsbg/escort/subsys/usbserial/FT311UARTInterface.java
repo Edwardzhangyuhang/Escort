@@ -17,6 +17,8 @@ import android.os.ParcelFileDescriptor;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.foxconn.cnsbg.escort.common.SysUtil;
+
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -205,7 +207,7 @@ public class FT311UARTInterface
 		UsbAccessory[] accessories = usbmanager.getAccessoryList();
 		if(accessories != null)
 		{
-			Toast.makeText(global_context, "Accessory Attached", Toast.LENGTH_SHORT).show();
+			SysUtil.showToast(global_context, "Accessory Attached", Toast.LENGTH_SHORT);
 		}
 		else
 		{
@@ -219,23 +221,23 @@ public class FT311UARTInterface
 		if (accessory != null) {
 			if( -1 == accessory.toString().indexOf(ManufacturerString))
 			{
-				Toast.makeText(global_context, "Manufacturer is not matched!", Toast.LENGTH_SHORT).show();
+				SysUtil.showToast(global_context, "Manufacturer is not matched!", Toast.LENGTH_SHORT);
 				return 1;
 			}
 
 			if( -1 == accessory.toString().indexOf(ModelString1) && -1 == accessory.toString().indexOf(ModelString2))
 			{
-				Toast.makeText(global_context, "Model is not matched!", Toast.LENGTH_SHORT).show();
+				SysUtil.showToast(global_context, "Model is not matched!", Toast.LENGTH_SHORT);
 				return 1;
 			}
 
 			if( -1 == accessory.toString().indexOf(VersionString))
 			{
-				Toast.makeText(global_context, "Version is not matched!", Toast.LENGTH_SHORT).show();
+				SysUtil.showToast(global_context, "Version is not matched!", Toast.LENGTH_SHORT);
 				return 1;
 			}
 
-			Toast.makeText(global_context, "Manufacturer, Model & Version are matched!", Toast.LENGTH_SHORT).show();
+			SysUtil.showToast(global_context, "Manufacturer, Model & Version are matched!", Toast.LENGTH_SHORT);
 			accessory_attached = true;
 
 			if (usbmanager.hasPermission(accessory)) {
@@ -245,7 +247,7 @@ public class FT311UARTInterface
 			{
 				synchronized (mUsbReceiver) {
 					if (!mPermissionRequestPending) {
-						Toast.makeText(global_context, "Request USB Permission", Toast.LENGTH_SHORT).show();
+						SysUtil.showToast(global_context, "Request USB Permission", Toast.LENGTH_SHORT);
 						usbmanager.requestPermission(accessory,
 								mPermissionIntent);
 						mPermissionRequestPending = true;
@@ -356,12 +358,12 @@ public class FT311UARTInterface
 					UsbAccessory accessory = (UsbAccessory) intent.getParcelableExtra(UsbManager.EXTRA_ACCESSORY);
 					if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false))
 					{
-						Toast.makeText(global_context, "Allow USB Permission", Toast.LENGTH_SHORT).show();
+						SysUtil.showToast(global_context, "Allow USB Permission", Toast.LENGTH_SHORT);
 						OpenAccessory(accessory);
 					} 
 					else 
 					{
-						Toast.makeText(global_context, "Deny USB Permission", Toast.LENGTH_SHORT).show();
+						SysUtil.showToast(global_context, "Deny USB Permission", Toast.LENGTH_SHORT);
 						Log.d("LED", "permission denied for accessory "+ accessory);
 
 					}

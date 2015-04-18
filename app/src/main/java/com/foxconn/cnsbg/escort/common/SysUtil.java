@@ -1,11 +1,13 @@
-package com.foxconn.cnsbg.escort.subsys.common;
+package com.foxconn.cnsbg.escort.common;
 
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Handler;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -78,5 +80,15 @@ public class SysUtil {
             }
         }
         return false;
+    }
+
+    public static void showToast(final Context context, final String text, final int duration) {
+        Handler handler  = new Handler(context.getMainLooper());
+        final Runnable runnable = new Runnable() {
+            public void run() {
+                Toast.makeText(context, text, duration).show();
+            }
+        };
+        handler.post(runnable);
     }
 }
