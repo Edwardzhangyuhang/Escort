@@ -25,6 +25,8 @@ public class CrashHandler implements UncaughtExceptionHandler{
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
+            System.exit(1);
         }
     }
 

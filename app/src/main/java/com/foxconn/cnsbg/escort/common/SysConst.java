@@ -32,7 +32,7 @@ public interface SysConst {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     public static final String APP_DB_NAME = "escort-db";
     public static final String APP_PREF_NAME = "escort-perf";
-    public static final String APP_CRASH_LOG_PATH = "/mnt/sdcard/escort_crash_log.txt";
+    public static final String APP_CRASH_LOG_FILE = "escort_crash_log.txt";
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     //Location Task Parameter

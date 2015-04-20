@@ -40,6 +40,8 @@ public class LocTask extends ComDataTxTask {
     private boolean locDataUpdated = false;
     private LocData locData = new LocData();
 
+    private static final String gpsTopic = SysConst.MQ_TOPIC_GPS_DATA + CtrlCenter.getUDID();
+
     public LocTask(Context context, ComMQ mq) {
         mContext = context;
         mComMQ = mq;
@@ -68,6 +70,28 @@ public class LocTask extends ComDataTxTask {
         //don't setup LocationUpdates at this point
         //locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, curMinTime, curMinDistance, locHandler);
         //locManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, curMinTime, curMinDistance, locHandler);
+
+        //Send our last known location to the database
+        List<String> matchingProviders = locManager.getAllProviders();
+        for (String provider : matchingProviders) {
+            Location location = locManager.getLastKnownLocation(provider);
+            if (location != null)
+                handleLastKnownLocation(location);
+        }
+    }
+
+    private void handleLastKnownLocation(Location loc) {
+        if (loc == null)
+            return;
+
+        if (!loc.hasAccuracy())
+            return;
+
+        if(loc.getAccuracy() > curAccuracy)
+            return;
+
+        lastLocTime = loc.getTime();
+        handleLocation(loc);
     }
 
     public void restartLocationUpdates() {
@@ -243,7 +267,7 @@ public class LocTask extends ComDataTxTask {
         if (data == null)
             return false;
 
-        if (!mComMQ.publish(SysConst.MQ_TOPIC_GPS_DATA, data, SysConst.MQ_SEND_MAX_TIMEOUT))
+        if (!mComMQ.publish(gpsTopic, data, SysConst.MQ_SEND_MAX_TIMEOUT))
             return false;
 
         return true;

@@ -55,9 +55,9 @@ public class SerialMonitorTask extends Thread {
             }
 
             try {
-                if (status == 2)
-                    mComMQ.publish(alertTopic, "MCU detached!", runInterval);
-                else
+                //if (status == 2)
+                //    mComMQ.publish(alertTopic, "MCU detached!", runInterval);
+                //else
                     Thread.sleep(runInterval);
             } catch (InterruptedException e) {
                 e.printStackTrace();

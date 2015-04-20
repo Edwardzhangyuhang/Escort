@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import com.foxconn.cnsbg.escort.common.SysConst;
 import com.foxconn.cnsbg.escort.common.SysUtil;
+import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
 import com.foxconn.cnsbg.escort.subsys.communication.ComDataTxTask;
 import com.foxconn.cnsbg.escort.subsys.communication.ComMQ;
 
@@ -27,6 +28,8 @@ public class BLETask extends ComDataTxTask implements BluetoothAdapter.LeScanCal
     private long last_timer;
 
     private BLEData bleData = new BLEData();
+
+    private static final String bleTopic = SysConst.MQ_TOPIC_BLE_DATA + CtrlCenter.getUDID();
 
     public BLETask(Context context, ComMQ mq) {
         mContext = context;

@@ -14,6 +14,7 @@ import com.foxconn.cnsbg.escort.subsys.location.BLETask;
 import com.foxconn.cnsbg.escort.subsys.location.LocTask;
 import com.foxconn.cnsbg.escort.subsys.usbserial.SerialMonitorTask;
 import com.foxconn.cnsbg.escort.subsys.usbserial.SerialCtrl;
+import com.foxconn.cnsbg.escort.subsys.usbserial.SerialReadTask;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -27,6 +28,7 @@ public class CtrlCenter {
     private static CacheDao mDao;
 
     private static SerialMonitorTask mSerialMonitorTask;
+    private static SerialReadTask mSerialReadTask;
     private static ComCmdRxTask mCmdTask;
     private static ComDataTxTask mAccelTask;
     private static ComDataTxTask mGPSTask;
@@ -66,6 +68,8 @@ public class CtrlCenter {
             return;
         }
 
+        UDID = "0"; //debug
+
         //setup database for cache
         mDao = new CacheDao(context, SysConst.APP_DB_NAME);
 
@@ -73,6 +77,7 @@ public class CtrlCenter {
         ComMQ mq = new ComMQ(context);
 
         mSerialMonitorTask = new SerialMonitorTask(context, sc, mq);
+        mSerialReadTask = new SerialReadTask(context, sc, mq);
         mCmdTask = new ComCmdRxTask(context, sc, mq);
         mAccelTask = new AccelTask(context);
         mGPSTask = new LocTask(context, mq);
@@ -94,6 +99,7 @@ public class CtrlCenter {
 
     private void startTask() {
         mSerialMonitorTask.start();
+        mSerialReadTask.start();
         mCmdTask.start();
         mAccelTask.start();
         mGPSTask.start();
@@ -101,26 +107,31 @@ public class CtrlCenter {
     }
 
     private void stopTask() {
-        boolean serialTaskAlive = mSerialMonitorTask.isAlive();
+        boolean monitorTaskAlive = mSerialMonitorTask.isAlive();
+        boolean readTaskAlive = mSerialReadTask.isAlive();
         boolean cmdTaskAlive = mCmdTask.isAlive();
         boolean accelTaskAlive = mAccelTask.isAlive();
         boolean gpsTaskAlive = mGPSTask.isAlive();
         boolean bleTaskAlive = mBLETask.isAlive();
 
         mSerialMonitorTask.requestShutdown();
+        mSerialReadTask.requestShutdown();
         mCmdTask.requestShutdown();
         mAccelTask.requestShutdown();
         mGPSTask.requestShutdown();
         mBLETask.requestShutdown();
 
-        while (serialTaskAlive || cmdTaskAlive || accelTaskAlive || gpsTaskAlive || bleTaskAlive) {
+        while (monitorTaskAlive || readTaskAlive
+                || cmdTaskAlive || accelTaskAlive
+                || gpsTaskAlive || bleTaskAlive) {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
 
-            serialTaskAlive = mSerialMonitorTask.isAlive();
+            monitorTaskAlive = mSerialMonitorTask.isAlive();
+            readTaskAlive = mSerialReadTask.isAlive();
             cmdTaskAlive = mCmdTask.isAlive();
             gpsTaskAlive = mGPSTask.isAlive();
             bleTaskAlive = mBLETask.isAlive();

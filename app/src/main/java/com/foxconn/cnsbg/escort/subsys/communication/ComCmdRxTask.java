@@ -47,22 +47,12 @@ public class ComCmdRxTask extends Thread {
 
         SysUtil.showToast(mContext, "MQ Rx:" + cmd, Toast.LENGTH_SHORT);
 
-        String cmdCode;
+        SerialCode.CmdCode cmdCode = SerialCode.getCmdCode(cmd);
+        if (cmdCode == null)
+            return false;
 
-        if (cmd.equalsIgnoreCase("c"))
-            cmdCode = SerialCode.CMD_SET_LOCK;
-        else if (cmd.equalsIgnoreCase("o"))
-            cmdCode = SerialCode.CMD_SET_UNLOCK;
-        else
-            cmdCode = SerialCode.CMD_NOOP;
-
-        byte[] ack = new byte[64];
-        mSerialCtrl.write(cmdCode);
-        for (int i = 0; i < 100; i++) {
-            int num = mSerialCtrl.read(ack, ack.length);
-            System.out.println("i=" + i + ", read " + num + " bytes");
-        }
-        //mSerialCtrl.close();
+        if (cmdCode.getType() == SerialCode.CmdType.CMD_TYPE_SERIAL)
+            mSerialCtrl.write(cmdCode.getCode() + "\r\n");
 
         return true;
     }

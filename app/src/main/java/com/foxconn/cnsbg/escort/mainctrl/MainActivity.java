@@ -3,6 +3,7 @@ package com.foxconn.cnsbg.escort.mainctrl;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 
 import com.foxconn.cnsbg.escort.common.CrashHandler;
 import com.foxconn.cnsbg.escort.common.SysConst;
@@ -15,7 +16,8 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        CrashHandler.getInstance().init(SysConst.APP_CRASH_LOG_PATH);
+        String sdcard = Environment.getExternalStorageDirectory().getPath();
+        CrashHandler.getInstance().init(sdcard + SysConst.APP_CRASH_LOG_FILE);
 
         Intent serviceIntent = new Intent(MainActivity.this, MainService.class);
         startService(serviceIntent);
