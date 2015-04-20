@@ -207,7 +207,7 @@ public class FT311UARTInterface
 		UsbAccessory[] accessories = usbmanager.getAccessoryList();
 		if(accessories != null)
 		{
-			SysUtil.showToast(global_context, "Accessory Attached", Toast.LENGTH_SHORT);
+			//SysUtil.showToast(global_context, "Accessory Attached", Toast.LENGTH_SHORT);
 		}
 		else
 		{
@@ -237,7 +237,7 @@ public class FT311UARTInterface
 				return 1;
 			}
 
-			SysUtil.showToast(global_context, "Manufacturer, Model & Version are matched!", Toast.LENGTH_SHORT);
+			//SysUtil.showToast(global_context, "Manufacturer, Model & Version are matched!", Toast.LENGTH_SHORT);
 			accessory_attached = true;
 
 			if (usbmanager.hasPermission(accessory)) {

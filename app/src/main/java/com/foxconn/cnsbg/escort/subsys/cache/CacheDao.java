@@ -16,7 +16,6 @@ import com.foxconn.cnsbg.escort.subsys.dao.LocationEntityDao;
 import com.foxconn.cnsbg.escort.subsys.dao.MainUserEntityDao;
 import com.foxconn.cnsbg.escort.subsys.dao.UserEntity;
 import com.foxconn.cnsbg.escort.subsys.dao.UserEntityDao;
-import com.foxconn.cnsbg.escort.subsys.location.AccelData;
 import com.foxconn.cnsbg.escort.subsys.location.LocData;
 
 import java.text.ParsePosition;
@@ -398,94 +397,6 @@ public class CacheDao {
 
         for (CachedLocationEntity cachedLocation : deleteList)
             cachedLocationDao.delete(cachedLocation);
-
-        return;
-    }
-
-    public synchronized List<AccelData> queryCachedAccelerationData() {
-        List<AccelData> cachedAccelerationList = new ArrayList<AccelData>();
-        int offset = 0;
-        cachedAccelerationQb.setOffset(offset);
-        List<CachedAccelerationEntity> queryList = cachedAccelerationQb.list();
-        while (queryList != null && !queryList.isEmpty()) {
-            for (CachedAccelerationEntity cachedAcceleration : queryList) {
-                AccelData newAcc = new AccelData();
-                newAcc.UDID = cachedAcceleration.getUDID();
-                newAcc.datetimestamp = new Date(cachedAcceleration.getDatetimestamp());
-                newAcc.accelX_avg = cachedAcceleration.getAccelX_avg();
-                newAcc.accelY_avg = cachedAcceleration.getAccelY_avg();
-                newAcc.accelZ_avg = cachedAcceleration.getAccelZ_avg();
-                newAcc.accelX_stddev = cachedAcceleration.getAccelX_stddev();
-                newAcc.accelY_stddev = cachedAcceleration.getAccelY_stddev();
-                newAcc.accelZ_stddev = cachedAcceleration.getAccelZ_stddev();
-                cachedAccelerationList.add(newAcc);
-            }
-
-            offset += QUERY_LIMIT;
-            cachedAccelerationQb.setOffset(offset);
-            queryList = cachedAccelerationQb.list();
-        }
-
-        return cachedAccelerationList;
-    }
-
-    public synchronized void saveCachedAccelerationData(AccelData data) {
-        if (data == null)
-            return;
-
-        CachedAccelerationEntity newAcc = new CachedAccelerationEntity();
-        newAcc.setUDID(data.UDID);
-        newAcc.setDatetimestamp(data.datetimestamp.getTime());
-        newAcc.setAccelX_avg(data.accelX_avg);
-        newAcc.setAccelY_avg(data.accelY_avg);
-        newAcc.setAccelZ_avg(data.accelZ_avg);
-        newAcc.setAccelX_stddev(data.accelX_stddev);
-        newAcc.setAccelY_stddev(data.accelY_stddev);
-        newAcc.setAccelZ_stddev(data.accelZ_stddev);
-
-        cachedAccelerationDao.insert(newAcc);
-
-        return;
-    }
-
-    public synchronized void deleteCachedAccelerationData(List<AccelData> data) {
-        if (data == null || data.isEmpty())
-            return;
-
-        List<CachedAccelerationEntity> cachedAccelerationList = new ArrayList<CachedAccelerationEntity>();
-        int offset = 0;
-        cachedAccelerationQb.setOffset(offset);
-        List<CachedAccelerationEntity> queryList = cachedAccelerationQb.list();
-        while (queryList != null && !queryList.isEmpty()) {
-            cachedAccelerationList.addAll(queryList);
-
-            offset += QUERY_LIMIT;
-            cachedAccelerationQb.setOffset(offset);
-            queryList = cachedAccelerationQb.list();
-        }
-
-        if (cachedAccelerationList == null || cachedAccelerationList.isEmpty())
-            return;
-
-        List<CachedAccelerationEntity> deleteList = new ArrayList<CachedAccelerationEntity>();
-        for (CachedAccelerationEntity cachedAcceleration : cachedAccelerationList) {
-            AccelData deleteAcc = new AccelData();
-            deleteAcc.UDID = cachedAcceleration.getUDID();
-            deleteAcc.datetimestamp = new Date(cachedAcceleration.getDatetimestamp());
-            deleteAcc.accelX_avg = cachedAcceleration.getAccelX_avg();
-            deleteAcc.accelY_avg = cachedAcceleration.getAccelY_avg();
-            deleteAcc.accelZ_avg = cachedAcceleration.getAccelZ_avg();
-            deleteAcc.accelX_stddev = cachedAcceleration.getAccelX_stddev();
-            deleteAcc.accelY_stddev = cachedAcceleration.getAccelY_stddev();
-            deleteAcc.accelZ_stddev = cachedAcceleration.getAccelZ_stddev();
-
-            //to avoid ConcurrentModificationException
-            if (data.contains(deleteAcc))
-                deleteList.add(cachedAcceleration);
-        }
-
-        for (CachedAccelerationEntity cachedAcceleration : deleteList)
-            cachedAccelerationDao.delete(cachedAcceleration);
 
         return;
     }
