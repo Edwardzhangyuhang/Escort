@@ -11,7 +11,7 @@ import com.foxconn.cnsbg.escort.subsys.communication.ComMQ;
 public class SerialMonitorTask extends Thread {
     private static final String TAG = SerialMonitorTask.class.getSimpleName();
 
-    protected int runInterval = 1000;
+    private int runInterval = 1000;
     protected boolean requestShutdown = false;
 
     private Context mContext;
@@ -35,10 +35,14 @@ public class SerialMonitorTask extends Thread {
 
             if (mStatus != status) {
                 mStatus = status;
-                SysUtil.showToast(mContext, "MCU status:" + status, Toast.LENGTH_LONG);
+                SysUtil.showToast(mContext, "MCU status:" + status, Toast.LENGTH_SHORT);
 
                 if (status == 2) {
                     mMCUConfigured = false;
+
+                    SerialStatus.setLockStatus("N/A");
+                    SerialStatus.setDoorStatus("N/A");
+                    SerialStatus.setMagnetStatus("N/A");
                 } else if (status == 1) {
                     if (!mMCUConfigured) {
                         mSerialCtrl.config(
@@ -48,9 +52,14 @@ public class SerialMonitorTask extends Thread {
                                 SerialCtrl.PARITY_NONE,
                                 SerialCtrl.FLOW_CONTROL_NONE);
 
-                        SysUtil.showToast(mContext, "MCU configured!", Toast.LENGTH_LONG);
+                        SysUtil.showToast(mContext, "MCU configured!", Toast.LENGTH_SHORT);
                         mMCUConfigured = true;
                     }
+
+                    //trigger serial read task to set status
+                    mSerialCtrl.write(SerialCode.CMD_GET_LOCK + "\r\n");
+                    mSerialCtrl.write(SerialCode.CMD_GET_DOOR + "\r\n");
+                    mSerialCtrl.write(SerialCode.CMD_GET_MAGNET + "\r\n");
                 }
             }
 

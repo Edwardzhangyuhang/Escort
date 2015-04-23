@@ -6,15 +6,22 @@ import android.widget.Toast;
 import com.foxconn.cnsbg.escort.common.SysConst;
 import com.foxconn.cnsbg.escort.common.SysUtil;
 import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
+import com.foxconn.cnsbg.escort.subsys.communication.AlertMsg;
+import com.foxconn.cnsbg.escort.subsys.communication.CmdRespMsg;
 import com.foxconn.cnsbg.escort.subsys.communication.ComMQ;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
-public class SerialReadTask extends Thread {
+import java.util.Date;
+
+public final class SerialReadTask extends Thread {
     private static final String TAG = SerialReadTask.class.getSimpleName();
     private static final int SERIAL_READ_BUF_SIZE = 1024;
 
     protected int runInterval = 500;
     protected boolean requestShutdown = false;
 
+    private Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
     private Context mContext;
     private SerialCtrl mSerialCtrl;
     private ComMQ mComMQ;
@@ -62,12 +69,69 @@ public class SerialReadTask extends Thread {
             if (resp == null)
                 continue;
 
-            if (resp.getType() == SerialCode.AckType.ACK_TYPE_ALERT)
-                mComMQ.publish(alertTopic, resp.getResp(), runInterval);
-            else
-                mComMQ.publish(respTopic, resp.getResp(), runInterval);
+            switch (resp.getAckSource()) {
+                case ALERT:
+                    handleAlert(resp);
+                    break;
+                case SET:
+                    handleCmdResp(resp);
+                    break;
+                case GET:
+                    handleStatusResp(resp);
+                    break;
+                case HEARTBEAT:
+                    mSerialCtrl.write(SerialCode.MCU_HEARTBEAT_ACK + "\r\n");
+                    break;
+                default:
+                    break;
+            }
 
-            SysUtil.showToast(mContext, resp.getResp(), Toast.LENGTH_SHORT);
+            SysUtil.showToast(mContext, resp.getInfo(), Toast.LENGTH_SHORT);
+        }
+    }
+
+    private boolean handleAlert(SerialCode.AckResp resp) {
+        AlertMsg msg = new AlertMsg();
+
+        msg.device_id = CtrlCenter.getUDID();
+        msg.time = new Date();
+
+        msg.alert = new AlertMsg.AlertData();
+        msg.alert.type = resp.getAckType().ordinal();
+        msg.alert.level = "urgent";
+        msg.alert.info = resp.getInfo();
+
+        String json = gson.toJson(msg, AlertMsg.class);
+        return mComMQ.publish(alertTopic, json, runInterval);
+    }
+
+    private boolean handleCmdResp(SerialCode.AckResp resp) {
+        CmdRespMsg msg = new CmdRespMsg();
+
+        msg.device_id = CtrlCenter.getUDID();
+        msg.time = new Date();
+        msg.cmd = resp.getCmd();
+        msg.cmd_id = SerialCode.getCmdId();
+        msg.result = resp.getResult();
+        msg.reason = resp.getInfo();
+
+        String json = gson.toJson(msg, CmdRespMsg.class);
+        return mComMQ.publish(respTopic, json, runInterval);
+    }
+
+    private void handleStatusResp(SerialCode.AckResp resp) {
+        switch (resp.getAckType()) {
+            case LOCK:
+                SerialStatus.setLockStatus(resp.getInfo());
+                break;
+            case DOOR:
+                SerialStatus.setDoorStatus(resp.getInfo());
+                break;
+            case MAGNET:
+                SerialStatus.setMagnetStatus(resp.getInfo());
+                break;
+            default:
+                break;
         }
     }
 }

@@ -2,10 +2,7 @@ package com.foxconn.cnsbg.escort.subsys.communication;
 
 import android.content.Context;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.foxconn.cnsbg.escort.BuildConfig;
-import com.foxconn.cnsbg.escort.common.SysUtil;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -25,19 +22,15 @@ public abstract class ComDataTxTask extends Thread {
         while (!requestShutdown) {
             //collect data
             String data = collectData();
-            //Log.d("TAG", "CollectedData:" + data);
-
-            if (BuildConfig.DEBUG && data != null)
-                SysUtil.showToast(mContext, "MQ Tx:" + data, Toast.LENGTH_SHORT);
 
             //then send it to the server
             if (sendData(data)) {
                 //send OK, then send cached data as well
                 //sent data will be cleared as well
-                //sendCachedData();
+                sendCachedData();
             } else {
                 //send fail, then save collected data to cache
-                //saveCachedData(data);
+                saveCachedData(data);
             }
 
             //check for location provider and sensor change periodically

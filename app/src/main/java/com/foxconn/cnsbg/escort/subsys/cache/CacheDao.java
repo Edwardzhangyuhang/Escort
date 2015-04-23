@@ -2,132 +2,45 @@ package com.foxconn.cnsbg.escort.subsys.cache;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import android.location.Location;
 
-import com.foxconn.cnsbg.escort.subsys.dao.CachedAccelerationEntity;
-import com.foxconn.cnsbg.escort.subsys.dao.CachedAccelerationEntityDao;
-import com.foxconn.cnsbg.escort.subsys.dao.CachedLocationEntity;
-import com.foxconn.cnsbg.escort.subsys.dao.CachedLocationEntityDao;
+import com.foxconn.cnsbg.escort.subsys.dao.CachedBleData;
+import com.foxconn.cnsbg.escort.subsys.dao.CachedBleDataDao;
+import com.foxconn.cnsbg.escort.subsys.dao.CachedLocData;
+import com.foxconn.cnsbg.escort.subsys.dao.CachedLocDataDao;
 import com.foxconn.cnsbg.escort.subsys.dao.DaoMaster;
 import com.foxconn.cnsbg.escort.subsys.dao.DaoMaster.DevOpenHelper;
 import com.foxconn.cnsbg.escort.subsys.dao.DaoSession;
-import com.foxconn.cnsbg.escort.subsys.dao.LocationEntity;
-import com.foxconn.cnsbg.escort.subsys.dao.LocationEntityDao;
-import com.foxconn.cnsbg.escort.subsys.dao.MainUserEntityDao;
-import com.foxconn.cnsbg.escort.subsys.dao.UserEntity;
-import com.foxconn.cnsbg.escort.subsys.dao.UserEntityDao;
+import com.foxconn.cnsbg.escort.subsys.location.BLEData;
 import com.foxconn.cnsbg.escort.subsys.location.LocData;
 
-import java.text.ParsePosition;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 import de.greenrobot.dao.query.Query;
 
 public class CacheDao {
     public static final int QUERY_LIMIT = 5000;
 
-    public static class MVDaoLocation{
-        public Double latitude = null;
-        public Double longitude = null;
-        public Long datetimestamp = null;
-        public Boolean firstPoint = null;
-        public Float distance = null;
+    private SQLiteDatabase db;
 
-        @Override
-        public boolean equals(Object other) {
-            MVDaoLocation loc = MVDaoLocation.class.cast(other);
-            if (loc.datetimestamp.longValue() == datetimestamp.longValue()
-                    && loc.latitude.doubleValue() == latitude.doubleValue()
-                    && loc.longitude.doubleValue() == longitude.doubleValue()
-                    && loc.firstPoint.booleanValue() == firstPoint.booleanValue()
-                    && loc.distance.floatValue() == distance.floatValue())
-                return true;
-            else
-                return false;
-        }
+    private CachedLocDataDao cachedLocDao;
+    private CachedBleDataDao cachedBleDao;
 
-        @Override
-        public int hashCode() {
-            return (latitude.hashCode() + longitude.hashCode() + datetimestamp.hashCode()
-                    + firstPoint.hashCode() + distance.hashCode());
-        }
-    }
-
-    public static class MVDaoFriend{
-        public String username = null;
-        public Float hourDistance = null;
-        public Float totalDistance = null;
-        public Long lastUpdate = null;
-
-        @Override
-        public boolean equals(Object other) {
-            MVDaoFriend daoFriend = MVDaoFriend.class.cast(other);
-            if (daoFriend.username.equals(username)
-                    && daoFriend.hourDistance.floatValue() == hourDistance.floatValue()
-                    && daoFriend.totalDistance.floatValue() == totalDistance.floatValue()
-                    && daoFriend.lastUpdate.longValue() == lastUpdate.longValue())
-                return true;
-            else
-                return false;
-        }
-
-        @Override
-        public int hashCode() {
-            return (username.hashCode() + hourDistance.hashCode() + totalDistance.hashCode());
-        }
-    }
-
-    private static SQLiteDatabase db;
-    private DaoMaster daoMaster;
-    private DaoSession daoSession;
-    private LocationEntityDao locationDao;
-    private UserEntityDao userDao;
-    private MainUserEntityDao mainuserDao;
-    private CachedLocationEntityDao cachedLocationDao;
-    private CachedAccelerationEntityDao cachedAccelerationDao;
-
-    private Query<LocationEntity> locationQb;
-    private Query<UserEntity> userQb;
-
-    private Query<CachedLocationEntity> cachedLocationQb;
-    private Query<CachedAccelerationEntity> cachedAccelerationQb;
-
-    private Map<String, Long> friendToLastUpdate;
-    private boolean hasUsername;
-    private List<String> updatedUserList;
+    private Query<CachedLocData> cachedLocQuery;
+    private Query<CachedBleData> cachedBleQuery;
 
     public CacheDao(Context appContext, String dbName) {
         closeDao();
 
         DevOpenHelper helper = new DaoMaster.DevOpenHelper(appContext, dbName, null);
         db = helper.getWritableDatabase();
-        daoMaster = new DaoMaster(db);
-        daoSession = daoMaster.newSession();
-        locationDao = daoSession.getLocationEntityDao();
-        userDao = daoSession.getUserEntityDao();
-        mainuserDao = daoSession.getMainUserEntityDao();
-        cachedLocationDao = daoSession.getCachedLocationEntityDao();
-        cachedAccelerationDao = daoSession.getCachedAccelerationEntityDao();
+        DaoMaster daoMaster = new DaoMaster(db);
+        DaoSession daoSession = daoMaster.newSession();
+        cachedLocDao = daoSession.getCachedLocDataDao();
+        cachedBleDao = daoSession.getCachedBleDataDao();
 
-        locationQb = locationDao.queryBuilder().where(LocationEntityDao.Properties.UserId.eq(1),
-                LocationEntityDao.Properties.Datetimestamp.gt(getInitDate().getTime()))
-                .orderAsc(LocationEntityDao.Properties.Datetimestamp)
-                .limit(QUERY_LIMIT).offset(0).build();
-        userQb = userDao.queryBuilder().where(UserEntityDao.Properties.Username.eq("@self"))
-                .limit(QUERY_LIMIT).offset(0).build();
-
-        cachedLocationQb = cachedLocationDao.queryBuilder().limit(QUERY_LIMIT).offset(0).build();
-        cachedAccelerationQb = cachedAccelerationDao.queryBuilder().limit(QUERY_LIMIT).offset(0).build();
-
-        friendToLastUpdate = new HashMap<String, Long>();
-        hasUsername = false;
-        updatedUserList = new ArrayList<String>();
+        cachedLocQuery = cachedLocDao.queryBuilder().limit(QUERY_LIMIT).offset(0).build();
+        cachedBleQuery = cachedBleDao.queryBuilder().limit(QUERY_LIMIT).offset(0).build();
     }
 
     public void closeDao() {
@@ -135,269 +48,203 @@ public class CacheDao {
             db.close();
     }
 
-    private static Date getInitDate() {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
-        return sdf.parse("1970-01-01 00:00:00", new ParsePosition(0));
-    }
-
-    private static List<MVDaoLocation> convertEntityDaoLocation(List<LocationEntity> locations) {
-        if (locations == null || locations.isEmpty())
-            return null;
-
-        List<MVDaoLocation> returnList = new ArrayList<MVDaoLocation>();
-        for (LocationEntity loc : locations) {
-            MVDaoLocation daoLoc = new MVDaoLocation();
-            daoLoc.latitude = loc.getLatitude();
-            daoLoc.longitude = loc.getLongitude();
-            daoLoc.datetimestamp = loc.getDatetimestamp();
-            daoLoc.firstPoint = loc.getFirstPoint();
-            daoLoc.distance = loc.getDistance();
-            returnList.add(daoLoc);
-        }
-
-        return returnList;
-    }
-
-    private void updateLocations(List<MVDaoLocation> locations, String username, Float totalDist) {
-        if (username == null || username.length() == 0)
-            return;
-
-        UserEntity user = getUser(username, true);
-        if (user == null)
-            return;
-
-        LocationEntity lastLocationEntity = user.getLastLocation();
-        Float lastTotalDistance = 0.0f;
-        Location lastLocation = null;
-        Location thisLocation = new Location("thisLocation");
-
-        if (lastLocationEntity != null) {
-            Float valueDistance = lastLocationEntity.getDistance();
-            if (valueDistance != null)
-                lastTotalDistance = valueDistance;
-
-            Double valueLat = lastLocationEntity.getLatitude();
-            Double valueLong = lastLocationEntity.getLongitude();
-            if (valueLat != null && valueLong != null) {
-                lastLocation = new Location("lastLocation");
-                lastLocation.setLatitude(valueLat.doubleValue());
-                lastLocation.setLongitude(valueLong.doubleValue());
-            }
-        }
-
-        if (locations == null)
-            locations = new ArrayList<MVDaoLocation>();
-
-        for (MVDaoLocation loc : locations) {
-            if (loc == null || loc.latitude == null || loc.longitude == null || loc.datetimestamp == null)
-                continue;
-
-            thisLocation.setLatitude(loc.latitude);
-            thisLocation.setLongitude(loc.longitude);
-
-            if (lastLocation != null)
-                lastTotalDistance += thisLocation.distanceTo(lastLocation);
-
-            if (loc.distance != null)
-                lastTotalDistance = loc.distance;
-
-            LocationEntity newLocation = new LocationEntity();
-            newLocation.setLatitude(loc.latitude);
-            newLocation.setLongitude(loc.longitude);
-            newLocation.setDatetimestamp(loc.datetimestamp);
-            newLocation.setUser(user);
-            newLocation.setFirstPoint(loc.firstPoint);
-            newLocation.setDistance(lastTotalDistance);
-            locationDao.insert(newLocation);
-
-            user.setLastLocation(newLocation);
-
-            lastLocation = thisLocation;
-        }
-
-        if (totalDist == null)
-            user.setTotalDistance(lastTotalDistance);
-        else
-            user.setTotalDistance(totalDist);
-
-        updateHourDistance(user);
-        userDao.update(user);
-
-        updatedUserList.add(username);
-    }
-
-    private void updateHourDistance(UserEntity user) {
-        if (user == null)
-            return;
-
-        Float hourDistance = 0.0f;
-        //change past hour distance to last hour distance
-		/*
-		Calendar calendar = Calendar.getInstance();
-		calendar.add(Calendar.HOUR_OF_DAY, -1);
-
-		List<MVDaoLocation> hourLocations = getLocations(user, calendar.getTime());
-		*/
-        Date startDate = new Date();
-        long lastUpdateTime = getLastUpdateTime(user.getUsername());
-        startDate.setTime(lastUpdateTime - 3600*1000L);
-        List<MVDaoLocation> hourLocations = getLocations(user, startDate);
-        if (hourLocations != null && hourLocations.size() >= 2) {
-            Float firstDistance = hourLocations.get(0).distance;
-            Float lastDistance = hourLocations.get(hourLocations.size() - 1).distance;
-            if (firstDistance != null && lastDistance != null)
-                hourDistance = Math.abs(lastDistance - firstDistance);
-        }
-
-        user.setHourDistance(hourDistance);
-        //userDao.update(user);
-        return;
-    }
-
-    public synchronized long getLastUpdateTime(String username) {
-        Long lastUpdate = getInitDate().getTime();
-
-        if (username == null || username.length() == 0)
-            return lastUpdate;
-
-        lastUpdate = friendToLastUpdate.get(username);
-        if (lastUpdate == null)
-            lastUpdate = getInitDate().getTime();
-
-        return lastUpdate;
-    }
-
-    public synchronized UserEntity getUser(String username, boolean needCreate) {
-        if (username == null || username.length() == 0)
-            return null;
-
-        userQb.setParameter(0, username);
-        UserEntity user = userQb.unique();
-        if (user == null) {
-            if (!needCreate)
-                return null;
-
-            UserEntity newUser = new UserEntity();
-            newUser.setUsername(username);
-            userDao.insert(newUser);
-
-            return newUser;
-        }
-
-        return user;
-    }
-
-    public synchronized void removeFriend(String username) {
-        if (username == null || username.length() == 0)
-            return;
-
-        UserEntity friend = getUser(username, false);
-        if (friend == null)
-            return;
-
-        friend.setFriend(null);
-        userDao.update(friend);
-        return;
-    }
-
-    public synchronized List<MVDaoLocation> getLocations(UserEntity user, Date startDate) {
-        if (user == null || startDate == null)
-            return null;
-
-        String username = user.getUsername();
-        if (username == null || username.length() == 0)
-            return null;
-
-        List<LocationEntity> locationList = new ArrayList<LocationEntity>();
+    public synchronized List<LocData> queryCachedLocData() {
+        List<LocData> cachedList = new ArrayList<LocData>();
+        Query<CachedLocData> query = cachedLocQuery.forCurrentThread();
         int offset = 0;
-        locationQb.setOffset(offset);
-        locationQb.setParameter(0, user.getId());
-        locationQb.setParameter(1, startDate.getTime());
-        List<LocationEntity> queryList = locationQb.list();
+
+        query.setOffset(offset);
+        List<CachedLocData> queryList = query.list();
         while (queryList != null && !queryList.isEmpty()) {
-            locationList.addAll(queryList);
+            for (CachedLocData data : queryList) {
+                LocData newData = new LocData();
+                newData.device_id = data.getDeviceID();
+                newData.time = data.getTime();
+                newData.battery_level = data.getBatteryLevel();
+                newData.signal_strength = data.getSignalStrength();
+                newData.lock_status = data.getLockStatus();
+                newData.door_status = data.getDoorStatus();
 
-            offset += QUERY_LIMIT;
-            locationQb.setOffset(offset);
-            queryList = locationQb.list();
-        }
+                newData.location = new LocData.GPSLoc();
+                newData.location.type = "gps";
 
-        return convertEntityDaoLocation(locationList);
-    }
+                newData.location.data = new LocData.GPSData();
+                newData.location.data.latitude = data.getLatitude();
+                newData.location.data.longitude = data.getLongitude();
 
-    public synchronized List<LocData> queryCachedLocationData() {
-        List<LocData> cachedLocationList = new ArrayList<LocData>();
-        int offset = 0;
-        cachedLocationQb.setOffset(offset);
-        List<CachedLocationEntity> queryList = cachedLocationQb.list();
-        while (queryList != null && !queryList.isEmpty()) {
-            for (CachedLocationEntity cachedLocation : queryList) {
-                LocData newLoc = new LocData();
-                newLoc.UDID = cachedLocation.getUDID();
-                newLoc.datetimestamp = new Date(cachedLocation.getDatetimestamp());
-                newLoc.uLatitude = cachedLocation.getLatitudeE6();
-                newLoc.uLongitude = cachedLocation.getLongitudeE6();
-                cachedLocationList.add(newLoc);
+                cachedList.add(newData);
             }
 
             offset += QUERY_LIMIT;
-            cachedLocationQb.setOffset(offset);
-            queryList = cachedLocationQb.list();
+            query.setOffset(offset);
+            queryList = query.list();
         }
 
-        return cachedLocationList;
+        return cachedList;
     }
 
-    public synchronized void saveCachedLocationData(LocData data) {
+    public synchronized void saveCachedLocData(LocData data) {
         if (data == null)
             return;
 
-        CachedLocationEntity newLoc = new CachedLocationEntity();
-        newLoc.setUDID(data.UDID);
-        newLoc.setDatetimestamp(data.datetimestamp.getTime());
-        newLoc.setLatitudeE6(data.uLatitude);
-        newLoc.setLongitudeE6(data.uLongitude);
+        CachedLocData newData = new CachedLocData();
 
-        cachedLocationDao.insert(newLoc);
+        newData.setDeviceID(data.device_id);
+        newData.setTime(data.time);
+        newData.setBatteryLevel(data.battery_level);
+        newData.setSignalStrength(data.signal_strength);
+        newData.setLockStatus(data.lock_status);
+        newData.setDoorStatus(data.door_status);
+        newData.setLongitude(data.location.data.longitude);
+        newData.setLatitude(data.location.data.latitude);
 
-        return;
+        cachedLocDao.insert(newData);
     }
 
-    public synchronized void deleteCachedLocationData(List<LocData> data) {
+    public synchronized void deleteCachedLocData(List<LocData> data) {
         if (data == null || data.isEmpty())
             return;
 
-        List<CachedLocationEntity> cachedLocationList = new ArrayList<CachedLocationEntity>();
+        List<CachedLocData> cachedList = new ArrayList<CachedLocData>();
+        Query<CachedLocData> query = cachedLocQuery.forCurrentThread();
         int offset = 0;
-        cachedLocationQb.setOffset(offset);
-        List<CachedLocationEntity> queryList = cachedLocationQb.list();
+
+        query.setOffset(offset);
+        List<CachedLocData> queryList = query.list();
         while (queryList != null && !queryList.isEmpty()) {
-            cachedLocationList.addAll(queryList);
+            cachedList.addAll(queryList);
 
             offset += QUERY_LIMIT;
-            cachedLocationQb.setOffset(offset);
-            queryList = cachedLocationQb.list();
+            query.setOffset(offset);
+            queryList = query.list();
         }
 
-        if (cachedLocationList == null || cachedLocationList.isEmpty())
+        if (cachedList.isEmpty())
             return;
 
-        List<CachedLocationEntity> deleteList = new ArrayList<CachedLocationEntity>();
-        for (CachedLocationEntity cachedLocation : cachedLocationList) {
-            LocData deleteLoc = new LocData();
-            deleteLoc.UDID = cachedLocation.getUDID();
-            deleteLoc.datetimestamp = new Date(cachedLocation.getDatetimestamp());
-            deleteLoc.uLatitude = cachedLocation.getLatitudeE6();
-            deleteLoc.uLongitude = cachedLocation.getLongitudeE6();
+        List<CachedLocData> deleteList = new ArrayList<CachedLocData>();
+        for (CachedLocData cachedData : cachedList) {
+            LocData deleteData = new LocData();
+            deleteData.device_id = cachedData.getDeviceID();
+            deleteData.time = cachedData.getTime();
+            deleteData.battery_level = cachedData.getBatteryLevel();
+            deleteData.signal_strength = cachedData.getSignalStrength();
+            deleteData.lock_status = cachedData.getLockStatus();
+            deleteData.door_status = cachedData.getDoorStatus();
+
+            deleteData.location = new LocData.GPSLoc();
+            deleteData.location.type = "gps";
+
+            deleteData.location.data = new LocData.GPSData();
+            deleteData.location.data.latitude = cachedData.getLatitude();
+            deleteData.location.data.longitude = cachedData.getLongitude();
 
             //to avoid ConcurrentModificationException
-            if (data.contains(deleteLoc))
-                deleteList.add(cachedLocation);
+            if (data.contains(deleteData))
+                deleteList.add(cachedData);
         }
 
-        for (CachedLocationEntity cachedLocation : deleteList)
-            cachedLocationDao.delete(cachedLocation);
+        for (CachedLocData cachedLocation : deleteList)
+            cachedLocDao.delete(cachedLocation);
+    }
 
-        return;
+    public synchronized List<BLEData> queryCachedBleData() {
+        List<BLEData> cachedList = new ArrayList<BLEData>();
+        Query<CachedBleData> query = cachedBleQuery.forCurrentThread();
+        int offset = 0;
+
+        query.setOffset(offset);
+        List<CachedBleData> queryList = query.list();
+        while (queryList != null && !queryList.isEmpty()) {
+            for (CachedBleData data : queryList) {
+                BLEData newData = new BLEData();
+                newData.device_id = data.getDeviceID();
+                newData.time = data.getTime();
+                newData.battery_level = data.getBatteryLevel();
+                newData.signal_strength = data.getSignalStrength();
+                newData.lock_status = data.getLockStatus();
+                newData.door_status = data.getDoorStatus();
+
+                newData.location = new BLEData.BLELoc();
+                newData.location.type = "ibeacon";
+
+                newData.location.data = new BLEData.DeviceData();
+                newData.location.data.mac = data.getMac();
+                newData.location.data.rssi = data.getRssi();
+
+                cachedList.add(newData);
+            }
+
+            offset += QUERY_LIMIT;
+            query.setOffset(offset);
+            queryList = query.list();
+        }
+
+        return cachedList;
+    }
+
+    public synchronized void saveCachedBleData(BLEData data) {
+        if (data == null)
+            return;
+
+        CachedBleData newData = new CachedBleData();
+
+        newData.setDeviceID(data.device_id);
+        newData.setTime(data.time);
+        newData.setBatteryLevel(data.battery_level);
+        newData.setSignalStrength(data.signal_strength);
+        newData.setLockStatus(data.lock_status);
+        newData.setDoorStatus(data.door_status);
+        newData.setMac(data.location.data.mac);
+        newData.setRssi(data.location.data.rssi);
+
+        cachedBleDao.insert(newData);
+    }
+
+    public synchronized void deleteCachedBleData(List<BLEData> data) {
+        if (data == null || data.isEmpty())
+            return;
+
+        List<CachedBleData> cachedList = new ArrayList<CachedBleData>();
+        Query<CachedBleData> query = cachedBleQuery.forCurrentThread();
+        int offset = 0;
+
+        query.setOffset(offset);
+        List<CachedBleData> queryList = query.list();
+        while (queryList != null && !queryList.isEmpty()) {
+            cachedList.addAll(queryList);
+
+            offset += QUERY_LIMIT;
+            query.setOffset(offset);
+            queryList = query.list();
+        }
+
+        if (cachedList.isEmpty())
+            return;
+
+        List<CachedBleData> deleteList = new ArrayList<CachedBleData>();
+        for (CachedBleData cachedData : cachedList) {
+            BLEData deleteData = new BLEData();
+            deleteData.device_id = cachedData.getDeviceID();
+            deleteData.time = cachedData.getTime();
+            deleteData.battery_level = cachedData.getBatteryLevel();
+            deleteData.signal_strength = cachedData.getSignalStrength();
+            deleteData.lock_status = cachedData.getLockStatus();
+            deleteData.door_status = cachedData.getDoorStatus();
+
+            deleteData.location = new BLEData.BLELoc();
+            deleteData.location.type = "ibeacon";
+
+            deleteData.location.data = new BLEData.DeviceData();
+            deleteData.location.data.mac = cachedData.getMac();
+            deleteData.location.data.rssi = cachedData.getRssi();
+
+            //to avoid ConcurrentModificationException
+            if (data.contains(deleteData))
+                deleteList.add(cachedData);
+        }
+
+        for (CachedBleData cachedLocation : deleteList)
+            cachedBleDao.delete(cachedLocation);
     }
 }

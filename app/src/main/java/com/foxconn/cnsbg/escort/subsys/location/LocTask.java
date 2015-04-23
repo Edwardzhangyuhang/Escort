@@ -17,6 +17,7 @@ import com.foxconn.cnsbg.escort.common.SysConst;
 import com.foxconn.cnsbg.escort.common.SysUtil;
 import com.foxconn.cnsbg.escort.subsys.communication.ComDataTxTask;
 import com.foxconn.cnsbg.escort.subsys.communication.ComMQ;
+import com.foxconn.cnsbg.escort.subsys.usbserial.SerialStatus;
 import com.google.gson.JsonParseException;
 
 import java.util.ArrayList;
@@ -33,7 +34,7 @@ public class LocTask extends ComDataTxTask {
     private float curAccuracy;
     private String curProvider;
     private long lastProviderCheckTime;
-    private boolean isProviderChanged;
+    private boolean isProviderChanged = false;
 
     private long lastLocTime = 0;
 
@@ -57,15 +58,12 @@ public class LocTask extends ComDataTxTask {
         //context.getSharedPreferences(SysConst.APP_PREF_NAME, Context.MODE_PRIVATE);
         setAccuracyLevel(SysConst.LOC_ACCURACY_LEVEL);
 
-        locData.UDID = CtrlCenter.getUDID();
-
         //get a handle on the location manager
         locHandler = new LocationUpdateHandler();
         locManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         curProvider = LocationManager.NETWORK_PROVIDER;//used to trigger the notification
         curProvider = findAvailableProvider(Criteria.ACCURACY_COARSE);
         lastProviderCheckTime = new Date().getTime();
-        isProviderChanged = false;
 
         //don't setup LocationUpdates at this point
         //locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, curMinTime, curMinDistance, locHandler);
@@ -210,13 +208,21 @@ public class LocTask extends ComDataTxTask {
         if (loc.getTime() <= 0)
             return;
 
-        int newLat = (int) (loc.getLatitude()*1E6);
-        int newLng = (int) (loc.getLongitude()*1E6);
+        locData.device_id = CtrlCenter.getUDID();
+        locData.time = new Date(loc.getTime());
 
-        locData.uLatitude = newLat;
-        locData.uLongitude = newLng;
-        locData.datetimestamp = new Date(loc.getTime());
-        locData.UDID = CtrlCenter.getUDID();
+        locData.battery_level = SysUtil.getBatteryLevel(mContext);
+        locData.signal_strength = SysUtil.getSignalStrength(mContext);
+        locData.lock_status = SerialStatus.getLockStatus();
+        locData.door_status = SerialStatus.getDoorStatus();
+
+        locData.location = new LocData.GPSLoc();
+        locData.location.type = "gps";
+
+        locData.location.data = new LocData.GPSData();
+        locData.location.data.latitude = loc.getLatitude();
+        locData.location.data.longitude = loc.getLongitude();
+
         locDataUpdated = true;
     }
 
@@ -275,7 +281,7 @@ public class LocTask extends ComDataTxTask {
 
     @Override
     protected boolean sendCachedData() {
-        List<LocData> dataList = CtrlCenter.getDao().queryCachedLocationData();
+        List<LocData> dataList = CtrlCenter.getDao().queryCachedLocData();
         if (dataList == null || dataList.isEmpty())
             return true;
 
@@ -289,7 +295,7 @@ public class LocTask extends ComDataTxTask {
         }
 
         //could delete one by one, bulk deletion is just for convenience
-        CtrlCenter.getDao().deleteCachedLocationData(sentList);
+        CtrlCenter.getDao().deleteCachedLocData(sentList);
 
         if (sentList.size() == dataList.size())
             return true;
@@ -304,7 +310,7 @@ public class LocTask extends ComDataTxTask {
 
         try {
             LocData data = gson.fromJson(dataString, LocData.class);
-            CtrlCenter.getDao().saveCachedLocationData(data);
+            CtrlCenter.getDao().saveCachedLocData(data);
         } catch (JsonParseException e) {
             Log.w(TAG + ":saveCachedData", "JsonParseException");
         } catch (NullPointerException e) {

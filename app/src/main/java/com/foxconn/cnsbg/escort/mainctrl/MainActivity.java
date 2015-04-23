@@ -21,7 +21,7 @@ public class MainActivity extends Activity {
         sc = new SerialCtrl(this);
 
         String sdcard = Environment.getExternalStorageDirectory().getPath();
-        CrashHandler.getInstance().init(sdcard + SysConst.APP_CRASH_LOG_FILE);
+        CrashHandler.getInstance().init(sdcard + "/" + SysConst.APP_CRASH_LOG_FILE);
 
         Intent serviceIntent = new Intent(MainActivity.this, MainService.class);
         startService(serviceIntent);

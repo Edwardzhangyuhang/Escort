@@ -3,9 +3,21 @@ package com.foxconn.cnsbg.escort.common;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.BatteryManager;
 import android.os.Handler;
+import android.telephony.CellInfo;
+import android.telephony.CellInfoCdma;
+import android.telephony.CellInfoGsm;
+import android.telephony.CellInfoLte;
+import android.telephony.CellInfoWcdma;
+import android.telephony.CellSignalStrengthCdma;
+import android.telephony.CellSignalStrengthGsm;
+import android.telephony.CellSignalStrengthLte;
+import android.telephony.CellSignalStrengthWcdma;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -15,6 +27,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.List;
 
 public class SysUtil {
     public static boolean isServerReachable(Context context, Intent intent) {
@@ -90,5 +103,49 @@ public class SysUtil {
             }
         };
         handler.post(runnable);
+    }
+
+    public static int getBatteryLevel(Context context) {
+        Intent batteryIntent = context.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        if (batteryIntent == null)
+            return 0;
+
+        int level = batteryIntent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+        int scale = batteryIntent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+
+        if (level == -1 || scale == -1)
+            return 0;
+
+        return (int)((float)level / (float)scale * 100.0f);
+    }
+
+    public static int getSignalStrength(Context context) {
+        TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+        List<CellInfo> allCellInfo = tm.getAllCellInfo();
+        if (allCellInfo == null || allCellInfo.isEmpty())
+            return 0;
+
+        int dbm = 0;
+        for (CellInfo info : allCellInfo) {
+            if (info instanceof CellInfoLte) {
+                CellSignalStrengthLte lte = ((CellInfoLte) info).getCellSignalStrength();
+                dbm = lte.getDbm();
+                break;
+            } else if (info instanceof CellInfoWcdma) {
+                CellSignalStrengthWcdma wcdma = ((CellInfoWcdma) info).getCellSignalStrength();
+                dbm = wcdma.getDbm();
+                break;
+            } else if (info instanceof CellInfoCdma) {
+                CellSignalStrengthCdma cdma = ((CellInfoCdma) info).getCellSignalStrength();
+                dbm = cdma.getDbm();
+                break;
+            } else if (info instanceof CellInfoGsm) {
+                CellSignalStrengthGsm gsm = ((CellInfoGsm) info).getCellSignalStrength();
+                dbm = gsm.getDbm();
+                break;
+            }
+        }
+
+        return dbm;
     }
 }

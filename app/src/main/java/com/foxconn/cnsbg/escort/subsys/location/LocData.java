@@ -3,24 +3,21 @@ package com.foxconn.cnsbg.escort.subsys.location;
 import java.util.Date;
 
 public final class LocData {
-    public int uLatitude = 0, uLongitude = 0;//The latitude and longitude
-    public Date datetimestamp = null;
-    public String UDID = null;
+    public String device_id;
+    public Date time;
+    public int battery_level;
+    public int signal_strength;
+    public String lock_status;
+    public String door_status;
+    public GPSLoc location;
 
-    @Override
-    public boolean equals(Object other) {
-        LocData loc = LocData.class.cast(other);
-        if ((loc.UDID == UDID || loc.UDID.equals(UDID))
-                && loc.datetimestamp.getTime() == datetimestamp.getTime()
-                && loc.uLatitude == uLatitude
-                && loc.uLongitude == uLongitude)
-            return true;
-        else
-            return false;
+    public static class GPSLoc {
+        public String type;
+        public GPSData data;
     }
 
-    @Override
-    public int hashCode() {
-        return (UDID.hashCode() + datetimestamp.hashCode());
+    public static class GPSData {
+        public double latitude;
+        public double longitude;
     }
 }
