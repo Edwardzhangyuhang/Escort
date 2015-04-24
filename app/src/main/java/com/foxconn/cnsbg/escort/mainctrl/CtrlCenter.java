@@ -12,8 +12,8 @@ import com.foxconn.cnsbg.escort.subsys.communication.ComMQ;
 import com.foxconn.cnsbg.escort.subsys.location.AccelTask;
 import com.foxconn.cnsbg.escort.subsys.location.BLETask;
 import com.foxconn.cnsbg.escort.subsys.location.LocTask;
-import com.foxconn.cnsbg.escort.subsys.usbserial.SerialMonitorTask;
 import com.foxconn.cnsbg.escort.subsys.usbserial.SerialCtrl;
+import com.foxconn.cnsbg.escort.subsys.usbserial.SerialMonitorTask;
 import com.foxconn.cnsbg.escort.subsys.usbserial.SerialReadTask;
 
 import java.util.ArrayList;
@@ -107,19 +107,19 @@ public class CtrlCenter {
     }
 
     private void stopTask() {
-        boolean monitorTaskAlive = mSerialMonitorTask.isAlive();
-        boolean readTaskAlive = mSerialReadTask.isAlive();
-        boolean cmdTaskAlive = mCmdTask.isAlive();
-        boolean accelTaskAlive = mAccelTask.isAlive();
-        boolean gpsTaskAlive = mGPSTask.isAlive();
-        boolean bleTaskAlive = mBLETask.isAlive();
-
         mSerialMonitorTask.requestShutdown();
         mSerialReadTask.requestShutdown();
         mCmdTask.requestShutdown();
         mAccelTask.requestShutdown();
         mGPSTask.requestShutdown();
         mBLETask.requestShutdown();
+
+        boolean monitorTaskAlive = mSerialMonitorTask.isAlive();
+        boolean readTaskAlive = mSerialReadTask.isAlive();
+        boolean cmdTaskAlive = mCmdTask.isAlive();
+        boolean accelTaskAlive = mAccelTask.isAlive();
+        boolean gpsTaskAlive = mGPSTask.isAlive();
+        boolean bleTaskAlive = mBLETask.isAlive();
 
         while (monitorTaskAlive || readTaskAlive
                 || cmdTaskAlive || accelTaskAlive

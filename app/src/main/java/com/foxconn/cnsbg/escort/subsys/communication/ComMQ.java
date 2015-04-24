@@ -6,6 +6,7 @@ import android.widget.Toast;
 import com.foxconn.cnsbg.escort.common.SysConst;
 import com.foxconn.cnsbg.escort.common.SysUtil;
 
+import org.fusesource.hawtdispatch.Dispatch;
 import org.fusesource.mqtt.client.Future;
 import org.fusesource.mqtt.client.FutureConnection;
 import org.fusesource.mqtt.client.MQTT;
@@ -43,6 +44,7 @@ public class ComMQ {
         mqtt.setReconnectAttemptsMax(SysConst.MQ_RECONNECT_ATTEMPTS);
         mqtt.setReconnectDelay(SysConst.MQ_RECONNECT_DELAY);
         mqtt.setReconnectDelayMax(SysConst.MQ_RECONNECT_MAX_DELAY);
+        mqtt.setDispatchQueue(Dispatch.createQueue());
 
         mConn = mqtt.futureConnection();
         mConn.connect();

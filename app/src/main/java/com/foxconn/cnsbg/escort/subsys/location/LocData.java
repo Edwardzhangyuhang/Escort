@@ -19,5 +19,12 @@ public final class LocData {
     public static class GPSData {
         public double latitude;
         public double longitude;
+
+        public String provider;
+        public float accuracy;
+        public double altitude;
+        public float bearing;
+        public float speed;
+        public boolean mock;
     }
 }

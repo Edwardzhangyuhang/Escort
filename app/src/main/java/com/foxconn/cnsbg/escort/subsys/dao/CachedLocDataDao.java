@@ -34,10 +34,11 @@ public class CachedLocDataDao extends AbstractDao<CachedLocData, Long> {
         public final static Property Altitude = new Property(8, Double.class, "altitude", false, "ALTITUDE");
         public final static Property Bearing = new Property(9, Float.class, "bearing", false, "BEARING");
         public final static Property Speed = new Property(10, Float.class, "speed", false, "SPEED");
-        public final static Property BatteryLevel = new Property(11, Integer.class, "batteryLevel", false, "BATTERY_LEVEL");
-        public final static Property SignalStrength = new Property(12, Integer.class, "signalStrength", false, "SIGNAL_STRENGTH");
-        public final static Property LockStatus = new Property(13, String.class, "lockStatus", false, "LOCK_STATUS");
-        public final static Property DoorStatus = new Property(14, String.class, "doorStatus", false, "DOOR_STATUS");
+        public final static Property Mock = new Property(11, Boolean.class, "mock", false, "MOCK");
+        public final static Property BatteryLevel = new Property(12, Integer.class, "batteryLevel", false, "BATTERY_LEVEL");
+        public final static Property SignalStrength = new Property(13, Integer.class, "signalStrength", false, "SIGNAL_STRENGTH");
+        public final static Property LockStatus = new Property(14, String.class, "lockStatus", false, "LOCK_STATUS");
+        public final static Property DoorStatus = new Property(15, String.class, "doorStatus", false, "DOOR_STATUS");
     };
 
 
@@ -64,10 +65,11 @@ public class CachedLocDataDao extends AbstractDao<CachedLocData, Long> {
                 "'ALTITUDE' REAL," + // 8: altitude
                 "'BEARING' REAL," + // 9: bearing
                 "'SPEED' REAL," + // 10: speed
-                "'BATTERY_LEVEL' INTEGER," + // 11: batteryLevel
-                "'SIGNAL_STRENGTH' INTEGER," + // 12: signalStrength
-                "'LOCK_STATUS' TEXT," + // 13: lockStatus
-                "'DOOR_STATUS' TEXT);"); // 14: doorStatus
+                "'MOCK' INTEGER," + // 11: mock
+                "'BATTERY_LEVEL' INTEGER," + // 12: batteryLevel
+                "'SIGNAL_STRENGTH' INTEGER," + // 13: signalStrength
+                "'LOCK_STATUS' TEXT," + // 14: lockStatus
+                "'DOOR_STATUS' TEXT);"); // 15: doorStatus
     }
 
     /** Drops the underlying database table. */
@@ -136,24 +138,29 @@ public class CachedLocDataDao extends AbstractDao<CachedLocData, Long> {
             stmt.bindDouble(11, speed);
         }
  
+        Boolean mock = entity.getMock();
+        if (mock != null) {
+            stmt.bindLong(12, mock ? 1l: 0l);
+        }
+ 
         Integer batteryLevel = entity.getBatteryLevel();
         if (batteryLevel != null) {
-            stmt.bindLong(12, batteryLevel);
+            stmt.bindLong(13, batteryLevel);
         }
  
         Integer signalStrength = entity.getSignalStrength();
         if (signalStrength != null) {
-            stmt.bindLong(13, signalStrength);
+            stmt.bindLong(14, signalStrength);
         }
  
         String lockStatus = entity.getLockStatus();
         if (lockStatus != null) {
-            stmt.bindString(14, lockStatus);
+            stmt.bindString(15, lockStatus);
         }
  
         String doorStatus = entity.getDoorStatus();
         if (doorStatus != null) {
-            stmt.bindString(15, doorStatus);
+            stmt.bindString(16, doorStatus);
         }
     }
 
@@ -178,10 +185,11 @@ public class CachedLocDataDao extends AbstractDao<CachedLocData, Long> {
             cursor.isNull(offset + 8) ? null : cursor.getDouble(offset + 8), // altitude
             cursor.isNull(offset + 9) ? null : cursor.getFloat(offset + 9), // bearing
             cursor.isNull(offset + 10) ? null : cursor.getFloat(offset + 10), // speed
-            cursor.isNull(offset + 11) ? null : cursor.getInt(offset + 11), // batteryLevel
-            cursor.isNull(offset + 12) ? null : cursor.getInt(offset + 12), // signalStrength
-            cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13), // lockStatus
-            cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14) // doorStatus
+            cursor.isNull(offset + 11) ? null : cursor.getShort(offset + 11) != 0, // mock
+            cursor.isNull(offset + 12) ? null : cursor.getInt(offset + 12), // batteryLevel
+            cursor.isNull(offset + 13) ? null : cursor.getInt(offset + 13), // signalStrength
+            cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14), // lockStatus
+            cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15) // doorStatus
         );
         return entity;
     }
@@ -200,10 +208,11 @@ public class CachedLocDataDao extends AbstractDao<CachedLocData, Long> {
         entity.setAltitude(cursor.isNull(offset + 8) ? null : cursor.getDouble(offset + 8));
         entity.setBearing(cursor.isNull(offset + 9) ? null : cursor.getFloat(offset + 9));
         entity.setSpeed(cursor.isNull(offset + 10) ? null : cursor.getFloat(offset + 10));
-        entity.setBatteryLevel(cursor.isNull(offset + 11) ? null : cursor.getInt(offset + 11));
-        entity.setSignalStrength(cursor.isNull(offset + 12) ? null : cursor.getInt(offset + 12));
-        entity.setLockStatus(cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13));
-        entity.setDoorStatus(cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14));
+        entity.setMock(cursor.isNull(offset + 11) ? null : cursor.getShort(offset + 11) != 0);
+        entity.setBatteryLevel(cursor.isNull(offset + 12) ? null : cursor.getInt(offset + 12));
+        entity.setSignalStrength(cursor.isNull(offset + 13) ? null : cursor.getInt(offset + 13));
+        entity.setLockStatus(cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14));
+        entity.setDoorStatus(cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15));
      }
     
     /** @inheritdoc */

@@ -70,12 +70,12 @@ public class LocTask extends ComDataTxTask {
         //locManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, curMinTime, curMinDistance, locHandler);
 
         //Send our last known location to the database
-        List<String> matchingProviders = locManager.getAllProviders();
-        for (String provider : matchingProviders) {
-            Location location = locManager.getLastKnownLocation(provider);
-            if (location != null)
-                handleLastKnownLocation(location);
-        }
+        //List<String> matchingProviders = locManager.getAllProviders();
+        //for (String provider : matchingProviders) {
+        //    Location location = locManager.getLastKnownLocation(provider);
+        //    if (location != null)
+        //        handleLastKnownLocation(location);
+        //}
     }
 
     private void handleLastKnownLocation(Location loc) {
@@ -222,6 +222,13 @@ public class LocTask extends ComDataTxTask {
         locData.location.data = new LocData.GPSData();
         locData.location.data.latitude = loc.getLatitude();
         locData.location.data.longitude = loc.getLongitude();
+
+        locData.location.data.provider = loc.getProvider();
+        locData.location.data.accuracy = loc.getAccuracy();
+        locData.location.data.altitude = loc.getAltitude();
+        locData.location.data.bearing = loc.getBearing();
+        locData.location.data.speed = loc.getSpeed();
+        locData.location.data.mock = loc.isFromMockProvider();
 
         locDataUpdated = true;
     }

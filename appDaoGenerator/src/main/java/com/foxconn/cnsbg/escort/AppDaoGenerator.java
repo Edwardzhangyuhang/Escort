@@ -20,6 +20,7 @@ public class AppDaoGenerator {
         loc.addDoubleProperty("altitude");
         loc.addFloatProperty("bearing");
         loc.addFloatProperty("speed");
+        loc.addBooleanProperty("mock");
 
         loc.addIntProperty("batteryLevel");
         loc.addIntProperty("signalStrength");

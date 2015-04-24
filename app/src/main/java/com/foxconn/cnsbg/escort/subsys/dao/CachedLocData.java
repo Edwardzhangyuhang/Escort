@@ -17,6 +17,7 @@ public class CachedLocData {
     private Double altitude;
     private Float bearing;
     private Float speed;
+    private Boolean mock;
     private Integer batteryLevel;
     private Integer signalStrength;
     private String lockStatus;
@@ -29,7 +30,7 @@ public class CachedLocData {
         this.id = id;
     }
 
-    public CachedLocData(Long id, String deviceID, String carID, java.util.Date time, Double latitude, Double longitude, String provider, Float accuracy, Double altitude, Float bearing, Float speed, Integer batteryLevel, Integer signalStrength, String lockStatus, String doorStatus) {
+    public CachedLocData(Long id, String deviceID, String carID, java.util.Date time, Double latitude, Double longitude, String provider, Float accuracy, Double altitude, Float bearing, Float speed, Boolean mock, Integer batteryLevel, Integer signalStrength, String lockStatus, String doorStatus) {
         this.id = id;
         this.deviceID = deviceID;
         this.carID = carID;
@@ -41,6 +42,7 @@ public class CachedLocData {
         this.altitude = altitude;
         this.bearing = bearing;
         this.speed = speed;
+        this.mock = mock;
         this.batteryLevel = batteryLevel;
         this.signalStrength = signalStrength;
         this.lockStatus = lockStatus;
@@ -133,6 +135,14 @@ public class CachedLocData {
 
     public void setSpeed(Float speed) {
         this.speed = speed;
+    }
+
+    public Boolean getMock() {
+        return mock;
+    }
+
+    public void setMock(Boolean mock) {
+        this.mock = mock;
     }
 
     public Integer getBatteryLevel() {

@@ -72,6 +72,13 @@ public class CacheDao {
                 newData.location.data.latitude = data.getLatitude();
                 newData.location.data.longitude = data.getLongitude();
 
+                newData.location.data.provider = data.getProvider();
+                newData.location.data.accuracy = data.getAccuracy();
+                newData.location.data.altitude = data.getAltitude();
+                newData.location.data.bearing = data.getBearing();
+                newData.location.data.speed = data.getSpeed();
+                newData.location.data.mock = data.getMock();
+
                 cachedList.add(newData);
             }
 
@@ -138,6 +145,13 @@ public class CacheDao {
             deleteData.location.data = new LocData.GPSData();
             deleteData.location.data.latitude = cachedData.getLatitude();
             deleteData.location.data.longitude = cachedData.getLongitude();
+
+            deleteData.location.data.provider = cachedData.getProvider();
+            deleteData.location.data.accuracy = cachedData.getAccuracy();
+            deleteData.location.data.altitude = cachedData.getAltitude();
+            deleteData.location.data.bearing = cachedData.getBearing();
+            deleteData.location.data.speed = cachedData.getSpeed();
+            deleteData.location.data.mock = cachedData.getMock();
 
             //to avoid ConcurrentModificationException
             if (data.contains(deleteData))

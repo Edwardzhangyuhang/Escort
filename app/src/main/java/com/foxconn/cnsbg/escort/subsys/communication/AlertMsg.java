@@ -2,7 +2,7 @@ package com.foxconn.cnsbg.escort.subsys.communication;
 
 import java.util.Date;
 
-public class AlertMsg {
+public final class AlertMsg {
     public String device_id;
     public Date time;
     public AlertData alert;
