@@ -40,9 +40,9 @@ public class SerialMonitorTask extends Thread {
                 if (status == 2) {
                     mMCUConfigured = false;
 
-                    SerialStatus.setLockStatus("N/A");
-                    SerialStatus.setDoorStatus("N/A");
-                    SerialStatus.setMagnetStatus("N/A");
+                    SerialStatus.setLockStatus("");
+                    SerialStatus.setDoorStatus("");
+                    SerialStatus.setMagnetStatus("");
                 } else if (status == 1) {
                     if (!mMCUConfigured) {
                         mSerialCtrl.config(

@@ -1,9 +1,9 @@
 package com.foxconn.cnsbg.escort.subsys.usbserial;
 
 public class SerialStatus {
-    private static String mLockStatus = "N/A";
-    private static String mDoorStatus = "N/A";
-    private static String mMagnetStatus = "N/A";
+    private static String mLockStatus = "";
+    private static String mDoorStatus = "";
+    private static String mMagnetStatus = "";
 
     public synchronized static void setLockStatus(String status) {
         mLockStatus = status;
