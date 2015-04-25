@@ -18,6 +18,7 @@ import java.util.Date;
 public class AccelTask extends ComDataTxTask implements SensorEventListener {
     private static final String TAG = AccelTask.class.getSimpleName();
 
+    private boolean mListening = false;
     private boolean accelerometerSupport = true;
     private SensorManager mSensorMgr;
     private Sensor mAccelerometer;
@@ -46,8 +47,17 @@ public class AccelTask extends ComDataTxTask implements SensorEventListener {
 
         //accelData.UDID = CtrlCenter.getUDID();
         //mAccelData_list = new CopyOnWriteArrayList<AccelSensorData>();
+    }
 
-        activeTask();
+    private void setAccelListening(boolean enable) {
+        if (mListening == enable)
+            return;
+
+        mListening = enable;
+        if (enable)
+            mSensorMgr.registerListener(this, mAccelerometer, mRate);
+        else
+            mSensorMgr.unregisterListener(this);
     }
 
     @Override
@@ -74,8 +84,15 @@ public class AccelTask extends ComDataTxTask implements SensorEventListener {
     @Override
     protected void checkTask() {
         //if accelerometer is not supported, always update motion detection time
-        if (!accelerometerSupport)
+        if (!accelerometerSupport) {
             CtrlCenter.setMotionDetectionTime((new Date()).getTime());
+            return;
+        }
+
+        if (CtrlCenter.isTrackingLocation())
+            setAccelListening(true);
+        else
+            setAccelListening(false);
     }
 
     @Override
@@ -92,13 +109,4 @@ public class AccelTask extends ComDataTxTask implements SensorEventListener {
     protected void saveCachedData(String dataStr) {
     }
 
-    @Override
-    public void activeTask() {
-        mSensorMgr.registerListener(this, mAccelerometer, mRate);
-    }
-
-    @Override
-    public void deactiveTask() {
-        mSensorMgr.unregisterListener(this);
-    }
 }

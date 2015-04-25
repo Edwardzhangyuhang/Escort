@@ -55,7 +55,4 @@ public abstract class ComDataTxTask extends Thread {
     protected abstract boolean sendCachedData();
     protected abstract void saveCachedData(String dataStr);
     protected abstract void checkTask();
-
-    public abstract void activeTask();
-    public abstract void deactiveTask();
 }

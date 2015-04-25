@@ -27,6 +27,7 @@ import java.util.List;
 public class LocTask extends ComDataTxTask {
     private static final String TAG = LocTask.class.getSimpleName();
 
+    private boolean locUpdating = false;
     private LocationManager locManager;
     private LocationUpdateHandler locHandler;
     private long curMinTime;
@@ -92,22 +93,12 @@ public class LocTask extends ComDataTxTask {
         handleLocation(loc);
     }
 
-    public void restartLocationUpdates() {
-        if (CtrlCenter.isTrackingLocation()) {
-            stopLocationUpdates();
-            startLocationUpdates();
-        }
-    }
+    private void setLocUpdating(boolean enable) {
+        if (locUpdating == enable)
+            return;
 
-    public void stopLocationUpdates() {
-        if (CtrlCenter.isTrackingLocation()) {
-            locManager.removeUpdates(locHandler);
-            CtrlCenter.setTrackingLocation(false);
-        }
-    }
-
-    public void startLocationUpdates() {
-        if (!CtrlCenter.isTrackingLocation()) {
+        locUpdating = enable;
+        if (enable) {
             if (curProvider == null) {
                 locManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 0, 0, locHandler);
                 locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locHandler);
@@ -115,7 +106,8 @@ public class LocTask extends ComDataTxTask {
             } else {
                 locManager.requestLocationUpdates(curProvider, curMinTime, curMinDistance, locHandler);
             }
-            CtrlCenter.setTrackingLocation(true);
+        } else {
+            locManager.removeUpdates(locHandler);
         }
     }
 
@@ -230,6 +222,8 @@ public class LocTask extends ComDataTxTask {
     protected void checkTask() {
         if (CtrlCenter.isTrackingLocation())
             checkProvider();
+        else
+            setLocUpdating(false);
     }
 
     private void checkProvider() {
@@ -241,7 +235,7 @@ public class LocTask extends ComDataTxTask {
                 && !curProvider.equals(LocationManager.PASSIVE_PROVIDER)) {
             System.out.println("Pause location tracking...");
             curProvider = LocationManager.PASSIVE_PROVIDER;
-            locManager.removeUpdates(locHandler);
+            setLocUpdating(false);
         } else if (motionDetectTime > lastProviderCheckTime
                 && currentTime - lastProviderCheckTime > SysConst.LOC_PROVIDER_CHECK_TIME) {
             if (curProvider != null
@@ -259,7 +253,8 @@ public class LocTask extends ComDataTxTask {
             Handler handler = new Handler(mContext.getMainLooper());
             final Runnable providerUpdateThread = new Runnable() {
                 public void run() {
-                    restartLocationUpdates();
+                    setLocUpdating(false);
+                    setLocUpdating(true);
                 }
             };
             handler.post(providerUpdateThread);
@@ -318,13 +313,4 @@ public class LocTask extends ComDataTxTask {
         }
     }
 
-    @Override
-    public void activeTask() {
-        startLocationUpdates();
-    }
-
-    @Override
-    public void deactiveTask() {
-        stopLocationUpdates();
-    }
 }

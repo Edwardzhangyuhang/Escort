@@ -57,18 +57,17 @@ public class BLETask extends ComDataTxTask implements BluetoothAdapter.LeScanCal
             mBluetoothAdapter.enable();
 
         runInterval = SysConst.BLE_TASK_RUN_INTERVAL;
-
-        activeTask();
     }
 
-    private void scanLeDevice(boolean enable) {
-        if (mScanning != enable) {
-            mScanning = enable;
-            if (enable)
-                mBluetoothAdapter.startLeScan(this);
-            else
-                mBluetoothAdapter.stopLeScan(this);
-        }
+    private void setBleScanning(boolean enable) {
+        if (mScanning == enable)
+            return;
+
+        mScanning = enable;
+        if (enable)
+            mBluetoothAdapter.startLeScan(this);
+        else
+            mBluetoothAdapter.stopLeScan(this);
     }
 
     @Override
@@ -184,15 +183,10 @@ public class BLETask extends ComDataTxTask implements BluetoothAdapter.LeScanCal
 
     @Override
     protected void checkTask() {
+        setBleScanning(false);
+
+        if (CtrlCenter.isTrackingLocation())
+            setBleScanning(true);
     }
 
-    @Override
-    public void activeTask() {
-        scanLeDevice(true);
-    }
-
-    @Override
-    public void deactiveTask() {
-        scanLeDevice(false);
-    }
 }

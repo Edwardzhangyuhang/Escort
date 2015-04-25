@@ -137,16 +137,4 @@ public class CtrlCenter {
             bleTaskAlive = mBLETask.isAlive();
         }
     }
-
-    public static void activePublishTask() {
-        mAccelTask.activeTask();
-        mGPSTask.activeTask();
-        mBLETask.activeTask();
-    }
-
-    public static void deactivePublishTask() {
-        mAccelTask.deactiveTask();
-        mGPSTask.deactiveTask();
-        mBLETask.deactiveTask();
-    }
 }
