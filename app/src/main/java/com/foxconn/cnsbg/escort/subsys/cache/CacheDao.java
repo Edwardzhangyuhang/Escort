@@ -105,6 +105,13 @@ public class CacheDao {
         newData.setLongitude(data.location.data.longitude);
         newData.setLatitude(data.location.data.latitude);
 
+        newData.setProvider(data.location.data.provider);
+        newData.setAccuracy(data.location.data.accuracy);
+        newData.setAltitude(data.location.data.altitude);
+        newData.setBearing(data.location.data.bearing);
+        newData.setSpeed(data.location.data.speed);
+        newData.setMock(data.location.data.mock);
+
         cachedLocDao.insert(newData);
     }
 
