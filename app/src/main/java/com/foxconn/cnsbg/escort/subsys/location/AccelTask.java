@@ -79,7 +79,7 @@ public class AccelTask extends ComDataTxTask implements SensorEventListener {
     }
 
     @Override
-    protected boolean sendData(String data) {
+    protected boolean sendData(String dataStr) {
         return true;
     }
 
@@ -89,7 +89,7 @@ public class AccelTask extends ComDataTxTask implements SensorEventListener {
     }
 
     @Override
-    protected void saveCachedData(String dataString) {
+    protected void saveCachedData(String dataStr) {
     }
 
     @Override

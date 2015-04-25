@@ -56,7 +56,7 @@ public class LocTask extends ComDataTxTask {
         runInterval = SysConst.LOC_TASK_RUN_INTERVAL;
 
         //context.getSharedPreferences(SysConst.APP_PREF_NAME, Context.MODE_PRIVATE);
-        setAccuracyLevel(SysConst.LOC_ACCURACY_LEVEL);
+        setAccuracyLevel(SysConst.LOC_MIN_ACCURACY, SysConst.LOC_UPDATE_MIN_TIME, SysConst.LOC_UPDATE_MIN_DISTANCE);
 
         //get a handle on the location manager
         locHandler = new LocationUpdateHandler();
@@ -119,15 +119,10 @@ public class LocTask extends ComDataTxTask {
         }
     }
 
-    private void setAccuracyLevel(int percentage) {
-        float accuracyLevel = (5.0f - (percentage/20.0f));
-
-        curMinTime = (long)(SysConst.LOC_UPDATE_MIN_TIME * accuracyLevel);
-        curMinDistance = (SysConst.LOC_UPDATE_MIN_DISTANCE * accuracyLevel);
-        if (accuracyLevel < 1.0f)
-            curAccuracy = (SysConst.LOC_MIN_ACCURACY);
-        else
-            curAccuracy = (SysConst.LOC_MIN_ACCURACY * accuracyLevel);
+    private void setAccuracyLevel(float accuracy, long time, float distance) {
+        curAccuracy = accuracy;
+        curMinTime = time;
+        curMinDistance = distance;
     }
 
     @Override
@@ -217,8 +212,6 @@ public class LocTask extends ComDataTxTask {
         locData.door_status = SerialStatus.getDoorStatus();
 
         locData.location = new LocData.GPSLoc();
-        locData.location.type = "gps";
-
         locData.location.data = new LocData.GPSData();
         locData.location.data.latitude = loc.getLatitude();
         locData.location.data.longitude = loc.getLongitude();
@@ -276,11 +269,11 @@ public class LocTask extends ComDataTxTask {
     }
 
     @Override
-    protected boolean sendData(String data) {
-        if (data == null)
+    protected boolean sendData(String dataStr) {
+        if (dataStr == null)
             return false;
 
-        if (!mComMQ.publish(gpsTopic, data, SysConst.MQ_SEND_MAX_TIMEOUT))
+        if (!mComMQ.publish(gpsTopic, dataStr, SysConst.MQ_SEND_MAX_TIMEOUT))
             return false;
 
         return true;
@@ -311,12 +304,12 @@ public class LocTask extends ComDataTxTask {
     }
 
     @Override
-    protected void saveCachedData(String dataString) {
-        if (dataString == null || dataString.length() == 0)
+    protected void saveCachedData(String dataStr) {
+        if (dataStr == null || dataStr.length() == 0)
             return;
 
         try {
-            LocData data = gson.fromJson(dataString, LocData.class);
+            LocData data = gson.fromJson(dataStr, LocData.class);
             CtrlCenter.getDao().saveCachedLocData(data);
         } catch (JsonParseException e) {
             Log.w(TAG + ":saveCachedData", "JsonParseException");

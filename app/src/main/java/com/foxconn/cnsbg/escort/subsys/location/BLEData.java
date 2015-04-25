@@ -12,7 +12,7 @@ public final class BLEData {
     public BLELoc location;
 
     public static class BLELoc {
-        public String type;
+        public final String type = "ibeacon";
         public DeviceData data;
     }
 

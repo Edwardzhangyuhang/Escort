@@ -12,7 +12,7 @@ public final class LocData {
     public GPSLoc location;
 
     public static class GPSLoc {
-        public String type;
+        public final String type = "gps";
         public GPSData data;
     }
 

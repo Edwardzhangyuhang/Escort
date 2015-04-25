@@ -66,8 +66,6 @@ public class CacheDao {
                 newData.door_status = data.getDoorStatus();
 
                 newData.location = new LocData.GPSLoc();
-                newData.location.type = "gps";
-
                 newData.location.data = new LocData.GPSData();
                 newData.location.data.latitude = data.getLatitude();
                 newData.location.data.longitude = data.getLongitude();
@@ -147,8 +145,6 @@ public class CacheDao {
             deleteData.door_status = cachedData.getDoorStatus();
 
             deleteData.location = new LocData.GPSLoc();
-            deleteData.location.type = "gps";
-
             deleteData.location.data = new LocData.GPSData();
             deleteData.location.data.latitude = cachedData.getLatitude();
             deleteData.location.data.longitude = cachedData.getLongitude();
@@ -187,8 +183,6 @@ public class CacheDao {
                 newData.door_status = data.getDoorStatus();
 
                 newData.location = new BLEData.BLELoc();
-                newData.location.type = "ibeacon";
-
                 newData.location.data = new BLEData.DeviceData();
                 newData.location.data.mac = data.getMac();
                 newData.location.data.rssi = data.getRssi();
@@ -254,8 +248,6 @@ public class CacheDao {
             deleteData.door_status = cachedData.getDoorStatus();
 
             deleteData.location = new BLEData.BLELoc();
-            deleteData.location.type = "ibeacon";
-
             deleteData.location.data = new BLEData.DeviceData();
             deleteData.location.data.mac = cachedData.getMac();
             deleteData.location.data.rssi = cachedData.getRssi();

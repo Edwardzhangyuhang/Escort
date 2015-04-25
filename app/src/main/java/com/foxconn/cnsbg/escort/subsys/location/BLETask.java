@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.foxconn.cnsbg.escort.common.SysConst;
@@ -12,8 +13,14 @@ import com.foxconn.cnsbg.escort.common.SysUtil;
 import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
 import com.foxconn.cnsbg.escort.subsys.communication.ComDataTxTask;
 import com.foxconn.cnsbg.escort.subsys.communication.ComMQ;
+import com.foxconn.cnsbg.escort.subsys.usbserial.SerialStatus;
+import com.google.gson.JsonParseException;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
 
 public class BLETask extends ComDataTxTask implements BluetoothAdapter.LeScanCallback {
     private static final String TAG = BLETask.class.getSimpleName();
@@ -21,12 +28,10 @@ public class BLETask extends ComDataTxTask implements BluetoothAdapter.LeScanCal
     private BluetoothAdapter mBluetoothAdapter;
     private boolean mScanning = false;
 
-    private int[] test_rssi = new int[500];
-    private String[] test_mac = new String[500];
-    private int i = 0;
-    private long current_timer;
-    private long last_timer;
+    private List<BLEData.DeviceData> dataList = new ArrayList<BLEData.DeviceData>();
+    private long lastUpdateTime = 0L;
 
+    private boolean bleDataUpdated = false;
     private BLEData bleData = new BLEData();
 
     private static final String bleTopic = SysConst.MQ_TOPIC_BLE_DATA + CtrlCenter.getUDID();
@@ -56,29 +61,6 @@ public class BLETask extends ComDataTxTask implements BluetoothAdapter.LeScanCal
         activeTask();
     }
 
-    @Override
-    public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
-        String record = device.getName() + rssi + device.getAddress();
-
-        if( rssi >= -80 )
-        {
-            last_timer = System.currentTimeMillis();
-            if ((last_timer - current_timer ) > 2000 )
-            {
-                test_mac[i] = device.getAddress();
-                test_rssi[i] = rssi;
-                current_timer = System.currentTimeMillis();
-                analyse(test_mac,test_rssi);
-            }
-            else
-            {
-                test_mac[i] = device.getAddress();
-                test_rssi[i] = rssi;
-                i++;
-            }
-        }
-    }
-
     private void scanLeDevice(boolean enable) {
         if (mScanning != enable) {
             mScanning = enable;
@@ -89,120 +71,115 @@ public class BLETask extends ComDataTxTask implements BluetoothAdapter.LeScanCal
         }
     }
 
-    public void analyse(String[] mac,int[] rssi) {
+    @Override
+    public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
+        long time = System.currentTimeMillis();
+        if (lastUpdateTime == 0)
+            lastUpdateTime = time;
 
-        float rssi_test;
-        String mac_test;
-        int num = 1;
+        if (!device.getName().contains(SysConst.BLE_DEVICE_NAME_FILTER))
+            return;
 
-        int[][] rssi_i = new int[50][50];
-        String[] mac_i = new String[50];
-        int j[] = new int[50];
+        if (rssi < SysConst.BLE_RSSI_THRESHOLD)
+            return;
 
-        rssi_i[0][0] = rssi[0];
-        mac_i[0] = mac[0];
-        j[0] = 1;
+        BLEData.DeviceData data = new BLEData.DeviceData();
+        data.mac = device.getAddress();
+        data.rssi = rssi;
+        dataList.add(data);
 
-        int z;
-        while (num <= i) {
+        if (time - lastUpdateTime > SysConst.BLE_UPDATE_MIN_TIME) {
+            lastUpdateTime = time;
 
-            z = 0;
+            BLEData.DeviceData result = analyse(dataList);
+            dataList.clear();
 
-            while (z < 49) {
+            bleData.device_id = CtrlCenter.getUDID();
+            bleData.time = new Date();
 
-                //System.out.println(mac_i[z]);
-                if (mac_i[z] == null) {
-                    mac_i[z] = mac[num];
-                    rssi_i[z][0] = rssi[num];
-                    j[z]++;
-                    break;
-                } else if (mac_i[z].equals(mac[num]) == true) {
-                    //System.out.println(mac_i[z]);
-                    //System.out.println(rssi_i[z]);
-                    //System.out.println(rssi[z]);
-                    rssi_i[z][j[z]] = rssi[num];
-                    //System.out.println(rssi_i[z][j[z]]);
-                    j[z]++;
-                    //System.out.println(j[z]);
-                    break;
-                }
-                z++;
-            }
+            bleData.battery_level = SysUtil.getBatteryLevel(mContext);
+            bleData.signal_strength = SysUtil.getSignalStrength(mContext);
+            bleData.lock_status = SerialStatus.getLockStatus();
+            bleData.door_status = SerialStatus.getDoorStatus();
 
-            num++;
-            //String printf =num + "  "+ mac[num] +"  " + rssi[num];
-            //System.out.println(printf);
+            bleData.location = new BLEData.BLELoc();
+            bleData.location.data = new BLEData.DeviceData();
+            bleData.location.data.mac = result.mac;
+            bleData.location.data.rssi = result.rssi;
+
+            bleDataUpdated = true;
         }
-
-        z = 1;
-
-        rssi_test = average(rssi_i[0], j[0]);
-
-        mac_test = mac_i[0];
-        while (z <= 49) {
-            if (mac_i[z] != null) {
-
-                if (rssi_test < average(rssi_i[z], j[z])) {
-                    mac_test = mac_i[z];
-                    rssi_test = average(rssi_i[z], j[z]);
-                }
-                z++;
-            } else
-                break;
-        }
-        i = 0;
-        String data = "";
-        data = "mac address:" + mac_test + " rssi:" + rssi_test + "dbm";
-        sendData(data);
     }
 
-    public float average(int array[],int num){
-        int total = 0;
-        int i = 0;
-
-        float ave = 0;
-
-        if(num < 2)
-        {
-            while( i < num)
-            {
-                total += array[i];
-                i++;
+    public BLEData.DeviceData analyse(List<BLEData.DeviceData> list) {
+        Collections.sort(list, new Comparator<BLEData.DeviceData>() {
+            @Override
+            public int compare(BLEData.DeviceData data1, BLEData.DeviceData data2) {
+                return data2.rssi - data1.rssi;
             }
+        });
 
-            ave = ((float)total)/num ;
-            return  ave;
-        }
-        else
-        {
-
-            Arrays.sort(array);
-
-            total = array[num-1] + array[num-2];
-
-            ave = ((float)total)/2 ;
-
-            return  ave;
-        }
+        return list.get(0);
     }
 
     @Override
     protected String collectData() {
+        if (bleDataUpdated) {
+            bleDataUpdated = false;
+            return gson.toJson(bleData, BLEData.class);
+        }
+
         return null;
     }
 
     @Override
-    protected boolean sendData(String data) {
+    protected boolean sendData(String dataStr) {
+        if (dataStr == null)
+            return false;
+
+        if (!mComMQ.publish(bleTopic, dataStr, SysConst.MQ_SEND_MAX_TIMEOUT))
+            return false;
+
         return true;
     }
 
     @Override
     protected boolean sendCachedData() {
-        return true;
+        List<BLEData> dataList = CtrlCenter.getDao().queryCachedBleData();
+        if (dataList == null || dataList.isEmpty())
+            return true;
+
+        List<BLEData> sentList = new ArrayList<BLEData>();
+        for (BLEData data : dataList) {
+            String dataString = gson.toJson(data, BLEData.class);
+            if (sendData(dataString))
+                sentList.add(data);
+            else
+                break;
+        }
+
+        //could delete one by one, bulk deletion is just for convenience
+        CtrlCenter.getDao().deleteCachedBleData(sentList);
+
+        if (sentList.size() == dataList.size())
+            return true;
+
+        return false;
     }
 
     @Override
-    protected void saveCachedData(String date) {
+    protected void saveCachedData(String dataStr) {
+        if (dataStr == null || dataStr.length() == 0)
+            return;
+
+        try {
+            BLEData data = gson.fromJson(dataStr, BLEData.class);
+            CtrlCenter.getDao().saveCachedBleData(data);
+        } catch (JsonParseException e) {
+            Log.w(TAG + ":saveCachedData", "JsonParseException");
+        } catch (NullPointerException e) {
+            Log.w(TAG + ":saveCachedData", "NullPointerException");
+        }
     }
 
     @Override
