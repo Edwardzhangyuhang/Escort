@@ -3,33 +3,39 @@ package com.foxconn.cnsbg.escort.subsys.location;
 import java.util.Date;
 
 public class AccelData {
-    public float accelX_avg = 0;
-    public float accelY_avg = 0;
-    public float accelZ_avg = 0;
-    public double accelX_stddev = 0;
-    public double accelY_stddev = 0;
-    public double accelZ_stddev = 0;
-    public Date datetimestamp = null;
-    public String UDID = null;
+    public String device_id;
+    public Date time;
+
+    public float accelX_avg;
+    public float accelY_avg;
+    public float accelZ_avg;
+    public double accelX_stddev;
+    public double accelY_stddev;
+    public double accelZ_stddev;
 
     @Override
-    public boolean equals(Object other) {
-        AccelData acc = AccelData.class.cast(other);
-        if ((acc.UDID == UDID || acc.UDID.equals(UDID))
-                && acc.datetimestamp.getTime() == datetimestamp.getTime()
-                && acc.accelX_avg == accelX_avg
-                && acc.accelY_avg == accelY_avg
-                && acc.accelZ_avg == accelZ_avg
-                && acc.accelX_stddev == accelX_stddev
-                && acc.accelY_stddev == accelY_stddev
-                && acc.accelZ_stddev == accelZ_stddev)
+    public boolean equals(Object obj) {
+        if (obj == this)
             return true;
-        else
+
+        if (obj == null)
             return false;
+
+        if (getClass() != obj.getClass())
+            return false;
+
+        AccelData data = AccelData.class.cast(obj);
+        if (!data.device_id.equals(device_id))
+            return false;
+
+        if (data.time.getTime() != time.getTime())
+            return false;
+
+        return true;
     }
 
     @Override
     public int hashCode() {
-        return (UDID.hashCode() + datetimestamp.hashCode());
+        return (device_id.hashCode() + time.hashCode());
     }
 }
