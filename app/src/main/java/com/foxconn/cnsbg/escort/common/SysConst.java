@@ -53,8 +53,8 @@ public interface SysConst {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     //BLE Task Parameter
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    public static final int BLE_TASK_RUN_INTERVAL = 5000;
+    public static final int BLE_TASK_RUN_INTERVAL = 1000;
     public static final String BLE_DEVICE_NAME_FILTER = "InFocus";
     public static final int BLE_RSSI_THRESHOLD = -80;
-    public static final long BLE_UPDATE_MIN_TIME = 3 * 1000L;
+    public static final long BLE_UPDATE_MIN_TIME = 5 * 1000L;
 }
