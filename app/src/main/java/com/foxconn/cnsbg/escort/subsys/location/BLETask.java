@@ -185,8 +185,12 @@ public class BLETask extends ComDataTxTask implements BluetoothAdapter.LeScanCal
     protected void checkTask() {
         setBleScanning(false);
 
-        if (CtrlCenter.isTrackingLocation())
-            setBleScanning(true);
-    }
+        if (CtrlCenter.isTrackingLocation()) {
+            long currentTime = new Date().getTime();
+            long motionDetectTime = CtrlCenter.getMotionDetectionTime();
 
+            if (currentTime - motionDetectTime < SysConst.LOC_UPDATE_PAUSE_IDLE_TIME)
+                setBleScanning(true);
+        }
+    }
 }
