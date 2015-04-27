@@ -336,6 +336,7 @@ public class FT311UARTInterface
 		inputstream = null;
 		outputstream = null;
 
+		global_context.unregisterReceiver(mUsbReceiver);
 	}
 
 	protected void saveDetachPreference() {
