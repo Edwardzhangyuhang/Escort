@@ -143,7 +143,7 @@ public class AccelSampling {
 
     //=========================================================================
     private static final int SAMPLELIMIT = 8;
-    private static final float MOVEMENT_THRESHOLD = SAMPLELIMIT * 0.1f;
+    private static final float MOVEMENT_THRESHOLD = SAMPLELIMIT * 0.15f;
 
     private float sampleWindow[] = new float[ SAMPLELIMIT ];
     private int currentSampleCounter = 0;
