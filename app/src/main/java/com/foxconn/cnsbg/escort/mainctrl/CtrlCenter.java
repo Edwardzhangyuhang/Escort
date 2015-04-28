@@ -85,7 +85,6 @@ public class CtrlCenter {
 
         List<String> subscribes = new ArrayList<String>();
         subscribes.add(SysConst.MQ_TOPIC_COMMAND + UDID);
-        subscribes.add("yg1"); //debug
         if (mq.init(subscribes)) {
             setTrackingLocation(true);
             startTask();
@@ -133,6 +132,7 @@ public class CtrlCenter {
             monitorTaskAlive = mSerialMonitorTask.isAlive();
             readTaskAlive = mSerialReadTask.isAlive();
             cmdTaskAlive = mCmdTask.isAlive();
+            accelTaskAlive = mAccelTask.isAlive();
             gpsTaskAlive = mGPSTask.isAlive();
             bleTaskAlive = mBLETask.isAlive();
         }
