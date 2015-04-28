@@ -1,10 +1,8 @@
 package com.foxconn.cnsbg.escort.subsys.usbserial;
 
 import android.content.Context;
-import android.widget.Toast;
 
 import com.foxconn.cnsbg.escort.common.SysConst;
-import com.foxconn.cnsbg.escort.common.SysUtil;
 import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
 import com.foxconn.cnsbg.escort.subsys.communication.AlertMsg;
 import com.foxconn.cnsbg.escort.subsys.communication.CmdRespMsg;
@@ -61,7 +59,10 @@ public final class SerialReadTask extends Thread {
         String acks[] = ackStr.split("\r\n");
 
         for (String ack : acks) {
-            SysUtil.showToast(mContext, ack, Toast.LENGTH_SHORT);
+            if (ack.length() == 0)
+                continue;
+
+            //SysUtil.showToast(mContext, ack, Toast.LENGTH_SHORT);
 
             String ackCode = ack.substring(0, 1);
             SerialCode.AckResp resp = SerialCode.getAckResp(ackCode);
@@ -85,8 +86,6 @@ public final class SerialReadTask extends Thread {
                 default:
                     break;
             }
-
-            SysUtil.showToast(mContext, resp.getInfo(), Toast.LENGTH_SHORT);
         }
     }
 
