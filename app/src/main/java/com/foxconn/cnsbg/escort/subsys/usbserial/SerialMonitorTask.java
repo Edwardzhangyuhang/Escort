@@ -3,9 +3,7 @@ package com.foxconn.cnsbg.escort.subsys.usbserial;
 import android.content.Context;
 import android.widget.Toast;
 
-import com.foxconn.cnsbg.escort.common.SysConst;
 import com.foxconn.cnsbg.escort.common.SysUtil;
-import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
 import com.foxconn.cnsbg.escort.subsys.communication.ComMQ;
 
 public class SerialMonitorTask extends Thread {
@@ -19,8 +17,6 @@ public class SerialMonitorTask extends Thread {
     private ComMQ mComMQ;
     private boolean mMCUConfigured = false;
     private int mStatus = 2;
-
-    private static final String alertTopic = SysConst.MQ_TOPIC_ALERT + CtrlCenter.getUDID();
 
     public SerialMonitorTask(Context context, SerialCtrl sc, ComMQ mq) {
         mContext = context;
@@ -55,19 +51,18 @@ public class SerialMonitorTask extends Thread {
                         SysUtil.showToast(mContext, "MCU configured!", Toast.LENGTH_SHORT);
                         mMCUConfigured = true;
                     }
-
-                    //trigger serial read task to set status
-                    mSerialCtrl.write(SerialCode.CMD_GET_LOCK + "\r\n");
-                    mSerialCtrl.write(SerialCode.CMD_GET_DOOR + "\r\n");
-                    mSerialCtrl.write(SerialCode.CMD_GET_MAGNET + "\r\n");
                 }
             }
 
+            if (status == 1) {
+                //trigger serial read task to set status
+                mSerialCtrl.write(SerialCode.CMD_GET_LOCK + "\r\n");
+                mSerialCtrl.write(SerialCode.CMD_GET_DOOR + "\r\n");
+                mSerialCtrl.write(SerialCode.CMD_GET_MAGNET + "\r\n");
+            }
+
             try {
-                //if (status == 2)
-                //    mComMQ.publish(alertTopic, "MCU detached!", runInterval);
-                //else
-                    Thread.sleep(runInterval);
+                Thread.sleep(runInterval);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
