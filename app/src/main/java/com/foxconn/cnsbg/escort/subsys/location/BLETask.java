@@ -8,7 +8,7 @@ import android.content.pm.PackageManager;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.foxconn.cnsbg.escort.common.SysConst;
+import com.foxconn.cnsbg.escort.common.SysPref;
 import com.foxconn.cnsbg.escort.common.SysUtil;
 import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
 import com.foxconn.cnsbg.escort.subsys.communication.ComDataTxTask;
@@ -34,7 +34,7 @@ public class BLETask extends ComDataTxTask implements BluetoothAdapter.LeScanCal
     private boolean bleDataUpdated = false;
     private BLEData bleData = new BLEData();
 
-    private static final String bleTopic = SysConst.MQ_TOPIC_BLE_DATA + CtrlCenter.getUDID();
+    private static final String bleTopic = SysPref.MQ_TOPIC_BLE_DATA + CtrlCenter.getUDID();
 
     public BLETask(Context context, ComMQ mq) {
         mContext = context;
@@ -56,7 +56,7 @@ public class BLETask extends ComDataTxTask implements BluetoothAdapter.LeScanCal
         if (!mBluetoothAdapter.isEnabled())
             mBluetoothAdapter.enable();
 
-        runInterval = SysConst.BLE_TASK_RUN_INTERVAL;
+        runInterval = SysPref.BLE_TASK_RUN_INTERVAL;
     }
 
     private void setBleScanning(boolean enable) {
@@ -76,10 +76,10 @@ public class BLETask extends ComDataTxTask implements BluetoothAdapter.LeScanCal
         if (lastUpdateTime == 0)
             lastUpdateTime = time;
 
-        if (!device.getName().contains(SysConst.BLE_DEVICE_NAME_FILTER))
+        if (!device.getName().contains(SysPref.BLE_DEVICE_NAME_FILTER))
             return;
 
-        if (rssi < SysConst.BLE_RSSI_THRESHOLD)
+        if (rssi < SysPref.BLE_RSSI_THRESHOLD)
             return;
 
         BLEData.DeviceData data = new BLEData.DeviceData();
@@ -87,7 +87,7 @@ public class BLETask extends ComDataTxTask implements BluetoothAdapter.LeScanCal
         data.rssi = rssi;
         dataList.add(data);
 
-        if (time - lastUpdateTime > SysConst.BLE_UPDATE_MIN_TIME) {
+        if (time - lastUpdateTime > SysPref.BLE_UPDATE_MIN_TIME) {
             lastUpdateTime = time;
 
             BLEData.DeviceData result = analyse(dataList);
@@ -136,7 +136,7 @@ public class BLETask extends ComDataTxTask implements BluetoothAdapter.LeScanCal
         if (dataStr == null)
             return false;
 
-        if (!mComMQ.publish(bleTopic, dataStr, SysConst.MQ_SEND_MAX_TIMEOUT))
+        if (!mComMQ.publish(bleTopic, dataStr, SysPref.MQ_SEND_MAX_TIMEOUT))
             return false;
 
         return true;
@@ -189,7 +189,7 @@ public class BLETask extends ComDataTxTask implements BluetoothAdapter.LeScanCal
             long currentTime = new Date().getTime();
             long motionDetectTime = CtrlCenter.getMotionDetectionTime();
 
-            if (currentTime - motionDetectTime < SysConst.LOC_UPDATE_PAUSE_IDLE_TIME)
+            if (currentTime - motionDetectTime < SysPref.LOC_UPDATE_PAUSE_IDLE_TIME)
                 setBleScanning(true);
         }
     }

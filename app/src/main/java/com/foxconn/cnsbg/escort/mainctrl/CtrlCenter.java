@@ -4,7 +4,7 @@ import android.content.Context;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
-import com.foxconn.cnsbg.escort.common.SysConst;
+import com.foxconn.cnsbg.escort.common.SysPref;
 import com.foxconn.cnsbg.escort.subsys.cache.CacheDao;
 import com.foxconn.cnsbg.escort.subsys.communication.ComCmdRxTask;
 import com.foxconn.cnsbg.escort.subsys.communication.ComDataTxTask;
@@ -70,8 +70,10 @@ public class CtrlCenter {
 
         UDID = "0"; //debug
 
+        SysPref.init(context);
+
         //setup database for cache
-        mDao = new CacheDao(context, SysConst.APP_DB_NAME);
+        mDao = new CacheDao(context, SysPref.APP_DB_NAME);
 
         SerialCtrl sc = new SerialCtrl(context);
         ComMQ mq = new ComMQ(context);
@@ -84,7 +86,7 @@ public class CtrlCenter {
         mBLETask = new BLETask(context, mq);
 
         List<String> subscribes = new ArrayList<String>();
-        subscribes.add(SysConst.MQ_TOPIC_COMMAND + UDID);
+        subscribes.add(SysPref.MQ_TOPIC_COMMAND + UDID);
         if (mq.init(subscribes)) {
             setTrackingLocation(true);
             startTask();

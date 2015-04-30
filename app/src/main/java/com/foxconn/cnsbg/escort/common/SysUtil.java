@@ -63,7 +63,7 @@ public class SysUtil {
 
     public static boolean checkHttpConnection(int timeout) {
         try {
-            URI uri = new URI("http", null, SysConst.HTTP_SERVER_HOST, SysConst.HTTP_SERVER_PORT, null, null, null);
+            URI uri = new URI("http", null, SysPref.HTTP_SERVER_HOST, SysPref.HTTP_SERVER_PORT, null, null, null);
             URL url = uri.toURL();
             HttpURLConnection urlc = (HttpURLConnection) url.openConnection();
             urlc.setRequestProperty("User-Agent", "Escort");

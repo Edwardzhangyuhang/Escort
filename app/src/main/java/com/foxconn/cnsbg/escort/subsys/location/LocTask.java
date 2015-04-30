@@ -12,8 +12,8 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.foxconn.cnsbg.escort.BuildConfig;
+import com.foxconn.cnsbg.escort.common.SysPref;
 import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
-import com.foxconn.cnsbg.escort.common.SysConst;
 import com.foxconn.cnsbg.escort.common.SysUtil;
 import com.foxconn.cnsbg.escort.subsys.communication.ComDataTxTask;
 import com.foxconn.cnsbg.escort.subsys.communication.ComMQ;
@@ -42,7 +42,7 @@ public class LocTask extends ComDataTxTask {
     private boolean locDataUpdated = false;
     private LocData locData = new LocData();
 
-    private static final String gpsTopic = SysConst.MQ_TOPIC_GPS_DATA + CtrlCenter.getUDID();
+    private static final String gpsTopic = SysPref.MQ_TOPIC_GPS_DATA + CtrlCenter.getUDID();
 
     public LocTask(Context context, ComMQ mq) {
         mContext = context;
@@ -54,10 +54,9 @@ public class LocTask extends ComDataTxTask {
             return;
         }
 
-        runInterval = SysConst.LOC_TASK_RUN_INTERVAL;
+        runInterval = SysPref.LOC_TASK_RUN_INTERVAL;
 
-        //context.getSharedPreferences(SysConst.APP_PREF_NAME, Context.MODE_PRIVATE);
-        setAccuracyLevel(SysConst.LOC_MIN_ACCURACY, SysConst.LOC_UPDATE_MIN_TIME, SysConst.LOC_UPDATE_MIN_DISTANCE);
+        setAccuracyLevel(SysPref.LOC_MIN_ACCURACY, SysPref.LOC_UPDATE_MIN_TIME, SysPref.LOC_UPDATE_MIN_DISTANCE);
 
         //get a handle on the location manager
         locHandler = new LocationUpdateHandler();
@@ -145,7 +144,7 @@ public class LocTask extends ComDataTxTask {
             if (BuildConfig.DEBUG) {
                 String text = "Provider:" + loc.getProvider() + ", Accuracy:" + loc.getAccuracy()
                         + ", Interval:" + (loc.getTime() - lastLocTime)/1000;
-                SysUtil.showToast(mContext, "Updated Location:" + text, Toast.LENGTH_LONG);
+                //SysUtil.showToast(mContext, "Updated Location:" + text, Toast.LENGTH_LONG);
             }
 
             lastLocTime = loc.getTime();
@@ -231,13 +230,13 @@ public class LocTask extends ComDataTxTask {
         long currentTime = new Date().getTime();
         long motionDetectTime = CtrlCenter.getMotionDetectionTime();
 
-        if (currentTime - motionDetectTime > SysConst.LOC_UPDATE_PAUSE_IDLE_TIME
+        if (currentTime - motionDetectTime > SysPref.LOC_UPDATE_PAUSE_IDLE_TIME
                 && !curProvider.equals(LocationManager.PASSIVE_PROVIDER)) {
             System.out.println("Pause location tracking...");
             curProvider = LocationManager.PASSIVE_PROVIDER;
             setLocUpdating(false);
         } else if (motionDetectTime > lastProviderCheckTime
-                && currentTime - lastProviderCheckTime > SysConst.LOC_PROVIDER_CHECK_TIME) {
+                && currentTime - lastProviderCheckTime > SysPref.LOC_PROVIDER_CHECK_TIME) {
             if (curProvider != null
                     && curProvider.equals(LocationManager.PASSIVE_PROVIDER))
                 System.out.println("Resume location tracking...");
@@ -268,7 +267,7 @@ public class LocTask extends ComDataTxTask {
         if (dataStr == null)
             return false;
 
-        if (!mComMQ.publish(gpsTopic, dataStr, SysConst.MQ_SEND_MAX_TIMEOUT))
+        if (!mComMQ.publish(gpsTopic, dataStr, SysPref.MQ_SEND_MAX_TIMEOUT))
             return false;
 
         return true;

@@ -2,7 +2,7 @@ package com.foxconn.cnsbg.escort.subsys.usbserial;
 
 import android.content.Context;
 
-import com.foxconn.cnsbg.escort.common.SysConst;
+import com.foxconn.cnsbg.escort.common.SysPref;
 import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
 import com.foxconn.cnsbg.escort.subsys.communication.AlertMsg;
 import com.foxconn.cnsbg.escort.subsys.communication.CmdRespMsg;
@@ -25,8 +25,8 @@ public final class SerialReadTask extends Thread {
     private ComMQ mComMQ;
     private byte[] mAckBuffer;
 
-    private static final String alertTopic = SysConst.MQ_TOPIC_ALERT + CtrlCenter.getUDID();
-    private static final String respTopic = SysConst.MQ_TOPIC_RESPONSE + CtrlCenter.getUDID();
+    private static final String alertTopic = SysPref.MQ_TOPIC_ALERT + CtrlCenter.getUDID();
+    private static final String respTopic = SysPref.MQ_TOPIC_RESPONSE + CtrlCenter.getUDID();
 
     public SerialReadTask(Context context, SerialCtrl sc, ComMQ mq) {
         mContext = context;

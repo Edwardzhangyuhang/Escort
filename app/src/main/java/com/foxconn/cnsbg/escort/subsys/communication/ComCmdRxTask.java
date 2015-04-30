@@ -2,10 +2,8 @@ package com.foxconn.cnsbg.escort.subsys.communication;
 
 import android.content.Context;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.foxconn.cnsbg.escort.common.SysConst;
-import com.foxconn.cnsbg.escort.common.SysUtil;
+import com.foxconn.cnsbg.escort.common.SysPref;
 import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
 import com.foxconn.cnsbg.escort.subsys.usbserial.SerialCode;
 import com.foxconn.cnsbg.escort.subsys.usbserial.SerialCtrl;
@@ -36,9 +34,9 @@ public final class ComCmdRxTask extends Thread {
             boolean ready = mComMQ.isConnected();
             if (mMQReady != ready) {
                 mMQReady = ready;
-                SysUtil.showToast(mContext, "MQ Ready:" + ready, Toast.LENGTH_SHORT);
+                //SysUtil.showToast(mContext, "MQ Ready:" + ready, Toast.LENGTH_SHORT);
             }
-            String msg = mComMQ.receive(SysConst.MQ_RECV_MAX_TIMEOUT);
+            String msg = mComMQ.receive(SysPref.MQ_RECV_MAX_TIMEOUT);
             String cmd = handleMessage(msg);
             handleCmd(cmd);
         }

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="key_device_id">device_id</string>
+
+    <string name="key_http_host">http_host</string>
+    <string name="key_http_port">http_port</string>
+
+    <string name="key_mq_host">mq_host</string>
+    <string name="key_mq_port">mq_port</string>
+    <string name="key_mq_keep_alive">mq_keep_alive</string>
+    <string name="key_mq_connect_attempts">mq_connect_attempts</string>
+    <string name="key_mq_reconnect_attempts">mq_reconnect_attempts</string>
+    <string name="key_mq_reconnect_delay">mq_reconnect_delay</string>
+    <string name="key_mq_reconnect_max_delay">mq_reconnect_max_delay</string>
+    <string name="key_mq_send_max_timeout">mq_send_max_timeout</string>
+    <string name="key_mq_recv_max_timeout">mq_recv_max_timeout</string>
+    <string name="key_mq_topic_gps_data">mq_topic_gps_data</string>
+    <string name="key_mq_topic_ble_data">mq_topic_ble_data</string>
+    <string name="key_mq_topic_cmd">mq_topic_cmd</string>
+    <string name="key_mq_topic_response">mq_topic_response</string>
+    <string name="key_mq_topic_alert">mq_topic_alert</string>
+
+    <string name="key_loc_task_run_interval">loc_task_run_interval</string>
+    <string name="key_loc_min_accuracy">loc_min_accuracy</string>
+    <string name="key_loc_update_min_distance">loc_update_min_distance</string>
+    <string name="key_loc_update_min_time">loc_update_min_time</string>
+    <string name="key_loc_provider_check_time">loc_provider_check_time</string>
+    <string name="key_loc_update_pause_idle_time">loc_update_pause_idle_time</string>
+
+    <string name="key_ble_task_run_interval">ble_task_run_interval</string>
+    <string name="key_ble_device_name_filter">ble_device_name_filter</string>
+    <string name="key_ble_rssi_threshold">ble_rssi_threshold</string>
+    <string name="key_ble_update_min_time">ble_update_min_time</string>
+
+</resources>

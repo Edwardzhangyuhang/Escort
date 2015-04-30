@@ -1,10 +1,8 @@
 package com.foxconn.cnsbg.escort.subsys.communication;
 
 import android.content.Context;
-import android.widget.Toast;
 
-import com.foxconn.cnsbg.escort.common.SysConst;
-import com.foxconn.cnsbg.escort.common.SysUtil;
+import com.foxconn.cnsbg.escort.common.SysPref;
 
 import org.fusesource.hawtdispatch.Dispatch;
 import org.fusesource.mqtt.client.Future;
@@ -32,18 +30,18 @@ public class ComMQ {
         MQTT mqtt = new MQTT();
 
         try {
-            mqtt.setHost(SysConst.MQ_SERVER_HOST, SysConst.MQ_SERVER_PORT);
+            mqtt.setHost(SysPref.MQ_SERVER_HOST, SysPref.MQ_SERVER_PORT);
         } catch (Exception e) {
             return false;
         }
 
         //setClientId(CtrlCenter.getUDID());
         //setCleanSession(false);
-        mqtt.setKeepAlive(SysConst.MQ_KEEP_ALIVE);
-        mqtt.setConnectAttemptsMax(SysConst.MQ_CONNECT_ATTEMPTS);
-        mqtt.setReconnectAttemptsMax(SysConst.MQ_RECONNECT_ATTEMPTS);
-        mqtt.setReconnectDelay(SysConst.MQ_RECONNECT_DELAY);
-        mqtt.setReconnectDelayMax(SysConst.MQ_RECONNECT_MAX_DELAY);
+        mqtt.setKeepAlive(SysPref.MQ_KEEP_ALIVE);
+        mqtt.setConnectAttemptsMax(SysPref.MQ_CONNECT_ATTEMPTS);
+        mqtt.setReconnectAttemptsMax(SysPref.MQ_RECONNECT_ATTEMPTS);
+        mqtt.setReconnectDelay(SysPref.MQ_RECONNECT_DELAY);
+        mqtt.setReconnectDelayMax(SysPref.MQ_RECONNECT_MAX_DELAY);
         mqtt.setDispatchQueue(Dispatch.createQueue());
 
         mConn = mqtt.futureConnection();
@@ -71,7 +69,7 @@ public class ComMQ {
             return false;
         }
 
-        SysUtil.showToast(mContext, "MQ publish:" + payload, Toast.LENGTH_SHORT);
+        //SysUtil.showToast(mContext, "MQ publish:" + payload, Toast.LENGTH_SHORT);
         return true;
     }
 
@@ -94,7 +92,7 @@ public class ComMQ {
             return null;
         }
 
-        SysUtil.showToast(mContext, "MQ receive:" + result, Toast.LENGTH_SHORT);
+        //SysUtil.showToast(mContext, "MQ receive:" + result, Toast.LENGTH_SHORT);
         return result;
     }
 

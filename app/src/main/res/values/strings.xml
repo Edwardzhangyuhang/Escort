@@ -1,43 +1,41 @@
 <resources>
     <string name="app_name">Escort</string>
-    <string name="hello">Hello World, UARTTestActivity!</string>
-    <string name="baudRate">Baud rate</string>    
-    <string-array name="baud_rate">        
-        <item>300</item>        
-        <item>600</item>        
-        <item>1200</item>        
-        <item>4800</item>        
-        <item>9600</item>        
-        <item>19200</item>        
-        <item>38400</item>        
-        <item>57600</item>
-        <item>115200</item>
-        <item>230400</item>    
-        <item>460800</item>
-        <item>921600</item>
-    </string-array>
-    
-    <string-array name="stop_bits">        
-        <item>1</item>        
-        <item>2</item>        
-    </string-array>
-        
-    <string-array name="data_bits">        
-        <item>7</item>        
-        <item>8</item>        
-    </string-array>
-    
-    <string-array name="parity">        
-        <item>None</item>        
-        <item>Odd</item>
-        <item>Even</item>
-        <item >Mark</item>
-        <item >Space</item>
-    </string-array>
-    
-    <string-array name="flow_control">        
-        <item>None</item>        
-        <item>CTS/RTS</item>
-    </string-array>
+
+    <!-- Strings related to Settings -->
+
+    <string name="sys_info_title">System Info</string>
+    <string name="device_id">Device ID</string>
+
+    <string name="http_server_title">HTTP server</string>
+    <string name="host">Host</string>
+    <string name="port">Port</string>
+
+    <string name="mq_server_title">MQ server</string>
+    <string name="keep_alive">Keep Alive Interval (Seconds)</string>
+    <string name="connect_attempts">Connect Attempts</string>
+    <string name="reconnect_attempts">Reconnect Attempts</string>
+    <string name="reconnect_delay">Reconnect Delay</string>
+    <string name="reconnect_max_delay">Reconnect Max Delay</string>
+    <string name="send_max_timeout">Send Max Timeout</string>
+    <string name="recv_max_timeout">Recv Max Timeout</string>
+    <string name="topic_gps_data">GPS Topic Prefix</string>
+    <string name="topic_ble_data">BLE Topic Prefix</string>
+    <string name="topic_cmd">Control Topic Prefix</string>
+    <string name="topic_response">Response Topic Prefix</string>
+    <string name="topic_alert">Alert Topic Prefix</string>
+
+    <string name="loc_title">Location Task Parameter</string>
+    <string name="loc_task_run_interval">Loc Task Run Interval</string>
+    <string name="loc_min_accuracy">Loc Min Accuracy</string>
+    <string name="loc_update_min_distance">Loc Update Min Distance</string>
+    <string name="loc_update_min_time">Loc Update Min Time</string>
+    <string name="loc_provider_check_time">Loc Provider Check Time</string>
+    <string name="loc_update_pause_idle_time">Loc Update Pause Idle Time</string>
+
+    <string name="ble_title">BLE Task Parameter</string>
+    <string name="ble_task_run_interval">BLE Task Run Interval</string>
+    <string name="ble_device_name_filter">BLE Device Name Filter</string>
+    <string name="ble_rssi_threshold">BLE RSSI Threshold</string>
+    <string name="ble_update_min_time">BLE Update Min Time</string>
 
 </resources>
