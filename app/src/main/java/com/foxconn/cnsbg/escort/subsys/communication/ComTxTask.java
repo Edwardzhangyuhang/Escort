@@ -6,8 +6,8 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-public abstract class ComDataTxTask extends Thread {
-    private static final String TAG = ComDataTxTask.class.getSimpleName();
+public abstract class ComTxTask extends Thread {
+    private static final String TAG = ComTxTask.class.getSimpleName();
 
     protected volatile int runInterval = 1000; //Default wait time of 1 sec
     protected volatile boolean requestShutdown = false;

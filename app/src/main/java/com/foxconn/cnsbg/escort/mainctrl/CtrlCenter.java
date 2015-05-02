@@ -6,8 +6,8 @@ import android.util.Log;
 
 import com.foxconn.cnsbg.escort.common.SysPref;
 import com.foxconn.cnsbg.escort.subsys.cache.CacheDao;
-import com.foxconn.cnsbg.escort.subsys.communication.ComCmdRxTask;
-import com.foxconn.cnsbg.escort.subsys.communication.ComDataTxTask;
+import com.foxconn.cnsbg.escort.subsys.communication.ComRxTask;
+import com.foxconn.cnsbg.escort.subsys.communication.ComTxTask;
 import com.foxconn.cnsbg.escort.subsys.communication.ComMQ;
 import com.foxconn.cnsbg.escort.subsys.location.AccelTask;
 import com.foxconn.cnsbg.escort.subsys.location.BLETask;
@@ -29,10 +29,10 @@ public class CtrlCenter {
 
     private static SerialMonitorTask mSerialMonitorTask;
     private static SerialReadTask mSerialReadTask;
-    private static ComCmdRxTask mCmdTask;
-    private static ComDataTxTask mAccelTask;
-    private static ComDataTxTask mGPSTask;
-    private static ComDataTxTask mBLETask;
+    private static ComRxTask mCmdTask;
+    private static ComTxTask mAccelTask;
+    private static ComTxTask mGPSTask;
+    private static ComTxTask mBLETask;
 
     private static boolean isTrackingLocation = false;
     private static long motionDetectionTime = new Date().getTime();
@@ -80,7 +80,7 @@ public class CtrlCenter {
 
         mSerialMonitorTask = new SerialMonitorTask(context, sc, mq);
         mSerialReadTask = new SerialReadTask(context, sc, mq);
-        mCmdTask = new ComCmdRxTask(context, sc, mq);
+        mCmdTask = new ComRxTask(context, sc, mq);
         mAccelTask = new AccelTask(context);
         mGPSTask = new LocTask(context, mq);
         mBLETask = new BLETask(context, mq);

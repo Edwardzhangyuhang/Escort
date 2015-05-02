@@ -5,14 +5,13 @@ import android.util.Log;
 
 import com.foxconn.cnsbg.escort.common.SysPref;
 import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
-import com.foxconn.cnsbg.escort.subsys.usbserial.SerialCode;
 import com.foxconn.cnsbg.escort.subsys.usbserial.SerialCtrl;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
 
-public final class ComCmdRxTask extends Thread {
-    private static final String TAG = ComCmdRxTask.class.getSimpleName();
+public final class ComRxTask extends Thread {
+    private static final String TAG = ComRxTask.class.getSimpleName();
 
     private boolean requestShutdown = false;
 
@@ -22,7 +21,7 @@ public final class ComCmdRxTask extends Thread {
     private ComMQ mComMQ;
     private boolean mMQReady = false;
 
-    public ComCmdRxTask(Context context, SerialCtrl sc, ComMQ mq) {
+    public ComRxTask(Context context, SerialCtrl sc, ComMQ mq) {
         mContext = context;
         mSerialCtrl = sc;
         mComMQ = mq;
@@ -46,37 +45,42 @@ public final class ComCmdRxTask extends Thread {
         requestShutdown = true;
     }
 
-    private String handleMessage(String msg) {
-        if (msg == null)
+    private String handleMessage(String msgStr) {
+        if (msgStr == null)
             return null;
 
         try {
-            CmdCtrlMsg ctrlMsg = gson.fromJson(msg, CmdCtrlMsg.class);
-            if (!ctrlMsg.device_id.equals(CtrlCenter.getUDID()))
+            CmdCtrlMsg msg = gson.fromJson(msgStr, CmdCtrlMsg.class);
+            if (!msg.device_id.equals(CtrlCenter.getUDID()))
                 return null;
 
-            SerialCode.setCmdId(ctrlMsg.cmd_id);
-            return ctrlMsg.cmd;
+            CmdCode.setCmdId(msg.cmd_id);
+            return msg.cmd;
         } catch (JsonParseException e) {
             Log.w(TAG + ":handleMessage", "JsonParseException");
         } catch (NullPointerException e) {
             Log.w(TAG + ":handleMessage", "NullPointerException");
         }
 
-        SerialCode.setCmdId(0);
-        return msg;
+        CmdCode.setCmdId(0);
+        return msgStr;
     }
 
-    private boolean handleCmd(String cmd) {
+    private boolean handleCmd(String cmdStr) {
+        if (cmdStr == null)
+            return false;
+
+        CmdCode.CtrlCmd cmd = CmdCode.getCtrlCmd(cmdStr);
         if (cmd == null)
             return false;
 
-        SerialCode.CmdCode cmdCode = SerialCode.getCmdCode(cmd);
-        if (cmdCode == null)
-            return false;
-
-        if (cmdCode.getTarget() == SerialCode.CmdTarget.SERIAL)
-            mSerialCtrl.write(cmdCode.getCode() + "\r\n");
+        switch (cmd.getTarget()) {
+            case SERIAL:
+                mSerialCtrl.write(cmd.getCode() + "\r\n");
+                break;
+            default:
+                break;
+        }
 
         return true;
     }

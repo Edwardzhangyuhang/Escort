@@ -15,7 +15,7 @@ import com.foxconn.cnsbg.escort.BuildConfig;
 import com.foxconn.cnsbg.escort.common.SysPref;
 import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
 import com.foxconn.cnsbg.escort.common.SysUtil;
-import com.foxconn.cnsbg.escort.subsys.communication.ComDataTxTask;
+import com.foxconn.cnsbg.escort.subsys.communication.ComTxTask;
 import com.foxconn.cnsbg.escort.subsys.communication.ComMQ;
 import com.foxconn.cnsbg.escort.subsys.usbserial.SerialStatus;
 import com.google.gson.JsonParseException;
@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class LocTask extends ComDataTxTask {
+public class LocTask extends ComTxTask {
     private static final String TAG = LocTask.class.getSimpleName();
 
     private boolean locUpdating = false;

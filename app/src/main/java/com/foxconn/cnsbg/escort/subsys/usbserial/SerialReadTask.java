@@ -5,6 +5,7 @@ import android.content.Context;
 import com.foxconn.cnsbg.escort.common.SysPref;
 import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
 import com.foxconn.cnsbg.escort.subsys.communication.AlertMsg;
+import com.foxconn.cnsbg.escort.subsys.communication.CmdCode;
 import com.foxconn.cnsbg.escort.subsys.communication.CmdRespMsg;
 import com.foxconn.cnsbg.escort.subsys.communication.ComMQ;
 import com.google.gson.Gson;
@@ -65,7 +66,7 @@ public final class SerialReadTask extends Thread {
             //SysUtil.showToast(mContext, ack, Toast.LENGTH_SHORT);
 
             String ackCode = ack.substring(0, 1);
-            SerialCode.AckResp resp = SerialCode.getAckResp(ackCode);
+            CmdCode.RespAck resp = CmdCode.getRespAck(ackCode);
 
             if (resp == null)
                 continue;
@@ -89,7 +90,7 @@ public final class SerialReadTask extends Thread {
         }
     }
 
-    private boolean handleAlert(SerialCode.AckResp resp) {
+    private boolean handleAlert(CmdCode.RespAck resp) {
         AlertMsg msg = new AlertMsg();
 
         msg.device_id = CtrlCenter.getUDID();
@@ -104,13 +105,13 @@ public final class SerialReadTask extends Thread {
         return mComMQ.publish(alertTopic, json, runInterval);
     }
 
-    private boolean handleCmdResp(SerialCode.AckResp resp) {
+    private boolean handleCmdResp(CmdCode.RespAck resp) {
         CmdRespMsg msg = new CmdRespMsg();
 
         msg.device_id = CtrlCenter.getUDID();
         msg.time = new Date();
         msg.cmd = resp.getCmd();
-        msg.cmd_id = SerialCode.getCmdId();
+        msg.cmd_id = CmdCode.getCmdId();
         msg.result = resp.getResult();
         msg.reason = resp.getInfo();
 
@@ -118,7 +119,7 @@ public final class SerialReadTask extends Thread {
         return mComMQ.publish(respTopic, json, runInterval);
     }
 
-    private void handleStatusResp(SerialCode.AckResp resp) {
+    private void handleStatusResp(CmdCode.RespAck resp) {
         switch (resp.getAckType()) {
             case LOCK:
                 SerialStatus.setLockStatus(resp.getInfo());

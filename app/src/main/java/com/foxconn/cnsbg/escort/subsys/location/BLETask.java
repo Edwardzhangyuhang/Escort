@@ -11,7 +11,7 @@ import android.widget.Toast;
 import com.foxconn.cnsbg.escort.common.SysPref;
 import com.foxconn.cnsbg.escort.common.SysUtil;
 import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
-import com.foxconn.cnsbg.escort.subsys.communication.ComDataTxTask;
+import com.foxconn.cnsbg.escort.subsys.communication.ComTxTask;
 import com.foxconn.cnsbg.escort.subsys.communication.ComMQ;
 import com.foxconn.cnsbg.escort.subsys.usbserial.SerialStatus;
 import com.google.gson.JsonParseException;
@@ -22,7 +22,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-public class BLETask extends ComDataTxTask implements BluetoothAdapter.LeScanCallback {
+public class BLETask extends ComTxTask implements BluetoothAdapter.LeScanCallback {
     private static final String TAG = BLETask.class.getSimpleName();
 
     private BluetoothAdapter mBluetoothAdapter;

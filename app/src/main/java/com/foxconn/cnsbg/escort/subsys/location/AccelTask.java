@@ -11,11 +11,11 @@ import android.widget.Toast;
 
 import com.foxconn.cnsbg.escort.common.SysUtil;
 import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
-import com.foxconn.cnsbg.escort.subsys.communication.ComDataTxTask;
+import com.foxconn.cnsbg.escort.subsys.communication.ComTxTask;
 
 import java.util.Date;
 
-public class AccelTask extends ComDataTxTask implements SensorEventListener {
+public class AccelTask extends ComTxTask implements SensorEventListener {
     private static final String TAG = AccelTask.class.getSimpleName();
 
     private boolean mListening = false;
