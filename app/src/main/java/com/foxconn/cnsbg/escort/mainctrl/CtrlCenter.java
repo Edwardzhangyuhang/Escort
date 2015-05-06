@@ -2,13 +2,14 @@ package com.foxconn.cnsbg.escort.mainctrl;
 
 import android.content.Context;
 import android.telephony.TelephonyManager;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.foxconn.cnsbg.escort.common.SysPref;
 import com.foxconn.cnsbg.escort.subsys.cache.CacheDao;
+import com.foxconn.cnsbg.escort.subsys.communication.ComMQ;
 import com.foxconn.cnsbg.escort.subsys.communication.ComRxTask;
 import com.foxconn.cnsbg.escort.subsys.communication.ComTxTask;
-import com.foxconn.cnsbg.escort.subsys.communication.ComMQ;
 import com.foxconn.cnsbg.escort.subsys.location.AccelTask;
 import com.foxconn.cnsbg.escort.subsys.location.BLETask;
 import com.foxconn.cnsbg.escort.subsys.location.LocTask;
@@ -26,6 +27,8 @@ public class CtrlCenter {
     private static String UDID;
 
     private static CacheDao mDao;
+    private static SerialCtrl mSc;
+    private static ComMQ mMQ;
 
     private static SerialMonitorTask mSerialMonitorTask;
     private static SerialReadTask mSerialReadTask;
@@ -62,32 +65,32 @@ public class CtrlCenter {
     }
 
     public CtrlCenter(Context context) {
+        SysPref.init(context);
+
         UDID = ((TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
-        if (UDID == null) {
+        if (TextUtils.isEmpty(UDID)) {
             Log.e(TAG, "Can't get UDID, exiting...");
             return;
         }
 
-        UDID = "0"; //debug
-
-        SysPref.init(context);
+        if (!TextUtils.isEmpty(SysPref.APP_UDID))
+            UDID = SysPref.APP_UDID;
 
         //setup database for cache
         mDao = new CacheDao(context, SysPref.APP_DB_NAME);
+        mSc = new SerialCtrl(context);
+        mMQ = new ComMQ(context);
 
-        SerialCtrl sc = new SerialCtrl(context);
-        ComMQ mq = new ComMQ(context);
-
-        mSerialMonitorTask = new SerialMonitorTask(context, sc, mq);
-        mSerialReadTask = new SerialReadTask(context, sc, mq);
-        mCmdTask = new ComRxTask(context, sc, mq);
+        mSerialMonitorTask = new SerialMonitorTask(context, mSc, mMQ);
+        mSerialReadTask = new SerialReadTask(context, mSc, mMQ);
+        mCmdTask = new ComRxTask(context, mSc, mMQ);
         mAccelTask = new AccelTask(context);
-        mGPSTask = new LocTask(context, mq);
-        mBLETask = new BLETask(context, mq);
+        mGPSTask = new LocTask(context, mMQ);
+        mBLETask = new BLETask(context, mMQ);
 
         List<String> subscribes = new ArrayList<String>();
         subscribes.add(SysPref.MQ_TOPIC_COMMAND + UDID);
-        if (mq.init(subscribes)) {
+        if (mMQ.init(subscribes)) {
             setTrackingLocation(true);
             startTask();
         }
@@ -95,6 +98,8 @@ public class CtrlCenter {
 
     public void cleanup() {
         stopTask();
+        mSc.close();
+        mMQ.disconnect();
         mDao.closeDao();
     }
 

@@ -18,8 +18,6 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        sc = new SerialCtrl(this);
-
         String sdcard = Environment.getExternalStorageDirectory().getPath();
         CrashHandler.getInstance().init(sdcard + "/" + SysPref.APP_CRASH_LOG_FILE);
 
@@ -27,17 +25,5 @@ public class MainActivity extends Activity {
 
         startActivity(new Intent(this, SettingsActivity.class));
         finish();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        sc.open();
-    }
-
-    @Override
-    protected void onDestroy() {
-        sc.close();
-        super.onDestroy();
     }
 }

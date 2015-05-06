@@ -13,6 +13,9 @@ public class SysPref {
     public static final String APP_DB_NAME = "escort-db";
     public static final String APP_CRASH_LOG_FILE = "escort_crash_log.txt";
 
+    //Debug
+    public static String APP_UDID = "";
+
     ////////////////////////////////////////////////////////////////////////////////////////////////
     //HTTP Server
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -68,6 +71,9 @@ public class SysPref {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
         String value;
 
+        value = pref.getString(context.getString(R.string.key_device_id), "");
+        APP_UDID = value;
+
         value = String.valueOf(HTTP_SERVER_HOST);
         value = pref.getString(context.getString(R.string.key_http_host), value);
         HTTP_SERVER_HOST = value;
@@ -87,10 +93,6 @@ public class SysPref {
         value = String.valueOf(MQ_KEEP_ALIVE);
         value = pref.getString(context.getString(R.string.key_mq_keep_alive), value);
         MQ_KEEP_ALIVE = Short.valueOf(value);
-
-        value = String.valueOf(HTTP_SERVER_PORT);
-        value = pref.getString(context.getString(R.string.key_http_port), value);
-        HTTP_SERVER_PORT = Integer.parseInt(value);
 
         value = String.valueOf(MQ_CONNECT_ATTEMPTS);
         value = pref.getString(context.getString(R.string.key_mq_connect_attempts), value);
