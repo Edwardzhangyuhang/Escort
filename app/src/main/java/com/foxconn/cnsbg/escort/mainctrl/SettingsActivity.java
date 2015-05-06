@@ -70,6 +70,9 @@ public class SettingsActivity extends PreferenceActivity
         if (pref == null)
             return;
 
+        if (defaults == null)
+            return;
+
         String value = defaults;
 
         if (pref.isEnabled()) {
@@ -90,18 +93,22 @@ public class SettingsActivity extends PreferenceActivity
         EditTextPreference pref = (EditTextPreference) preference;
         String value = String.valueOf(o);
 
+        if (pref.getKey().equalsIgnoreCase(getString(R.string.key_device_id)) && TextUtils.isEmpty(value))
+            value = ((TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
+
         pref.setSummary(value);
 
-        restart_service();
+        applyPreference();
         return true;
     }
 
-    private void restart_service() {
-        Intent serviceIntent = new Intent(this, MainService.class);
+    private void applyPreference() {
+        Intent intent = new Intent(this, MainService.class);
 
         if (SysUtil.isServiceRunning(this, MainService.class))
-            stopService(serviceIntent);
+            stopService(intent);
 
-        startService(serviceIntent);
+        //startService(serviceIntent);
+        System.exit(1);
     }
 }
