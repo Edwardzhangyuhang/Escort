@@ -3,6 +3,7 @@ package com.foxconn.cnsbg.escort.mainctrl;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -98,17 +99,24 @@ public class SettingsActivity extends PreferenceActivity
 
         pref.setSummary(value);
 
-        applyPreference();
+        Handler handler = new Handler();
+        final Runnable providerUpdateThread = new Runnable() {
+            public void run() {
+                exitSystem();
+            }
+        };
+        handler.postDelayed(providerUpdateThread, 1000);
+
         return true;
     }
 
-    private void applyPreference() {
+    private void exitSystem() {
         Intent intent = new Intent(this, MainService.class);
 
         if (SysUtil.isServiceRunning(this, MainService.class))
             stopService(intent);
 
-        //startService(serviceIntent);
+        //startService(intent);
         System.exit(1);
     }
 }
