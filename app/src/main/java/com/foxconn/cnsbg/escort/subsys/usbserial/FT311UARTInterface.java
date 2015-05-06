@@ -79,9 +79,6 @@ public class FT311UARTInterface
 		usbmanager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
 		// Log.d("LED", "usbmanager" +usbmanager);
 		mPermissionIntent = PendingIntent.getBroadcast(context, 0, new Intent(ACTION_USB_PERMISSION), 0);
-		IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
-		filter.addAction(UsbManager.ACTION_USB_ACCESSORY_DETACHED);
-		context.registerReceiver(mUsbReceiver, filter);
 
 		inputstream = null;
 		outputstream = null;
@@ -240,6 +237,10 @@ public class FT311UARTInterface
 			//SysUtil.showToast(global_context, "Manufacturer, Model & Version are matched!", Toast.LENGTH_SHORT);
 			accessory_attached = true;
 
+			IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
+			filter.addAction(UsbManager.ACTION_USB_ACCESSORY_DETACHED);
+			global_context.registerReceiver(mUsbReceiver, filter);
+
 			if (usbmanager.hasPermission(accessory)) {
 				OpenAccessory(accessory);
 			} 
@@ -285,6 +286,9 @@ public class FT311UARTInterface
 		try{Thread.sleep(10);}
 		catch(Exception e){}			
 		CloseAccessory();
+
+		if (accessory_attached)
+			global_context.unregisterReceiver(mUsbReceiver);
 	}
 
 	/*********************helper routines*************************************************/		
@@ -330,13 +334,11 @@ public class FT311UARTInterface
 				outputstream.close();
 
 		}catch(IOException e){}
-		/*FIXME, add the notfication also to close the application*/
+		/*FIXME, add the notification also to close the application*/
 
 		filedescriptor = null;
 		inputstream = null;
 		outputstream = null;
-
-		global_context.unregisterReceiver(mUsbReceiver);
 	}
 
 	protected void saveDetachPreference() {
