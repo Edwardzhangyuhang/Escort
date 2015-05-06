@@ -100,12 +100,12 @@ public class SettingsActivity extends PreferenceActivity
         pref.setSummary(value);
 
         Handler handler = new Handler();
-        final Runnable providerUpdateThread = new Runnable() {
+        final Runnable exitThread = new Runnable() {
             public void run() {
                 exitSystem();
             }
         };
-        handler.postDelayed(providerUpdateThread, 1000);
+        handler.postDelayed(exitThread, 1000);
 
         return true;
     }
