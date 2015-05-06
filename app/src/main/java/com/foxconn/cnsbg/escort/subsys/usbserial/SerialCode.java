@@ -34,4 +34,17 @@ public interface SerialCode {
 
     public static final String MCU_HEARTBEAT_REQ = "R";
     public static final String MCU_HEARTBEAT_ACK = "ha";
+
+    public static final String CMD_GET_BATTERY_BOX = "gb";
+    public static final String ACK_BATTERY_BOX_CLOSED = "S";
+    public static final String ACK_BATTERY_BOX_OPEN = "T";
+
+    public static final String CMD_GET_CONTROL_BOX = "gc";
+    public static final String ACK_CONTROL_BOX_CLOSED = "U";
+    public static final String ACK_CONTROL_BOX_OPEN = "V";
+
+    public static final String CMD_GET_VOLTAGE = "gv";
+    public static final String ACK_VOLTAGE_CRITICAL = "W";
+    public static final String ACK_VOLTAGE_LOW = "X";
+    public static final String ACK_VOLTAGE_NORMAL = "Y";
 }

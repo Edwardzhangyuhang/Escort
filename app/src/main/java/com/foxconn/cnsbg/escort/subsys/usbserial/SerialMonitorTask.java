@@ -31,14 +31,12 @@ public class SerialMonitorTask extends Thread {
 
             if (mStatus != status) {
                 mStatus = status;
-                SysUtil.showToast(mContext, "MCU status:" + status, Toast.LENGTH_SHORT);
 
                 if (status == 2) {
+                    SysUtil.showToast(mContext, "MCU detached!", Toast.LENGTH_SHORT);
                     mMCUConfigured = false;
 
-                    SerialStatus.setLockStatus("");
-                    SerialStatus.setDoorStatus("");
-                    SerialStatus.setMagnetStatus("");
+                    SerialStatus.initStatus();
                 } else if (status == 1) {
                     if (!mMCUConfigured) {
                         mSerialCtrl.config(
@@ -59,6 +57,9 @@ public class SerialMonitorTask extends Thread {
                 mSerialCtrl.write(SerialCode.CMD_GET_LOCK + "\r\n");
                 mSerialCtrl.write(SerialCode.CMD_GET_DOOR + "\r\n");
                 mSerialCtrl.write(SerialCode.CMD_GET_MAGNET + "\r\n");
+                mSerialCtrl.write(SerialCode.CMD_GET_BATTERY_BOX + "\r\n");
+                mSerialCtrl.write(SerialCode.CMD_GET_CONTROL_BOX + "\r\n");
+                mSerialCtrl.write(SerialCode.CMD_GET_VOLTAGE + "\r\n");
             }
 
             try {

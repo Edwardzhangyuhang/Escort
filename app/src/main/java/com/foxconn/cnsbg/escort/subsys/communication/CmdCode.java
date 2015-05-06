@@ -26,10 +26,13 @@ public class CmdCode {
     }
 
     public static enum AckType {
+        OTHERS,
         LOCK,
         DOOR,
         MAGNET,
-        OTHERS
+        BBOX,
+        CBOX,
+        VOLTAGE
     }
 
     public static class CtrlCmd {
@@ -67,6 +70,12 @@ public class CmdCode {
             cmd = new CtrlCmd(CmdTarget.SERIAL, SerialCode.CMD_GET_MAGNET);
         } else if (cmdStr.equals("ca")) {
             cmd = new CtrlCmd(CmdTarget.SERIAL, SerialCode.CMD_CLEAR_ALARM);
+        } else if (cmdStr.equals("gb")) {
+            cmd = new CtrlCmd(CmdTarget.SERIAL, SerialCode.CMD_GET_BATTERY_BOX);
+        } else if (cmdStr.equals("gc")) {
+            cmd = new CtrlCmd(CmdTarget.SERIAL, SerialCode.CMD_GET_CONTROL_BOX);
+        } else if (cmdStr.equals("gv")) {
+            cmd = new CtrlCmd(CmdTarget.SERIAL, SerialCode.CMD_GET_VOLTAGE);
         } else if (cmdStr.startsWith("#")) { //backdoor for debug
             cmd = new CtrlCmd(CmdTarget.SERIAL, cmdStr.substring(1));
         } else {
@@ -151,6 +160,20 @@ public class CmdCode {
             ack = new RespAck(AckSource.ALERT, AckType.DOOR, "", "success", "door is hacked");
         } else if (ackCode.equals(SerialCode.MCU_HEARTBEAT_REQ)) {
             ack = new RespAck(AckSource.HEARTBEAT, AckType.OTHERS, "", "success", "heartbeat");
+        } else if (ackCode.equals(SerialCode.ACK_BATTERY_BOX_OPEN)) {
+            ack = new RespAck(AckSource.GET, AckType.BBOX, "", "success", "open");
+        } else if (ackCode.equals(SerialCode.ACK_BATTERY_BOX_CLOSED)) {
+            ack = new RespAck(AckSource.GET, AckType.BBOX, "", "success", "closed");
+        } else if (ackCode.equals(SerialCode.ACK_CONTROL_BOX_OPEN)) {
+            ack = new RespAck(AckSource.GET, AckType.CBOX, "", "success", "open");
+        } else if (ackCode.equals(SerialCode.ACK_CONTROL_BOX_CLOSED)) {
+            ack = new RespAck(AckSource.GET, AckType.CBOX, "", "success", "closed");
+        } else if (ackCode.equals(SerialCode.ACK_VOLTAGE_CRITICAL)) {
+            ack = new RespAck(AckSource.GET, AckType.VOLTAGE, "", "success", "critical");
+        } else if (ackCode.equals(SerialCode.ACK_VOLTAGE_LOW)) {
+            ack = new RespAck(AckSource.GET, AckType.VOLTAGE, "", "success", "low");
+        } else if (ackCode.equals(SerialCode.ACK_VOLTAGE_NORMAL)) {
+            ack = new RespAck(AckSource.GET, AckType.VOLTAGE, "", "success", "normal");
         } else {
             ack = null;
         }
