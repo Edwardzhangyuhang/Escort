@@ -1,10 +1,8 @@
 package com.foxconn.cnsbg.escort.subsys.communication;
 
 import android.content.Context;
-import android.widget.Toast;
 
 import com.foxconn.cnsbg.escort.common.SysPref;
-import com.foxconn.cnsbg.escort.common.SysUtil;
 
 import org.fusesource.hawtdispatch.Dispatch;
 import org.fusesource.mqtt.client.Future;
@@ -94,7 +92,7 @@ public class ComMQ {
             return null;
         }
 
-        SysUtil.showToast(mContext, "MQ receive:" + result, Toast.LENGTH_SHORT);
+        //SysUtil.showToast(mContext, "MQ receive:" + result, Toast.LENGTH_SHORT);
         return result;
     }
 

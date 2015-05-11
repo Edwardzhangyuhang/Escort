@@ -11,6 +11,7 @@ import android.widget.Toast;
 import com.foxconn.cnsbg.escort.common.SysPref;
 import com.foxconn.cnsbg.escort.common.SysUtil;
 import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
+import com.foxconn.cnsbg.escort.subsys.communication.ComMsgCode;
 import com.foxconn.cnsbg.escort.subsys.communication.ComTxTask;
 import com.foxconn.cnsbg.escort.subsys.communication.ComMQ;
 import com.foxconn.cnsbg.escort.subsys.usbserial.SerialStatus;
@@ -98,8 +99,9 @@ public class BLETask extends ComTxTask implements BluetoothAdapter.LeScanCallbac
 
             bleData.battery_level = SysUtil.getBatteryLevel(mContext);
             bleData.signal_strength = SysUtil.getSignalStrength(mContext);
-            bleData.lock_status = SerialStatus.getLockStatus();
-            bleData.door_status = SerialStatus.getDoorStatus();
+            bleData.voltage_level = SerialStatus.getVoltageLevel();
+            bleData.lock_status = SerialStatus.getStatusStr(ComMsgCode.TargetType.LOCK);
+            bleData.door_status = SerialStatus.getStatusStr(ComMsgCode.TargetType.DOOR);
 
             bleData.location = new BLEData.BLELoc();
             bleData.location.data = new BLEData.DeviceData();

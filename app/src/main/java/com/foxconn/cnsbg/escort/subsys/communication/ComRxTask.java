@@ -8,6 +8,7 @@ import com.foxconn.cnsbg.escort.common.SysPref;
 import com.foxconn.cnsbg.escort.common.SysUtil;
 import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
 import com.foxconn.cnsbg.escort.subsys.usbserial.SerialCtrl;
+import com.foxconn.cnsbg.escort.subsys.usbserial.SerialStatus;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
@@ -52,11 +53,11 @@ public final class ComRxTask extends Thread {
             return null;
 
         try {
-            CmdCtrlMsg msg = gson.fromJson(msgStr, CmdCtrlMsg.class);
+            ComMsg.CtrlMsg msg = gson.fromJson(msgStr, ComMsg.CtrlMsg.class);
             if (!msg.device_id.equals(CtrlCenter.getUDID()))
                 return null;
 
-            CmdCode.setCmdId(msg.cmd_id);
+            ComMsgCode.setCmdId(msg.cmd_id);
             return msg.cmd;
         } catch (JsonParseException e) {
             Log.w(TAG + ":handleMessage", "JsonParseException");
@@ -64,7 +65,7 @@ public final class ComRxTask extends Thread {
             Log.w(TAG + ":handleMessage", "NullPointerException");
         }
 
-        CmdCode.setCmdId(0);
+        ComMsgCode.setCmdId(0);
         return msgStr;
     }
 
@@ -72,18 +73,44 @@ public final class ComRxTask extends Thread {
         if (cmdStr == null)
             return false;
 
-        CmdCode.CtrlCmd cmd = CmdCode.getCtrlCmd(cmdStr);
+        ComMsgCode.CtrlCmd cmd = ComMsgCode.getCtrlCmd(cmdStr);
         if (cmd == null)
             return false;
 
-        switch (cmd.getTarget()) {
-            case SERIAL:
-                mSerialCtrl.write(cmd.getCode() + "\r\n");
-                break;
-            default:
-                break;
+        if (cmd.getCmdType() == ComMsgCode.CmdType.GET)
+            return handleGetCmd(cmd);
+        else if (cmd.getCmdTarget() == ComMsgCode.CmdTarget.SERIAL)
+            return handleSerialCmd(cmd);
+        else if (cmd.getCmdTarget() == ComMsgCode.CmdTarget.SELF)
+            return handleSelfCmd(cmd);
+
+        return false;
+    }
+
+    private boolean handleGetCmd(ComMsgCode.CtrlCmd cmd) {
+        ComMsgCode.RespAck resp = SerialStatus.getStatus(cmd.getTargetType());
+
+        return ComMsg.sendRespMsg(mComMQ, resp, SysPref.MQ_SEND_MAX_TIMEOUT);
+    }
+
+    private boolean handleSerialCmd(ComMsgCode.CtrlCmd cmd) {
+        mSerialCtrl.write(cmd.getCmdCode() + "\r\n");
+        return true;
+    }
+
+    private boolean handleSelfCmd(ComMsgCode.CtrlCmd cmd) {
+        ComMsgCode.RespAck resp;
+
+        if (cmd.getCmdStr().equals(ComMsgCode.CMD_STR_SET_ACTIVATION)) {
+            CtrlCenter.setTrackingLocation(true);
+            resp = ComMsgCode.getRespAck(ComMsgCode.ACK_STR_SET_ACTIVATION_OK);
+        } else if (cmd.getCmdStr().equals(ComMsgCode.CMD_STR_SET_DEACTIVATION)) {
+            CtrlCenter.setTrackingLocation(false);
+            resp = ComMsgCode.getRespAck(ComMsgCode.ACK_STR_SET_DEACTIVATION_OK);
+        } else {
+            return false;
         }
 
-        return true;
+        return ComMsg.sendRespMsg(mComMQ, resp, SysPref.MQ_SEND_MAX_TIMEOUT);
     }
 }

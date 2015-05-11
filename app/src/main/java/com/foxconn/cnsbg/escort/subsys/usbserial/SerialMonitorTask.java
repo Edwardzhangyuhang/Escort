@@ -3,8 +3,11 @@ package com.foxconn.cnsbg.escort.subsys.usbserial;
 import android.content.Context;
 import android.widget.Toast;
 
+import com.foxconn.cnsbg.escort.common.SysPref;
 import com.foxconn.cnsbg.escort.common.SysUtil;
 import com.foxconn.cnsbg.escort.subsys.communication.ComMQ;
+import com.foxconn.cnsbg.escort.subsys.communication.ComMsg;
+import com.foxconn.cnsbg.escort.subsys.communication.ComMsgCode;
 
 public class SerialMonitorTask extends Thread {
     private static final String TAG = SerialMonitorTask.class.getSimpleName();
@@ -28,6 +31,7 @@ public class SerialMonitorTask extends Thread {
     public void run() {
         while (!requestShutdown) {
             int status = mSerialCtrl.open();
+            ComMsgCode.RespAck resp = null;
 
             if (mStatus != status) {
                 mStatus = status;
@@ -37,6 +41,8 @@ public class SerialMonitorTask extends Thread {
                     mMCUConfigured = false;
 
                     SerialStatus.initStatus();
+
+                    resp = ComMsgCode.getRespAck(ComMsgCode.ACK_STR_MCU_DETACHED);
                 } else if (status == 1) {
                     if (!mMCUConfigured) {
                         mSerialCtrl.config(
@@ -48,22 +54,22 @@ public class SerialMonitorTask extends Thread {
 
                         SysUtil.showToast(mContext, "MCU configured!", Toast.LENGTH_SHORT);
                         mMCUConfigured = true;
+
+                        resp = ComMsgCode.getRespAck(ComMsgCode.ACK_STR_MCU_ATTACHED);
                     }
                 }
             }
 
             if (status == 1) {
                 //trigger serial read task to set status
-                mSerialCtrl.write(SerialCode.CMD_GET_LOCK + "\r\n");
-                mSerialCtrl.write(SerialCode.CMD_GET_DOOR + "\r\n");
-                mSerialCtrl.write(SerialCode.CMD_GET_MAGNET + "\r\n");
-                mSerialCtrl.write(SerialCode.CMD_GET_BATTERY_BOX + "\r\n");
-                mSerialCtrl.write(SerialCode.CMD_GET_CONTROL_BOX + "\r\n");
-                mSerialCtrl.write(SerialCode.CMD_GET_VOLTAGE + "\r\n");
+                SerialStatus.checkStatus(mSerialCtrl);
             }
 
             try {
-                Thread.sleep(runInterval);
+                if (resp != null)
+                    ComMsg.sendAlertMsg(mComMQ, resp, SysPref.MQ_SEND_MAX_TIMEOUT);
+                else
+                    Thread.sleep(runInterval);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

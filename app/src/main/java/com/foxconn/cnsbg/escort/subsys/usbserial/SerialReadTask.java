@@ -2,16 +2,11 @@ package com.foxconn.cnsbg.escort.subsys.usbserial;
 
 import android.content.Context;
 
-import com.foxconn.cnsbg.escort.common.SysPref;
-import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
-import com.foxconn.cnsbg.escort.subsys.communication.AlertMsg;
-import com.foxconn.cnsbg.escort.subsys.communication.CmdCode;
-import com.foxconn.cnsbg.escort.subsys.communication.CmdRespMsg;
 import com.foxconn.cnsbg.escort.subsys.communication.ComMQ;
+import com.foxconn.cnsbg.escort.subsys.communication.ComMsg;
+import com.foxconn.cnsbg.escort.subsys.communication.ComMsgCode;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
-import java.util.Date;
 
 public final class SerialReadTask extends Thread {
     private static final String TAG = SerialReadTask.class.getSimpleName();
@@ -25,9 +20,6 @@ public final class SerialReadTask extends Thread {
     private SerialCtrl mSerialCtrl;
     private ComMQ mComMQ;
     private byte[] mAckBuffer;
-
-    private static final String alertTopic = SysPref.MQ_TOPIC_ALERT + CtrlCenter.getUDID();
-    private static final String respTopic = SysPref.MQ_TOPIC_RESPONSE + CtrlCenter.getUDID();
 
     public SerialReadTask(Context context, SerialCtrl sc, ComMQ mq) {
         mContext = context;
@@ -66,72 +58,31 @@ public final class SerialReadTask extends Thread {
             //SysUtil.showToast(mContext, ack, Toast.LENGTH_SHORT);
 
             String ackCode = ack.substring(0, 1);
-            CmdCode.RespAck resp = CmdCode.getRespAck(ackCode);
+            ComMsgCode.RespAck resp = ComMsgCode.getRespAck(ackCode);
 
             if (resp == null)
                 continue;
 
             switch (resp.getAckSource()) {
                 case ALERT:
-                    handleAlert(resp);
+                    ComMsg.sendAlertMsg(mComMQ, resp, runInterval);
                     break;
                 case SET:
-                    handleCmdResp(resp);
+                    ComMsg.sendRespMsg(mComMQ, resp, runInterval);
                     break;
                 case GET:
-                    handleStatusResp(resp);
+                    boolean statusChanged = SerialStatus.setStatus(resp);
+                    if (!statusChanged)
+                        break;
+
+                    ComMsg.sendAlertMsg(mComMQ, resp, runInterval);
                     break;
                 case HEARTBEAT:
-                    mSerialCtrl.write(SerialCode.MCU_HEARTBEAT_ACK + "\r\n");
+                    mSerialCtrl.write(SerialCode.MCU_CODE_HEARTBEAT_ACK + "\r\n");
                     break;
                 default:
                     break;
             }
-        }
-    }
-
-    private boolean handleAlert(CmdCode.RespAck resp) {
-        AlertMsg msg = new AlertMsg();
-
-        msg.device_id = CtrlCenter.getUDID();
-        msg.time = new Date();
-
-        msg.alert = new AlertMsg.AlertData();
-        msg.alert.type = resp.getAckType().ordinal();
-        msg.alert.level = "urgent";
-        msg.alert.info = resp.getInfo();
-
-        String json = gson.toJson(msg, AlertMsg.class);
-        return mComMQ.publish(alertTopic, json, runInterval);
-    }
-
-    private boolean handleCmdResp(CmdCode.RespAck resp) {
-        CmdRespMsg msg = new CmdRespMsg();
-
-        msg.device_id = CtrlCenter.getUDID();
-        msg.time = new Date();
-        msg.cmd = resp.getCmd();
-        msg.cmd_id = CmdCode.getCmdId();
-        msg.result = resp.getResult();
-        msg.reason = resp.getInfo();
-
-        String json = gson.toJson(msg, CmdRespMsg.class);
-        return mComMQ.publish(respTopic, json, runInterval);
-    }
-
-    private void handleStatusResp(CmdCode.RespAck resp) {
-        switch (resp.getAckType()) {
-            case LOCK:
-                SerialStatus.setLockStatus(resp.getInfo());
-                break;
-            case DOOR:
-                SerialStatus.setDoorStatus(resp.getInfo());
-                break;
-            case MAGNET:
-                SerialStatus.setMagnetStatus(resp.getInfo());
-                break;
-            default:
-                break;
         }
     }
 }

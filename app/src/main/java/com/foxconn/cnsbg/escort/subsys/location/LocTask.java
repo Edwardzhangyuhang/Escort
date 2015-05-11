@@ -15,6 +15,7 @@ import com.foxconn.cnsbg.escort.BuildConfig;
 import com.foxconn.cnsbg.escort.common.SysPref;
 import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
 import com.foxconn.cnsbg.escort.common.SysUtil;
+import com.foxconn.cnsbg.escort.subsys.communication.ComMsgCode;
 import com.foxconn.cnsbg.escort.subsys.communication.ComTxTask;
 import com.foxconn.cnsbg.escort.subsys.communication.ComMQ;
 import com.foxconn.cnsbg.escort.subsys.usbserial.SerialStatus;
@@ -61,7 +62,7 @@ public class LocTask extends ComTxTask {
         //get a handle on the location manager
         locHandler = new LocationUpdateHandler();
         locManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-        curProvider = LocationManager.NETWORK_PROVIDER;//used to trigger the notification
+        curProvider = LocationManager.NETWORK_PROVIDER;//used to trigger the updating
         curProvider = findAvailableProvider(Criteria.ACCURACY_COARSE);
         lastProviderCheckTime = new Date().getTime();
 
@@ -199,8 +200,9 @@ public class LocTask extends ComTxTask {
 
         locData.battery_level = SysUtil.getBatteryLevel(mContext);
         locData.signal_strength = SysUtil.getSignalStrength(mContext);
-        locData.lock_status = SerialStatus.getLockStatus();
-        locData.door_status = SerialStatus.getDoorStatus();
+        locData.voltage_level = SerialStatus.getVoltageLevel();
+        locData.lock_status = SerialStatus.getStatusStr(ComMsgCode.TargetType.LOCK);
+        locData.door_status = SerialStatus.getStatusStr(ComMsgCode.TargetType.DOOR);
 
         locData.location = new LocData.GPSLoc();
         locData.location.data = new LocData.GPSData();
@@ -219,10 +221,12 @@ public class LocTask extends ComTxTask {
 
     @Override
     protected void checkTask() {
-        if (CtrlCenter.isTrackingLocation())
+        if (CtrlCenter.isTrackingLocation()) {
             checkProvider();
-        else
+        } else {
+            isProviderChanged = true;
             setLocUpdating(false);
+        }
     }
 
     private void checkProvider() {

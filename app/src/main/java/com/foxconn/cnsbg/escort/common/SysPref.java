@@ -32,8 +32,8 @@ public class SysPref {
     public static long MQ_RECONNECT_ATTEMPTS = -1L;
     public static long MQ_RECONNECT_DELAY = 5 * 1000L; //milliseconds
     public static long MQ_RECONNECT_MAX_DELAY = 15 * 1000L; //milliseconds
-    public static long MQ_SEND_MAX_TIMEOUT = 10 * 1000L; //milliseconds
-    public static long MQ_RECV_MAX_TIMEOUT = 10 * 1000L; //milliseconds
+    public static long MQ_SEND_MAX_TIMEOUT = 5 * 1000L; //milliseconds
+    public static long MQ_RECV_MAX_TIMEOUT = 5 * 1000L; //milliseconds
     public static String MQ_TOPIC_GPS_DATA = "data/dev/";
     public static String MQ_TOPIC_BLE_DATA = "data/dev/";
     public static String MQ_TOPIC_COMMAND = "control/dev/";
@@ -46,7 +46,7 @@ public class SysPref {
     public static int LOC_TASK_RUN_INTERVAL = 1000;
     //change these to fine tune the power consumption
     //minimal accuracy
-    public static float LOC_MIN_ACCURACY = 51.0F;
+    public static float LOC_MIN_ACCURACY = 16.0F;
     //minimal update distance
     public static float LOC_UPDATE_MIN_DISTANCE = 5.0F;
     //minimal update interval

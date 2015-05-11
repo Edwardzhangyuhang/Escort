@@ -7,6 +7,7 @@ public final class BLEData {
     public Date time;
     public int battery_level;
     public int signal_strength;
+    public int voltage_level;
     public String lock_status;
     public String door_status;
     public BLELoc location;
