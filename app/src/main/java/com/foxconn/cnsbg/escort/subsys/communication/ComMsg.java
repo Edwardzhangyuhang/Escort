@@ -1,9 +1,12 @@
 package com.foxconn.cnsbg.escort.subsys.communication;
 
+import android.util.Log;
+
 import com.foxconn.cnsbg.escort.common.SysPref;
 import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParseException;
 
 import java.util.Date;
 
@@ -71,6 +74,24 @@ public class ComMsg {
     private static Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
     private static final String alertTopic = SysPref.MQ_TOPIC_ALERT + CtrlCenter.getUDID();
     private static final String respTopic = SysPref.MQ_TOPIC_RESPONSE + CtrlCenter.getUDID();
+
+    public static String parseCmdMsg(String msgStr) {
+        try {
+            CtrlMsg msg = gson.fromJson(msgStr, ComMsg.CtrlMsg.class);
+            if (!msg.device_id.equals(CtrlCenter.getUDID()))
+                return null;
+
+            ComMsgCode.setCmdId(msg.cmd_id);
+            return msg.cmd;
+        } catch (JsonParseException e) {
+            Log.w("parseCmdMsg:", "JsonParseException");
+        } catch (NullPointerException e) {
+            Log.w("parseCmdMsg:", "NullPointerException");
+        }
+
+        ComMsgCode.setCmdId(0);
+        return msgStr;
+    }
 
     public static boolean sendAlertMsg(ComMQ mq, ComMsgCode.RespAck resp, long timeout) {
         AlertMsg msg = generateAlertMsg(resp);

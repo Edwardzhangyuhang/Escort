@@ -340,7 +340,7 @@ public class ComMsgCode {
             targetType = TargetType.LOCK;
             cmdStr = CMD_STR_GET_LOCK;
             result = RespAck.ACK_RESULT_FAIL;
-            info = "no lock";
+            info = "";
         } else if (ackCode.equals(SerialCode.ACK_CODE_GET_LOCK_NG)) {
             ackSource = AckSource.GET;
             targetType = TargetType.LOCK;

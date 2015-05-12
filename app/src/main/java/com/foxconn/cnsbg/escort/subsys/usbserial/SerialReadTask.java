@@ -2,11 +2,10 @@ package com.foxconn.cnsbg.escort.subsys.usbserial;
 
 import android.content.Context;
 
+import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
 import com.foxconn.cnsbg.escort.subsys.communication.ComMQ;
 import com.foxconn.cnsbg.escort.subsys.communication.ComMsg;
 import com.foxconn.cnsbg.escort.subsys.communication.ComMsgCode;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 public final class SerialReadTask extends Thread {
     private static final String TAG = SerialReadTask.class.getSimpleName();
@@ -15,7 +14,6 @@ public final class SerialReadTask extends Thread {
     protected int runInterval = 500;
     protected boolean requestShutdown = false;
 
-    private Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
     private Context mContext;
     private SerialCtrl mSerialCtrl;
     private ComMQ mComMQ;
@@ -51,17 +49,25 @@ public final class SerialReadTask extends Thread {
         String ackStr = new String(ackBytes, 0, num);
         String acks[] = ackStr.split("\r\n");
 
+        //SysUtil.showToast(mContext, ackStr, Toast.LENGTH_SHORT);
+
         for (String ack : acks) {
             if (ack.length() == 0)
                 continue;
 
-            //SysUtil.showToast(mContext, ack, Toast.LENGTH_SHORT);
+            //FIXME! Should remove for formal code
+            if (ack.length() < 2 || ack.charAt(1) != ':')
+                continue;
 
             String ackCode = ack.substring(0, 1);
             ComMsgCode.RespAck resp = ComMsgCode.getRespAck(ackCode);
 
             if (resp == null)
                 continue;
+
+            //set ALARM flag for lock status processing
+            if (resp.getAckCode().equals(SerialCode.MCU_CODE_DOOR_ALARM))
+                CtrlCenter.setDoorAlarm(true);
 
             switch (resp.getAckSource()) {
                 case ALERT:

@@ -39,6 +39,7 @@ public class CtrlCenter {
 
     private static boolean isTrackingLocation = false;
     private static long motionDetectionTime = new Date().getTime();
+    private static boolean isDoorAlarm = false;
 
     public static String getUDID() {
         return UDID;
@@ -62,6 +63,14 @@ public class CtrlCenter {
 
     public static void setMotionDetectionTime(long time) {
         motionDetectionTime = time;
+    }
+
+    public static boolean isDoorAlarm() {
+        return isDoorAlarm;
+    }
+
+    public static void setDoorAlarm(boolean alarm) {
+        isDoorAlarm = alarm;
     }
 
     public CtrlCenter(Context context) {

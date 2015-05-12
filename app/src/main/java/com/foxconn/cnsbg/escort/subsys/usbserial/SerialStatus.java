@@ -1,5 +1,6 @@
 package com.foxconn.cnsbg.escort.subsys.usbserial;
 
+import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
 import com.foxconn.cnsbg.escort.subsys.communication.ComMsgCode;
 
 public final class SerialStatus {
@@ -20,12 +21,7 @@ public final class SerialStatus {
     }
 
     public synchronized static void checkStatus(SerialCtrl sc) {
-        sc.write(SerialCode.CMD_CODE_GET_LOCK + "\r\n");
-        sc.write(SerialCode.CMD_CODE_GET_DOOR + "\r\n");
-        sc.write(SerialCode.CMD_CODE_GET_MAGNET + "\r\n");
-        sc.write(SerialCode.CMD_CODE_GET_BATTERY_BOX + "\r\n");
-        sc.write(SerialCode.CMD_CODE_GET_CONTROL_BOX + "\r\n");
-        sc.write(SerialCode.CMD_CODE_GET_VOLTAGE + "\r\n");
+        sc.write(SerialCode.CMD_CODE_GET_ALL_STATUS + "\r\n");
     }
 
     public synchronized static boolean setStatus(ComMsgCode.RespAck resp) {
@@ -34,6 +30,10 @@ public final class SerialStatus {
 
         switch (type) {
             case LOCK:
+                //lock status is not reliable in this state
+                if (CtrlCenter.isDoorAlarm())
+                    ackCode = ComMsgCode.ACK_STR_GET_LOCK_NONE;
+
                 if (mLockStatusCode.equals(ackCode))
                     return false;
 
