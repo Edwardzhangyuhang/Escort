@@ -6,7 +6,7 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-public abstract class ComTxTask extends Thread {
+public abstract class ComTxTask<T> extends Thread {
     private static final String TAG = ComTxTask.class.getSimpleName();
 
     protected volatile int runInterval = 1000; //Default wait time of 1 sec
@@ -21,7 +21,7 @@ public abstract class ComTxTask extends Thread {
         //stop this loop by calling the .stop() method is not recommended
         while (!requestShutdown) {
             //collect data
-            String data = collectData();
+            T data = collectData();
 
             //then send it to the server
             if (sendData(data)) {
@@ -50,9 +50,9 @@ public abstract class ComTxTask extends Thread {
         requestShutdown = true;
     }
 
-    protected abstract String collectData();
-    protected abstract boolean sendData(String dataStr);
+    protected abstract T collectData();
+    protected abstract boolean sendData(T data);
     protected abstract boolean sendCachedData();
-    protected abstract void saveCachedData(String dataStr);
+    protected abstract void saveCachedData(T data);
     protected abstract void checkTask();
 }

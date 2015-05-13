@@ -15,7 +15,7 @@ import com.foxconn.cnsbg.escort.subsys.communication.ComTxTask;
 
 import java.util.Date;
 
-public class AccelTask extends ComTxTask implements SensorEventListener {
+public class AccelTask extends ComTxTask<AccelData> implements SensorEventListener {
     private static final String TAG = AccelTask.class.getSimpleName();
 
     private boolean mListening = false;
@@ -61,7 +61,7 @@ public class AccelTask extends ComTxTask implements SensorEventListener {
     }
 
     @Override
-    protected String collectData() {
+    protected AccelData collectData() {
         return null;
     }
 
@@ -96,7 +96,7 @@ public class AccelTask extends ComTxTask implements SensorEventListener {
     }
 
     @Override
-    protected boolean sendData(String dataStr) {
+    protected boolean sendData(AccelData data) {
         return true;
     }
 
@@ -106,7 +106,7 @@ public class AccelTask extends ComTxTask implements SensorEventListener {
     }
 
     @Override
-    protected void saveCachedData(String dataStr) {
+    protected void saveCachedData(AccelData data) {
     }
 
 }

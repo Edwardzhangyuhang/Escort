@@ -5,17 +5,15 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.foxconn.cnsbg.escort.common.SysPref;
 import com.foxconn.cnsbg.escort.common.SysUtil;
 import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
+import com.foxconn.cnsbg.escort.subsys.communication.ComMQ;
 import com.foxconn.cnsbg.escort.subsys.communication.ComMsgCode;
 import com.foxconn.cnsbg.escort.subsys.communication.ComTxTask;
-import com.foxconn.cnsbg.escort.subsys.communication.ComMQ;
 import com.foxconn.cnsbg.escort.subsys.usbserial.SerialStatus;
-import com.google.gson.JsonParseException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,7 +21,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-public class BLETask extends ComTxTask implements BluetoothAdapter.LeScanCallback {
+public class BLETask extends ComTxTask<BLEData> implements BluetoothAdapter.LeScanCallback {
     private static final String TAG = BLETask.class.getSimpleName();
 
     private BluetoothAdapter mBluetoothAdapter;
@@ -124,24 +122,22 @@ public class BLETask extends ComTxTask implements BluetoothAdapter.LeScanCallbac
     }
 
     @Override
-    protected String collectData() {
+    protected BLEData collectData() {
         if (bleDataUpdated) {
             bleDataUpdated = false;
-            return gson.toJson(bleData, BLEData.class);
+            return bleData;
         }
 
         return null;
     }
 
     @Override
-    protected boolean sendData(String dataStr) {
-        if (dataStr == null)
+    protected boolean sendData(BLEData data) {
+        if (data == null)
             return false;
 
-        if (!mComMQ.publish(bleTopic, dataStr, SysPref.MQ_SEND_MAX_TIMEOUT))
-            return false;
-
-        return true;
+        String dataStr = gson.toJson(data, BLEData.class);
+        return mComMQ.publish(bleTopic, dataStr, SysPref.MQ_SEND_MAX_TIMEOUT);
     }
 
     @Override
@@ -152,8 +148,7 @@ public class BLETask extends ComTxTask implements BluetoothAdapter.LeScanCallbac
 
         List<BLEData> sentList = new ArrayList<BLEData>();
         for (BLEData data : dataList) {
-            String dataString = gson.toJson(data, BLEData.class);
-            if (sendData(dataString))
+            if (sendData(data))
                 sentList.add(data);
             else
                 break;
@@ -162,25 +157,15 @@ public class BLETask extends ComTxTask implements BluetoothAdapter.LeScanCallbac
         //could delete one by one, bulk deletion is just for convenience
         CtrlCenter.getDao().deleteCachedBleData(sentList);
 
-        if (sentList.size() == dataList.size())
-            return true;
-
-        return false;
+        return (sentList.size() == dataList.size());
     }
 
     @Override
-    protected void saveCachedData(String dataStr) {
-        if (dataStr == null || dataStr.length() == 0)
+    protected void saveCachedData(BLEData data) {
+        if (data == null)
             return;
 
-        try {
-            BLEData data = gson.fromJson(dataStr, BLEData.class);
-            CtrlCenter.getDao().saveCachedBleData(data);
-        } catch (JsonParseException e) {
-            Log.w(TAG + ":saveCachedData", "JsonParseException");
-        } catch (NullPointerException e) {
-            Log.w(TAG + ":saveCachedData", "NullPointerException");
-        }
+        CtrlCenter.getDao().saveCachedBleData(data);
     }
 
     @Override

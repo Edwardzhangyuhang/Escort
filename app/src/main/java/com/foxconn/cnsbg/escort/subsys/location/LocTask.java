@@ -13,19 +13,18 @@ import android.widget.Toast;
 
 import com.foxconn.cnsbg.escort.BuildConfig;
 import com.foxconn.cnsbg.escort.common.SysPref;
-import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
 import com.foxconn.cnsbg.escort.common.SysUtil;
+import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
+import com.foxconn.cnsbg.escort.subsys.communication.ComMQ;
 import com.foxconn.cnsbg.escort.subsys.communication.ComMsgCode;
 import com.foxconn.cnsbg.escort.subsys.communication.ComTxTask;
-import com.foxconn.cnsbg.escort.subsys.communication.ComMQ;
 import com.foxconn.cnsbg.escort.subsys.usbserial.SerialStatus;
-import com.google.gson.JsonParseException;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class LocTask extends ComTxTask {
+public class LocTask extends ComTxTask<LocData> {
     private static final String TAG = LocTask.class.getSimpleName();
 
     private boolean locUpdating = false;
@@ -118,12 +117,12 @@ public class LocTask extends ComTxTask {
     }
 
     @Override
-    protected String collectData() {
-        //new loc have been constructed and be ready to send
+    protected LocData collectData() {
         if (locDataUpdated) {
             locDataUpdated = false;
-            return gson.toJson(locData, LocData.class);
+            return locData;
         }
+
         return null;
     }
 
@@ -267,14 +266,12 @@ public class LocTask extends ComTxTask {
     }
 
     @Override
-    protected boolean sendData(String dataStr) {
-        if (dataStr == null)
+    protected boolean sendData(LocData data) {
+        if (data == null)
             return false;
 
-        if (!mComMQ.publish(gpsTopic, dataStr, SysPref.MQ_SEND_MAX_TIMEOUT))
-            return false;
-
-        return true;
+        String dataStr = gson.toJson(data, LocData.class);
+        return mComMQ.publish(gpsTopic, dataStr, SysPref.MQ_SEND_MAX_TIMEOUT);
     }
 
     @Override
@@ -285,8 +282,7 @@ public class LocTask extends ComTxTask {
 
         List<LocData> sentList = new ArrayList<LocData>();
         for (LocData data : dataList) {
-            String dataString = gson.toJson(data, LocData.class);
-            if (sendData(dataString))
+            if (sendData(data))
                 sentList.add(data);
             else
                 break;
@@ -295,25 +291,14 @@ public class LocTask extends ComTxTask {
         //could delete one by one, bulk deletion is just for convenience
         CtrlCenter.getDao().deleteCachedLocData(sentList);
 
-        if (sentList.size() == dataList.size())
-            return true;
-
-        return false;
+        return (sentList.size() == dataList.size());
     }
 
     @Override
-    protected void saveCachedData(String dataStr) {
-        if (dataStr == null || dataStr.length() == 0)
+    protected void saveCachedData(LocData data) {
+        if (data == null)
             return;
 
-        try {
-            LocData data = gson.fromJson(dataStr, LocData.class);
-            CtrlCenter.getDao().saveCachedLocData(data);
-        } catch (JsonParseException e) {
-            Log.w(TAG + ":saveCachedData", "JsonParseException");
-        } catch (NullPointerException e) {
-            Log.w(TAG + ":saveCachedData", "NullPointerException");
-        }
+        CtrlCenter.getDao().saveCachedLocData(data);
     }
-
 }
