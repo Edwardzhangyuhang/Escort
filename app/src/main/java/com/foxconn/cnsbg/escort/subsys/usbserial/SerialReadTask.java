@@ -73,10 +73,10 @@ public final class SerialReadTask extends Thread {
                 case ALERT:
                     ComMsg.sendAlertMsg(mComMQ, resp, runInterval);
                     break;
-                case SET:
+                case SET_CMD:
                     ComMsg.sendRespMsg(mComMQ, resp, runInterval);
                     break;
-                case GET:
+                case GET_CMD:
                     boolean statusChanged = SerialStatus.setStatus(resp);
                     if (!statusChanged)
                         break;

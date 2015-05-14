@@ -8,6 +8,7 @@ import android.util.Log;
 import com.foxconn.cnsbg.escort.common.SysPref;
 import com.foxconn.cnsbg.escort.subsys.cache.CacheDao;
 import com.foxconn.cnsbg.escort.subsys.communication.ComMQ;
+import com.foxconn.cnsbg.escort.subsys.controller.DeviceRoundTask;
 import com.foxconn.cnsbg.escort.subsys.communication.ComRxTask;
 import com.foxconn.cnsbg.escort.subsys.communication.ComTxTask;
 import com.foxconn.cnsbg.escort.subsys.location.AccelTask;
@@ -32,14 +33,16 @@ public class CtrlCenter {
 
     private static SerialMonitorTask mSerialMonitorTask;
     private static SerialReadTask mSerialReadTask;
+    private static DeviceRoundTask mDeviceRoundTask;
     private static ComRxTask mCmdTask;
     private static ComTxTask mAccelTask;
     private static ComTxTask mGPSTask;
     private static ComTxTask mBLETask;
 
-    private static boolean isTrackingLocation = false;
     private static long motionDetectionTime = new Date().getTime();
+    private static boolean isTrackingLocation = false;
     private static boolean isDoorAlarm = false;
+    private static boolean isActiveState = false;
 
     public static String getUDID() {
         return UDID;
@@ -73,6 +76,14 @@ public class CtrlCenter {
         isDoorAlarm = alarm;
     }
 
+    public static boolean isActiveState() {
+        return isActiveState;
+    }
+
+    public static void setActiveState(boolean state) {
+        isActiveState = state;
+    }
+
     public CtrlCenter(Context context) {
         SysPref.init(context);
 
@@ -92,6 +103,7 @@ public class CtrlCenter {
 
         mSerialMonitorTask = new SerialMonitorTask(context, mSc, mMQ);
         mSerialReadTask = new SerialReadTask(context, mSc, mMQ);
+        mDeviceRoundTask = new DeviceRoundTask(context, mMQ);
         mCmdTask = new ComRxTask(context, mSc, mMQ);
         mAccelTask = new AccelTask(context);
         mGPSTask = new LocTask(context, mMQ);
@@ -115,6 +127,7 @@ public class CtrlCenter {
     private void startTask() {
         mSerialMonitorTask.start();
         mSerialReadTask.start();
+        mDeviceRoundTask.start();
         mCmdTask.start();
         mAccelTask.start();
         mGPSTask.start();
@@ -124,6 +137,7 @@ public class CtrlCenter {
     private void stopTask() {
         mSerialMonitorTask.requestShutdown();
         mSerialReadTask.requestShutdown();
+        mDeviceRoundTask.requestShutdown();
         mCmdTask.requestShutdown();
         mAccelTask.requestShutdown();
         mGPSTask.requestShutdown();
@@ -131,12 +145,13 @@ public class CtrlCenter {
 
         boolean monitorTaskAlive = mSerialMonitorTask.isAlive();
         boolean readTaskAlive = mSerialReadTask.isAlive();
+        boolean roundTaskAlive = mDeviceRoundTask.isAlive();
         boolean cmdTaskAlive = mCmdTask.isAlive();
         boolean accelTaskAlive = mAccelTask.isAlive();
         boolean gpsTaskAlive = mGPSTask.isAlive();
         boolean bleTaskAlive = mBLETask.isAlive();
 
-        while (monitorTaskAlive || readTaskAlive
+        while (monitorTaskAlive || readTaskAlive || roundTaskAlive
                 || cmdTaskAlive || accelTaskAlive
                 || gpsTaskAlive || bleTaskAlive) {
             try {
@@ -147,6 +162,7 @@ public class CtrlCenter {
 
             monitorTaskAlive = mSerialMonitorTask.isAlive();
             readTaskAlive = mSerialReadTask.isAlive();
+            roundTaskAlive = mDeviceRoundTask.isAlive();
             cmdTaskAlive = mCmdTask.isAlive();
             accelTaskAlive = mAccelTask.isAlive();
             gpsTaskAlive = mGPSTask.isAlive();

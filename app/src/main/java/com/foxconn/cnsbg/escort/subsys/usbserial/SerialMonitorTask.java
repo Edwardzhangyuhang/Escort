@@ -3,7 +3,6 @@ package com.foxconn.cnsbg.escort.subsys.usbserial;
 import android.content.Context;
 import android.widget.Toast;
 
-import com.foxconn.cnsbg.escort.common.SysPref;
 import com.foxconn.cnsbg.escort.common.SysUtil;
 import com.foxconn.cnsbg.escort.subsys.communication.ComMQ;
 import com.foxconn.cnsbg.escort.subsys.communication.ComMsg;
@@ -67,7 +66,7 @@ public class SerialMonitorTask extends Thread {
 
             try {
                 if (resp != null)
-                    ComMsg.sendAlertMsg(mComMQ, resp, SysPref.MQ_SEND_MAX_TIMEOUT);
+                    ComMsg.sendAlertMsg(mComMQ, resp, runInterval);
                 else
                     Thread.sleep(runInterval);
             } catch (InterruptedException e) {

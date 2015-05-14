@@ -29,7 +29,7 @@ public final class SerialStatus {
         String ackCode = resp.getAckCode();
 
         switch (type) {
-            case LOCK:
+            case MCU_LOCK_STATUS:
                 //lock status is not reliable in this state
                 if (CtrlCenter.isDoorAlarm())
                     ackCode = ComMsgCode.ACK_STR_GET_LOCK_NONE;
@@ -39,31 +39,31 @@ public final class SerialStatus {
 
                 mLockStatusCode = ackCode;
                 return true;
-            case DOOR:
+            case MCU_DOOR_STATUS:
                 if (mDoorStatusCode.equals(ackCode))
                     return false;
 
                 mDoorStatusCode = ackCode;
                 return true;
-            case MAGNET:
+            case MCU_MAGNET_STATUS:
                 if (mMagnetStatusCode.equals(ackCode))
                     return false;
 
                 mMagnetStatusCode = ackCode;
                 return true;
-            case BBOX:
+            case MCU_BBOX_STATUS:
                 if (mBBoxStatusCode.equals(ackCode))
                     return false;
 
                 mBBoxStatusCode = ackCode;
                 return true;
-            case CBOX:
+            case MCU_CBOX_STATUS:
                 if (mCBoxStatusCode.equals(ackCode))
                     return false;
 
                 mCBoxStatusCode = ackCode;
                 return true;
-            case VOLTAGE:
+            case MCU_BATTERY_LEVEL:
                 if (mVoltageStatusCode.equals(ackCode))
                     return false;
 
@@ -78,22 +78,22 @@ public final class SerialStatus {
         ComMsgCode.RespAck resp;
 
         switch (type) {
-            case LOCK:
+            case MCU_LOCK_STATUS:
                 resp = ComMsgCode.getRespAck(mLockStatusCode);
                 break;
-            case DOOR:
+            case MCU_DOOR_STATUS:
                 resp = ComMsgCode.getRespAck(mDoorStatusCode);
                 break;
-            case MAGNET:
+            case MCU_MAGNET_STATUS:
                 resp = ComMsgCode.getRespAck(mMagnetStatusCode);
                 break;
-            case BBOX:
+            case MCU_BBOX_STATUS:
                 resp = ComMsgCode.getRespAck(mBBoxStatusCode);
                 break;
-            case CBOX:
+            case MCU_CBOX_STATUS:
                 resp = ComMsgCode.getRespAck(mCBoxStatusCode);
                 break;
-            case VOLTAGE:
+            case MCU_BATTERY_LEVEL:
                 resp = ComMsgCode.getRespAck(mVoltageStatusCode);
                 break;
             default:
@@ -113,7 +113,7 @@ public final class SerialStatus {
     }
 
     public synchronized static int getVoltageLevel() {
-        String status = getStatusStr(ComMsgCode.TargetType.VOLTAGE);
+        String status = getStatusStr(ComMsgCode.TargetType.MCU_BATTERY_LEVEL);
         if (status.equals("critical"))
             return 15;
         else if (status.equals("low"))

@@ -98,8 +98,8 @@ public class BLETask extends ComTxTask<BLEData> implements BluetoothAdapter.LeSc
             bleData.battery_level = SysUtil.getBatteryLevel(mContext);
             bleData.signal_strength = SysUtil.getSignalStrength(mContext);
             bleData.voltage_level = SerialStatus.getVoltageLevel();
-            bleData.lock_status = SerialStatus.getStatusStr(ComMsgCode.TargetType.LOCK);
-            bleData.door_status = SerialStatus.getStatusStr(ComMsgCode.TargetType.DOOR);
+            bleData.lock_status = SerialStatus.getStatusStr(ComMsgCode.TargetType.MCU_LOCK_STATUS);
+            bleData.door_status = SerialStatus.getStatusStr(ComMsgCode.TargetType.MCU_DOOR_STATUS);
 
             bleData.location = new BLEData.BLELoc();
             bleData.location.data = new BLEData.DeviceData();

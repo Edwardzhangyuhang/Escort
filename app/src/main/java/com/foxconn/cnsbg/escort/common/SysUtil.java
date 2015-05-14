@@ -119,6 +119,18 @@ public class SysUtil {
         return (int)((float)level / (float)scale * 100.0f);
     }
 
+    public static int getBatteryTemperature(Context context) {
+        Intent batteryIntent = context.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        if (batteryIntent == null)
+            return 0;
+
+        int temperature = batteryIntent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1);
+        if (temperature == -1)
+            return 0;
+
+        return temperature;
+    }
+
     public static int getSignalStrength(Context context) {
         TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
         List<CellInfo> allCellInfo = tm.getAllCellInfo();

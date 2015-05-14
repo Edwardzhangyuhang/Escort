@@ -17,7 +17,7 @@ public class ComMsg {
         public AlertData alert;
 
         public static class AlertData {
-            public int type;
+            public String type;
             public String level;
             public String info;
         }
@@ -46,7 +46,7 @@ public class ComMsg {
         msg.time = new Date();
 
         msg.alert = new ComMsg.AlertMsg.AlertData();
-        msg.alert.type = resp.getTargetType().ordinal();
+        msg.alert.type = resp.getTargetTypeStr();
 
         if (resp.getAckSource() == ComMsgCode.AckSource.ALERT)
             msg.alert.level = "urgent";
