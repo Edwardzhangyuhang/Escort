@@ -20,6 +20,7 @@
     <string name="key_mq_topic_cmd">mq_topic_cmd</string>
     <string name="key_mq_topic_response">mq_topic_response</string>
     <string name="key_mq_topic_alert">mq_topic_alert</string>
+    <string name="key_mq_topic_connection">mq_topic_connection</string>
 
     <string name="key_loc_task_run_interval">loc_task_run_interval</string>
     <string name="key_loc_min_accuracy">loc_min_accuracy</string>

@@ -34,7 +34,8 @@ public class DeviceRoundTask extends Thread {
                 SysUtil.showToast(mContext, "MQ Ready:" + ready, Toast.LENGTH_SHORT);
 
                 if (ready) {
-                    //TODO: alive notification
+                    ComMsg.sendOnlineMsg(mComMQ, 500);
+
                     //trigger status reporting after connection is back
                     SerialStatus.initStatus();
                     DeviceStatus.initStatus();

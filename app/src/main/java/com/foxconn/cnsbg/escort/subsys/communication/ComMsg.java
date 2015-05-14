@@ -106,4 +106,10 @@ public class ComMsg {
         String json = gson.toJson(msg, RespMsg.class);
         return mq.publish(respTopic, json, timeout);
     }
+
+    private static final String connectionTopic = SysPref.MQ_TOPIC_CONNECTION + CtrlCenter.getUDID();
+
+    public static boolean sendOnlineMsg(ComMQ mq, long timeout) {
+        return mq.publish(connectionTopic, "online", timeout);
+    }
 }

@@ -39,6 +39,7 @@ public class SysPref {
     public static String MQ_TOPIC_COMMAND = "control/dev/";
     public static String MQ_TOPIC_RESPONSE = "response/dev/";
     public static String MQ_TOPIC_ALERT = "alerts/dev/";
+    public static String MQ_TOPIC_CONNECTION = "connection/dev/";
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     //Location Task Parameter
@@ -137,6 +138,10 @@ public class SysPref {
         value = String.valueOf(MQ_TOPIC_ALERT);
         value = pref.getString(context.getString(R.string.key_mq_topic_alert), value);
         MQ_TOPIC_ALERT = value;
+
+        value = String.valueOf(MQ_TOPIC_CONNECTION);
+        value = pref.getString(context.getString(R.string.key_mq_topic_connection), value);
+        MQ_TOPIC_CONNECTION = value;
 
         value = String.valueOf(LOC_TASK_RUN_INTERVAL);
         value = pref.getString(context.getString(R.string.key_loc_task_run_interval), value);

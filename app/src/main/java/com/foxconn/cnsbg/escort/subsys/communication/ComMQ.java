@@ -5,6 +5,7 @@ import android.widget.Toast;
 
 import com.foxconn.cnsbg.escort.common.SysPref;
 import com.foxconn.cnsbg.escort.common.SysUtil;
+import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
 
 import org.fusesource.hawtdispatch.Dispatch;
 import org.fusesource.mqtt.client.Future;
@@ -45,6 +46,9 @@ public class ComMQ {
         mqtt.setReconnectDelay(SysPref.MQ_RECONNECT_DELAY);
         mqtt.setReconnectDelayMax(SysPref.MQ_RECONNECT_MAX_DELAY);
         mqtt.setDispatchQueue(Dispatch.createQueue());
+
+        mqtt.setWillTopic(SysPref.MQ_TOPIC_CONNECTION + CtrlCenter.getUDID());
+        mqtt.setWillMessage("offline");
 
         mConn = mqtt.futureConnection();
         mConn.connect();

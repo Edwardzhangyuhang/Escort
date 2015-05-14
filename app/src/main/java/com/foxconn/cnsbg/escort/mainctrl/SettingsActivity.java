@@ -52,6 +52,7 @@ public class SettingsActivity extends PreferenceActivity
         setPreference(R.string.key_mq_topic_cmd, String.valueOf(SysPref.MQ_TOPIC_COMMAND));
         setPreference(R.string.key_mq_topic_response, String.valueOf(SysPref.MQ_TOPIC_RESPONSE));
         setPreference(R.string.key_mq_topic_alert, String.valueOf(SysPref.MQ_TOPIC_ALERT));
+        setPreference(R.string.key_mq_topic_connection, String.valueOf(SysPref.MQ_TOPIC_CONNECTION));
 
         setPreference(R.string.key_loc_task_run_interval, String.valueOf(SysPref.LOC_TASK_RUN_INTERVAL));
         setPreference(R.string.key_loc_min_accuracy, String.valueOf(SysPref.LOC_MIN_ACCURACY));

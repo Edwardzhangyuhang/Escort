@@ -23,6 +23,7 @@
     <string name="topic_cmd">Control Topic Prefix</string>
     <string name="topic_response">Response Topic Prefix</string>
     <string name="topic_alert">Alert Topic Prefix</string>
+    <string name="topic_connection">Connection Topic Prefix</string>
 
     <string name="loc_title">Location Task Parameter</string>
     <string name="loc_task_run_interval">Loc Task Run Interval</string>
