@@ -440,13 +440,6 @@ public class ComMsgCode {
             cmdStr = CMD_STR_GET_LOCK;
             result = RespAck.ACK_RESULT_OK;
             info = "unlocked";
-        } else if (ackCode.equals(ACK_STR_GET_LOCK_NONE)) {
-            ackSource = AckSource.GET_CMD;
-            targetType = TargetType.MCU_LOCK_STATUS;
-            targetTypeStr = RespAck.TYPE_STR_MCU_LOCK_STATUS;
-            cmdStr = CMD_STR_GET_LOCK;
-            result = RespAck.ACK_RESULT_FAIL;
-            info = "";
         } else if (ackCode.equals(SerialCode.ACK_CODE_GET_LOCK_NG)) {
             ackSource = AckSource.GET_CMD;
             targetType = TargetType.MCU_LOCK_STATUS;
@@ -454,6 +447,13 @@ public class ComMsgCode {
             cmdStr = CMD_STR_GET_LOCK;
             result = RespAck.ACK_RESULT_OK;
             info = "abnormal";
+        } else if (ackCode.equals(ACK_STR_GET_LOCK_NONE)) {
+            ackSource = AckSource.GET_CMD;
+            targetType = TargetType.MCU_LOCK_STATUS;
+            targetTypeStr = RespAck.TYPE_STR_MCU_LOCK_STATUS;
+            cmdStr = CMD_STR_GET_LOCK;
+            result = RespAck.ACK_RESULT_FAIL;
+            info = "";
         } else if (ackCode.equals(SerialCode.ACK_CODE_GET_DOOR_OPEN)) {
             ackSource = AckSource.GET_CMD;
             targetType = TargetType.MCU_DOOR_STATUS;
