@@ -69,6 +69,13 @@ public final class SerialReadTask extends Thread {
             if (resp.getAckCode().equals(SerialCode.MCU_CODE_DOOR_ALARM))
                 CtrlCenter.setDoorAlarm(true);
 
+            if (resp.getAckSource() == ComMsgCode.AckSource.SET_CMD) {
+                if (resp.getResult().equals(ComMsgCode.RespAck.ACK_RESULT_FAIL))
+                    SerialLedCtrl.setCmdFailLed(mSerialCtrl);
+                else
+                    SerialLedCtrl.setCmdSuccessLed(mSerialCtrl);
+            }
+
             switch (resp.getAckSource()) {
                 case ALERT:
                     ComMsg.sendAlertMsg(mComMQ, resp, runInterval);

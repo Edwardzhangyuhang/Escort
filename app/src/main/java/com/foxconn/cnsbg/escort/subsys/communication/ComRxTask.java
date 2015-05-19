@@ -7,6 +7,7 @@ import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
 import com.foxconn.cnsbg.escort.subsys.controller.DeviceStatus;
 import com.foxconn.cnsbg.escort.subsys.usbserial.SerialCode;
 import com.foxconn.cnsbg.escort.subsys.usbserial.SerialCtrl;
+import com.foxconn.cnsbg.escort.subsys.usbserial.SerialLedCtrl;
 import com.foxconn.cnsbg.escort.subsys.usbserial.SerialStatus;
 
 public final class ComRxTask extends Thread {
@@ -52,6 +53,9 @@ public final class ComRxTask extends Thread {
         if (cmd.getCmdCode().equals(SerialCode.CMD_CODE_SET_CLEAR_ALARM))
             CtrlCenter.setDoorAlarm(false);
 
+        if (cmd.getCmdCode().equals(SerialCode.CMD_CODE_SET_LOCK))
+            SerialLedCtrl.setLockStartLed(mSerialCtrl);
+
         switch (cmd.getCmdTarget()) {
             case MCU:
                 return handleSerialCmd(cmd);
@@ -92,9 +96,11 @@ public final class ComRxTask extends Thread {
                     ackCode = ComMsgCode.ACK_STR_SET_DEACTIVATION_OK;
                 } else if (cmd.getCmdStr().equals(ComMsgCode.CMD_STR_SET_TASK_START)) {
                     CtrlCenter.setActiveState(true);
+                    SerialLedCtrl.setTaskStartLed(mSerialCtrl);
                     ackCode = ComMsgCode.ACK_STR_SET_TASK_START_OK;
                 } else if (cmd.getCmdStr().equals(ComMsgCode.CMD_STR_SET_TASK_END)) {
                     CtrlCenter.setActiveState(false);
+                    SerialLedCtrl.setTaskEndLed(mSerialCtrl);
                     ackCode = ComMsgCode.ACK_STR_SET_TASK_END_OK;
                 } else {
                     return false;
