@@ -5,7 +5,6 @@ import android.util.Log;
 import com.foxconn.cnsbg.escort.common.SysPref;
 import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
 
 import java.util.Date;
@@ -48,10 +47,15 @@ public class ComMsg {
         msg.alert = new ComMsg.AlertMsg.AlertData();
         msg.alert.type = resp.getTargetTypeStr();
 
-        if (resp.getAckSource() == ComMsgCode.AckSource.ALERT)
-            msg.alert.level = "urgent";
-        else
-            msg.alert.level = "normal";
+        switch (resp.getAckLevel()) {
+            case URGENT:
+                msg.alert.level = "urgent";
+                break;
+            case NORMAL:
+            default:
+                msg.alert.level = "normal";
+                break;
+        }
 
         msg.alert.info = resp.getInfo();
 
@@ -68,10 +72,11 @@ public class ComMsg {
         msg.result = resp.getResult();
         msg.reason = resp.getInfo();
 
+        ComMsgCode.setCmdId(0);
         return msg;
     }
 
-    private static Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+    private static Gson gson = CtrlCenter.getGson();
     private static final String alertTopic = SysPref.MQ_TOPIC_ALERT + CtrlCenter.getUDID();
     private static final String respTopic = SysPref.MQ_TOPIC_RESPONSE + CtrlCenter.getUDID();
 

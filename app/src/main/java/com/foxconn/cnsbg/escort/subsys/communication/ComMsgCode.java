@@ -24,6 +24,11 @@ public class ComMsgCode {
     public static final String ACK_STR_SET_TASK_END_OK = "SE_OK";
     public static final String ACK_STR_SET_TASK_END_FAIL = "SE_NG";
 
+    public static final String CMD_STR_SET_UPDATE = "su";
+    public static final String ACK_STR_SET_UPDATE_OK = "SU_OK";
+    public static final String ACK_STR_SET_UPDATE_UPDATING = "SU_RUN";
+    public static final String ACK_STR_SET_UPDATE_FAIL = "SE_NG";
+
     //Commands to MCU
     public static final String CMD_STR_SET_UNLOCK = "kf";
     public static final String CMD_STR_SET_UNLOCK_ONCE = "of";
@@ -83,6 +88,11 @@ public class ComMsgCode {
         GET_CMD,
         ALERT,
         HEARTBEAT
+    }
+
+    public enum AckLevel {
+        NORMAL,
+        URGENT
     }
 
     public static class CtrlCmd {
@@ -160,6 +170,11 @@ public class ComMsgCode {
             cmdType = CmdType.GET;
             cmdTarget = CmdTarget.DEVICE;
             targetType = TargetType.DEV_TEMPERATURE;
+            cmdCode = cmdStr;
+        } else if (cmdStr.equals(CMD_STR_SET_UPDATE)) {
+            cmdType = CmdType.SET;
+            cmdTarget = CmdTarget.DEVICE;
+            targetType = TargetType.OTHERS;
             cmdCode = cmdStr;
         } else if (cmdStr.startsWith("#")) { //backdoor for debug
             cmdType = CmdType.SET;
@@ -241,6 +256,7 @@ public class ComMsgCode {
         public static final String TYPE_STR_DEV_TEMPERATURE = "device_temperature";
 
         private AckSource mAckSource;
+        private AckLevel mAckLevel;
         private TargetType mTargetType;
         private String mTargetTypeStr;
         private String mCmdStr;
@@ -248,9 +264,11 @@ public class ComMsgCode {
         private String mResult;
         private String mInfo;
 
-        public RespAck(AckSource source, TargetType type, String typeStr,
-                       String cmd, String code, String result, String info) {
+        public RespAck(AckSource source, AckLevel level, TargetType type,
+                       String typeStr, String cmd, String code,
+                       String result, String info) {
             mAckSource = source;
+            mAckLevel = level;
             mTargetType = type;
             mTargetTypeStr = typeStr;
             mCmdStr = cmd;
@@ -261,6 +279,10 @@ public class ComMsgCode {
 
         public AckSource getAckSource() {
             return mAckSource;
+        }
+
+        public AckLevel getAckLevel() {
+            return mAckLevel;
         }
 
         public TargetType getTargetType() {
@@ -294,6 +316,7 @@ public class ComMsgCode {
 
     public static RespAck getRespAck(String ackCode) {
         AckSource ackSource;
+        AckLevel ackLevel;
         TargetType targetType;
         String targetTypeStr;
         String cmdStr;
@@ -302,6 +325,7 @@ public class ComMsgCode {
 
         if (ackCode.equals(ACK_STR_SET_ACTIVATION_OK)) {
             ackSource = AckSource.SET_CMD;
+            ackLevel = AckLevel.NORMAL;
             targetType = TargetType.OTHERS;
             targetTypeStr = RespAck.TYPE_STR_OTHERS;
             cmdStr = CMD_STR_SET_ACTIVATION;
@@ -309,6 +333,7 @@ public class ComMsgCode {
             info = "activate ok";
         } else if (ackCode.equals(ACK_STR_SET_ACTIVATION_FAIL)) {
             ackSource = AckSource.SET_CMD;
+            ackLevel = AckLevel.NORMAL;
             targetType = TargetType.OTHERS;
             targetTypeStr = RespAck.TYPE_STR_OTHERS;
             cmdStr = CMD_STR_SET_ACTIVATION;
@@ -316,6 +341,7 @@ public class ComMsgCode {
             info = "activate error";
         } else if (ackCode.equals(ACK_STR_SET_DEACTIVATION_OK)) {
             ackSource = AckSource.SET_CMD;
+            ackLevel = AckLevel.NORMAL;
             targetType = TargetType.OTHERS;
             targetTypeStr = RespAck.TYPE_STR_OTHERS;
             cmdStr = CMD_STR_SET_DEACTIVATION;
@@ -323,6 +349,7 @@ public class ComMsgCode {
             info = "deactivate ok";
         } else if (ackCode.equals(ACK_STR_SET_DEACTIVATION_FAIL)) {
             ackSource = AckSource.SET_CMD;
+            ackLevel = AckLevel.NORMAL;
             targetType = TargetType.OTHERS;
             targetTypeStr = RespAck.TYPE_STR_OTHERS;
             cmdStr = CMD_STR_SET_DEACTIVATION;
@@ -330,6 +357,7 @@ public class ComMsgCode {
             info = "deactivate error";
         } else if (ackCode.equals(ACK_STR_GET_TEMPERATURE_OK)) {
             ackSource = AckSource.GET_CMD;
+            ackLevel = AckLevel.NORMAL;
             targetType = TargetType.DEV_TEMPERATURE;
             targetTypeStr = RespAck.TYPE_STR_DEV_TEMPERATURE;
             cmdStr = CMD_STR_GET_TEMPERATURE;
@@ -337,6 +365,7 @@ public class ComMsgCode {
             info = "";
         } else if (ackCode.equals(ACK_STR_GET_TEMPERATURE_FAIL)) {
             ackSource = AckSource.GET_CMD;
+            ackLevel = AckLevel.NORMAL;
             targetType = TargetType.DEV_TEMPERATURE;
             targetTypeStr = RespAck.TYPE_STR_DEV_TEMPERATURE;
             cmdStr = CMD_STR_GET_TEMPERATURE;
@@ -344,6 +373,7 @@ public class ComMsgCode {
             info = "";
         } else if (ackCode.equals(ACK_STR_SET_TASK_START_OK)) {
             ackSource = AckSource.SET_CMD;
+            ackLevel = AckLevel.NORMAL;
             targetType = TargetType.OTHERS;
             targetTypeStr = RespAck.TYPE_STR_OTHERS;
             cmdStr = CMD_STR_SET_TASK_START;
@@ -351,6 +381,7 @@ public class ComMsgCode {
             info = "task start ok";
         } else if (ackCode.equals(ACK_STR_SET_TASK_START_FAIL)) {
             ackSource = AckSource.SET_CMD;
+            ackLevel = AckLevel.NORMAL;
             targetType = TargetType.OTHERS;
             targetTypeStr = RespAck.TYPE_STR_OTHERS;
             cmdStr = CMD_STR_SET_TASK_START;
@@ -358,6 +389,7 @@ public class ComMsgCode {
             info = "task start error";
         } else if (ackCode.equals(ACK_STR_SET_TASK_END_OK)) {
             ackSource = AckSource.SET_CMD;
+            ackLevel = AckLevel.NORMAL;
             targetType = TargetType.OTHERS;
             targetTypeStr = RespAck.TYPE_STR_OTHERS;
             cmdStr = CMD_STR_SET_TASK_END;
@@ -365,13 +397,39 @@ public class ComMsgCode {
             info = "task end ok";
         } else if (ackCode.equals(ACK_STR_SET_TASK_END_FAIL)) {
             ackSource = AckSource.SET_CMD;
+            ackLevel = AckLevel.NORMAL;
             targetType = TargetType.OTHERS;
             targetTypeStr = RespAck.TYPE_STR_OTHERS;
             cmdStr = CMD_STR_SET_TASK_END;
             result = RespAck.ACK_RESULT_FAIL;
             info = "task end error";
+        } else if (ackCode.equals(ACK_STR_SET_UPDATE_OK)) {
+            ackSource = AckSource.SET_CMD;
+            ackLevel = AckLevel.NORMAL;
+            targetType = TargetType.OTHERS;
+            targetTypeStr = RespAck.TYPE_STR_OTHERS;
+            cmdStr = CMD_STR_SET_UPDATE;
+            result = RespAck.ACK_RESULT_OK;
+            info = "updated";
+        } else if (ackCode.equals(ACK_STR_SET_UPDATE_UPDATING)) {
+            ackSource = AckSource.SET_CMD;
+            ackLevel = AckLevel.NORMAL;
+            targetType = TargetType.OTHERS;
+            targetTypeStr = RespAck.TYPE_STR_OTHERS;
+            cmdStr = CMD_STR_SET_UPDATE;
+            result = RespAck.ACK_RESULT_OK;
+            info = "updating";
+        } else if (ackCode.equals(ACK_STR_SET_UPDATE_FAIL)) {
+            ackSource = AckSource.SET_CMD;
+            ackLevel = AckLevel.NORMAL;
+            targetType = TargetType.OTHERS;
+            targetTypeStr = RespAck.TYPE_STR_OTHERS;
+            cmdStr = CMD_STR_SET_UPDATE;
+            result = RespAck.ACK_RESULT_FAIL;
+            info = "update fail";
         } else if (ackCode.equals(SerialCode.ACK_CODE_SET_UNLOCK_OK)) {
             ackSource = AckSource.SET_CMD;
+            ackLevel = AckLevel.NORMAL;
             targetType = TargetType.MCU_LOCK_STATUS;
             targetTypeStr = RespAck.TYPE_STR_MCU_LOCK_STATUS;
             cmdStr = CMD_STR_SET_UNLOCK;
@@ -379,6 +437,7 @@ public class ComMsgCode {
             info = "unlock ok";
         } else if (ackCode.equals(SerialCode.ACK_CODE_SET_UNLOCK_ERROR)) {
             ackSource = AckSource.SET_CMD;
+            ackLevel = AckLevel.NORMAL;
             targetType = TargetType.MCU_LOCK_STATUS;
             targetTypeStr = RespAck.TYPE_STR_MCU_LOCK_STATUS;
             cmdStr = CMD_STR_SET_UNLOCK;
@@ -386,6 +445,7 @@ public class ComMsgCode {
             info = "unlock error";
         } else if (ackCode.equals(SerialCode.ACK_CODE_SET_UNLOCK_ONCE_OK)) {
             ackSource = AckSource.SET_CMD;
+            ackLevel = AckLevel.NORMAL;
             targetType = TargetType.MCU_LOCK_STATUS;
             targetTypeStr = RespAck.TYPE_STR_MCU_LOCK_STATUS;
             cmdStr = CMD_STR_SET_UNLOCK_ONCE;
@@ -393,6 +453,7 @@ public class ComMsgCode {
             info = "unlock once ok";
         } else if (ackCode.equals(SerialCode.ACK_CODE_SET_UNLOCK_ONCE_ERROR)) {
             ackSource = AckSource.SET_CMD;
+            ackLevel = AckLevel.NORMAL;
             targetType = TargetType.MCU_LOCK_STATUS;
             targetTypeStr = RespAck.TYPE_STR_MCU_LOCK_STATUS;
             cmdStr = CMD_STR_SET_UNLOCK_ONCE;
@@ -400,6 +461,7 @@ public class ComMsgCode {
             info = "unlock once error";
         } else if (ackCode.equals(SerialCode.ACK_CODE_SET_LOCK_OK)) {
             ackSource = AckSource.SET_CMD;
+            ackLevel = AckLevel.NORMAL;
             targetType = TargetType.MCU_LOCK_STATUS;
             targetTypeStr = RespAck.TYPE_STR_MCU_LOCK_STATUS;
             cmdStr = CMD_STR_SET_LOCK;
@@ -407,6 +469,7 @@ public class ComMsgCode {
             info = "lock ok";
         } else if (ackCode.equals(SerialCode.ACK_CODE_SET_LOCK_ERROR)) {
             ackSource = AckSource.SET_CMD;
+            ackLevel = AckLevel.NORMAL;
             targetType = TargetType.MCU_LOCK_STATUS;
             targetTypeStr = RespAck.TYPE_STR_MCU_LOCK_STATUS;
             cmdStr = CMD_STR_SET_LOCK;
@@ -414,6 +477,7 @@ public class ComMsgCode {
             info = "lock error";
         } else if (ackCode.equals(SerialCode.ACK_CODE_SET_LOCK_ERROR_DOOR_OPEN)) {
             ackSource = AckSource.SET_CMD;
+            ackLevel = AckLevel.NORMAL;
             targetType = TargetType.MCU_DOOR_STATUS;
             targetTypeStr = RespAck.TYPE_STR_MCU_DOOR_STATUS;
             cmdStr = CMD_STR_SET_LOCK;
@@ -421,6 +485,7 @@ public class ComMsgCode {
             info = "door is open";
         } else if (ackCode.equals(SerialCode.ACK_CODE_SET_LOCK_ERROR_MAGNET_LEAVE)) {
             ackSource = AckSource.SET_CMD;
+            ackLevel = AckLevel.NORMAL;
             targetType = TargetType.MCU_MAGNET_STATUS;
             targetTypeStr = RespAck.TYPE_STR_MCU_MAGNET_STATUS;
             cmdStr = CMD_STR_SET_LOCK;
@@ -428,6 +493,7 @@ public class ComMsgCode {
             info = "magnet is not detected";
         } else if (ackCode.equals(SerialCode.ACK_CODE_GET_LOCK_LOCKED)) {
             ackSource = AckSource.GET_CMD;
+            ackLevel = AckLevel.NORMAL;
             targetType = TargetType.MCU_LOCK_STATUS;
             targetTypeStr = RespAck.TYPE_STR_MCU_LOCK_STATUS;
             cmdStr = CMD_STR_GET_LOCK;
@@ -435,6 +501,7 @@ public class ComMsgCode {
             info = "locked";
         } else if (ackCode.equals(SerialCode.ACK_CODE_GET_LOCK_UNLOCKED)) {
             ackSource = AckSource.GET_CMD;
+            ackLevel = AckLevel.NORMAL;
             targetType = TargetType.MCU_LOCK_STATUS;
             targetTypeStr = RespAck.TYPE_STR_MCU_LOCK_STATUS;
             cmdStr = CMD_STR_GET_LOCK;
@@ -442,6 +509,7 @@ public class ComMsgCode {
             info = "unlocked";
         } else if (ackCode.equals(SerialCode.ACK_CODE_GET_LOCK_NG)) {
             ackSource = AckSource.GET_CMD;
+            ackLevel = AckLevel.NORMAL;
             targetType = TargetType.MCU_LOCK_STATUS;
             targetTypeStr = RespAck.TYPE_STR_MCU_LOCK_STATUS;
             cmdStr = CMD_STR_GET_LOCK;
@@ -449,6 +517,7 @@ public class ComMsgCode {
             info = "abnormal";
         } else if (ackCode.equals(ACK_STR_GET_LOCK_NONE)) {
             ackSource = AckSource.GET_CMD;
+            ackLevel = AckLevel.NORMAL;
             targetType = TargetType.MCU_LOCK_STATUS;
             targetTypeStr = RespAck.TYPE_STR_MCU_LOCK_STATUS;
             cmdStr = CMD_STR_GET_LOCK;
@@ -456,6 +525,7 @@ public class ComMsgCode {
             info = "";
         } else if (ackCode.equals(SerialCode.ACK_CODE_GET_DOOR_OPEN)) {
             ackSource = AckSource.GET_CMD;
+            ackLevel = AckLevel.NORMAL;
             targetType = TargetType.MCU_DOOR_STATUS;
             targetTypeStr = RespAck.TYPE_STR_MCU_DOOR_STATUS;
             cmdStr = CMD_STR_GET_DOOR;
@@ -463,6 +533,7 @@ public class ComMsgCode {
             info = "open";
         } else if (ackCode.equals(SerialCode.ACK_CODE_GET_DOOR_CLOSED)) {
             ackSource = AckSource.GET_CMD;
+            ackLevel = AckLevel.NORMAL;
             targetType = TargetType.MCU_DOOR_STATUS;
             targetTypeStr = RespAck.TYPE_STR_MCU_DOOR_STATUS;
             cmdStr = CMD_STR_GET_DOOR;
@@ -470,6 +541,7 @@ public class ComMsgCode {
             info = "closed";
         } else if (ackCode.equals(ACK_STR_GET_DOOR_NONE)) {
             ackSource = AckSource.GET_CMD;
+            ackLevel = AckLevel.NORMAL;
             targetType = TargetType.MCU_DOOR_STATUS;
             targetTypeStr = RespAck.TYPE_STR_MCU_DOOR_STATUS;
             cmdStr = CMD_STR_GET_DOOR;
@@ -477,6 +549,7 @@ public class ComMsgCode {
             info = "";
         } else if (ackCode.equals(SerialCode.ACK_CODE_GET_MAGNET_EXIST)) {
             ackSource = AckSource.GET_CMD;
+            ackLevel = AckLevel.NORMAL;
             targetType = TargetType.MCU_MAGNET_STATUS;
             targetTypeStr = RespAck.TYPE_STR_MCU_MAGNET_STATUS;
             cmdStr = CMD_STR_GET_MAGNET;
@@ -484,6 +557,7 @@ public class ComMsgCode {
             info = "detected";
         } else if (ackCode.equals(SerialCode.ACK_CODE_GET_MAGNET_LEAVE)) {
             ackSource = AckSource.GET_CMD;
+            ackLevel = AckLevel.NORMAL;
             targetType = TargetType.MCU_MAGNET_STATUS;
             targetTypeStr = RespAck.TYPE_STR_MCU_MAGNET_STATUS;
             cmdStr = CMD_STR_GET_MAGNET;
@@ -491,6 +565,7 @@ public class ComMsgCode {
             info = "undetected";
         } else if (ackCode.equals(ACK_STR_GET_MAGNET_NONE)) {
             ackSource = AckSource.GET_CMD;
+            ackLevel = AckLevel.NORMAL;
             targetType = TargetType.MCU_MAGNET_STATUS;
             targetTypeStr = RespAck.TYPE_STR_MCU_MAGNET_STATUS;
             cmdStr = CMD_STR_GET_MAGNET;
@@ -498,6 +573,7 @@ public class ComMsgCode {
             info = "";
         } else if (ackCode.equals(SerialCode.ACK_CODE_SET_CLEAR_ALARM_OK)) {
             ackSource = AckSource.SET_CMD;
+            ackLevel = AckLevel.NORMAL;
             targetType = TargetType.OTHERS;
             targetTypeStr = RespAck.TYPE_STR_OTHERS;
             cmdStr = CMD_STR_SET_CLEAR_ALARM;
@@ -505,6 +581,7 @@ public class ComMsgCode {
             info = "clear alarm ok";
         } else if (ackCode.equals(SerialCode.MCU_CODE_DOOR_ALARM)) {
             ackSource = AckSource.ALERT;
+            ackLevel = AckLevel.URGENT;
             targetType = TargetType.MCU_DOOR_STATUS;
             targetTypeStr = RespAck.TYPE_STR_MCU_DOOR_STATUS;
             cmdStr = "";
@@ -512,6 +589,7 @@ public class ComMsgCode {
             info = "door is hacked";
         } else if (ackCode.equals(SerialCode.MCU_CODE_HEARTBEAT_REQ)) {
             ackSource = AckSource.HEARTBEAT;
+            ackLevel = AckLevel.NORMAL;
             targetType = TargetType.OTHERS;
             targetTypeStr = RespAck.TYPE_STR_OTHERS;
             cmdStr = "";
@@ -519,6 +597,7 @@ public class ComMsgCode {
             info = "heartbeat request";
         } else if (ackCode.equals(SerialCode.ACK_CODE_GET_BATTERY_BOX_OPEN)) {
             ackSource = AckSource.GET_CMD;
+            ackLevel = AckLevel.NORMAL;
             targetType = TargetType.MCU_BBOX_STATUS;
             targetTypeStr = RespAck.TYPE_STR_MCU_BBOX_STATUS;
             cmdStr = CMD_STR_GET_BATTERY_BOX;
@@ -526,6 +605,7 @@ public class ComMsgCode {
             info = "open";
         } else if (ackCode.equals(SerialCode.ACK_CODE_GET_BATTERY_BOX_CLOSED)) {
             ackSource = AckSource.GET_CMD;
+            ackLevel = AckLevel.NORMAL;
             targetType = TargetType.MCU_BBOX_STATUS;
             targetTypeStr = RespAck.TYPE_STR_MCU_BBOX_STATUS;
             cmdStr = CMD_STR_GET_BATTERY_BOX;
@@ -533,6 +613,7 @@ public class ComMsgCode {
             info = "closed";
         } else if (ackCode.equals(ACK_STR_GET_BATTERY_BOX_NONE)) {
             ackSource = AckSource.GET_CMD;
+            ackLevel = AckLevel.NORMAL;
             targetType = TargetType.MCU_BBOX_STATUS;
             targetTypeStr = RespAck.TYPE_STR_MCU_BBOX_STATUS;
             cmdStr = CMD_STR_GET_BATTERY_BOX;
@@ -540,6 +621,7 @@ public class ComMsgCode {
             info = "";
         } else if (ackCode.equals(SerialCode.ACK_CODE_GET_CONTROL_BOX_OPEN)) {
             ackSource = AckSource.GET_CMD;
+            ackLevel = AckLevel.URGENT;
             targetType = TargetType.MCU_CBOX_STATUS;
             targetTypeStr = RespAck.TYPE_STR_MCU_CBOX_STATUS;
             cmdStr = CMD_STR_GET_CONTROL_BOX;
@@ -547,6 +629,7 @@ public class ComMsgCode {
             info = "open";
         } else if (ackCode.equals(SerialCode.ACK_CODE_GET_CONTROL_BOX_CLOSED)) {
             ackSource = AckSource.GET_CMD;
+            ackLevel = AckLevel.NORMAL;
             targetType = TargetType.MCU_CBOX_STATUS;
             targetTypeStr = RespAck.TYPE_STR_MCU_CBOX_STATUS;
             cmdStr = CMD_STR_GET_CONTROL_BOX;
@@ -554,6 +637,7 @@ public class ComMsgCode {
             info = "closed";
         } else if (ackCode.equals(ACK_STR_GET_CONTROL_BOX_NONE)) {
             ackSource = AckSource.GET_CMD;
+            ackLevel = AckLevel.NORMAL;
             targetType = TargetType.MCU_CBOX_STATUS;
             targetTypeStr = RespAck.TYPE_STR_MCU_CBOX_STATUS;
             cmdStr = CMD_STR_GET_CONTROL_BOX;
@@ -561,6 +645,7 @@ public class ComMsgCode {
             info = "";
         } else if (ackCode.equals(SerialCode.ACK_CODE_GET_VOLTAGE_CRITICAL)) {
             ackSource = AckSource.GET_CMD;
+            ackLevel = AckLevel.URGENT;
             targetType = TargetType.MCU_BATTERY_LEVEL;
             targetTypeStr = RespAck.TYPE_STR_MCU_BATTERY_LEVEL;
             cmdStr = CMD_STR_GET_VOLTAGE;
@@ -568,6 +653,7 @@ public class ComMsgCode {
             info = "critical";
         } else if (ackCode.equals(SerialCode.ACK_CODE_GET_VOLTAGE_LOW)) {
             ackSource = AckSource.GET_CMD;
+            ackLevel = AckLevel.NORMAL;
             targetType = TargetType.MCU_BATTERY_LEVEL;
             targetTypeStr = RespAck.TYPE_STR_MCU_BATTERY_LEVEL;
             cmdStr = CMD_STR_GET_VOLTAGE;
@@ -575,6 +661,7 @@ public class ComMsgCode {
             info = "low";
         } else if (ackCode.equals(SerialCode.ACK_CODE_GET_VOLTAGE_NORMAL)) {
             ackSource = AckSource.GET_CMD;
+            ackLevel = AckLevel.NORMAL;
             targetType = TargetType.MCU_BATTERY_LEVEL;
             targetTypeStr = RespAck.TYPE_STR_MCU_BATTERY_LEVEL;
             cmdStr = CMD_STR_GET_VOLTAGE;
@@ -582,20 +669,23 @@ public class ComMsgCode {
             info = "normal";
         } else if (ackCode.equals(ACK_STR_GET_VOLTAGE_NONE)) {
             ackSource = AckSource.GET_CMD;
+            ackLevel = AckLevel.NORMAL;
             targetType = TargetType.MCU_BATTERY_LEVEL;
             targetTypeStr = RespAck.TYPE_STR_MCU_BATTERY_LEVEL;
             cmdStr = CMD_STR_GET_VOLTAGE;
             result = RespAck.ACK_RESULT_FAIL;
             info = "";
         } else if (ackCode.equals(ACK_STR_MCU_ATTACHED)) {
-            ackSource = AckSource.ALERT;
+            ackSource = AckSource.GET_CMD;
+            ackLevel = AckLevel.NORMAL;
             targetType = TargetType.OTHERS;
             targetTypeStr = RespAck.TYPE_STR_OTHERS;
             cmdStr = "";
             result = RespAck.ACK_RESULT_OK;
             info = "MCU attached";
         } else if (ackCode.equals(ACK_STR_MCU_DETACHED)) {
-            ackSource = AckSource.ALERT;
+            ackSource = AckSource.GET_CMD;
+            ackLevel = AckLevel.URGENT;
             targetType = TargetType.OTHERS;
             targetTypeStr = RespAck.TYPE_STR_OTHERS;
             cmdStr = "";
@@ -605,6 +695,6 @@ public class ComMsgCode {
             return null;
         }
 
-        return new RespAck(ackSource, targetType, targetTypeStr, cmdStr, ackCode, result, info);
+        return new RespAck(ackSource, ackLevel, targetType, targetTypeStr, cmdStr, ackCode, result, info);
     }
 }
