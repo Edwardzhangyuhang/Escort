@@ -54,6 +54,8 @@ public class SerialMonitorTask extends Thread {
                         SysUtil.showToast(mContext, "MCU configured!", Toast.LENGTH_SHORT);
                         mMCUConfigured = true;
 
+                        SerialLedCtrl.setIdleLed(mContext, mSerialCtrl);
+
                         resp = ComMsgCode.getRespAck(ComMsgCode.ACK_STR_MCU_ATTACHED);
                     }
                 }

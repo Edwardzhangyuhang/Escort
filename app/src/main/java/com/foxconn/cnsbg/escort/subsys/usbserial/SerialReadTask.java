@@ -71,9 +71,11 @@ public final class SerialReadTask extends Thread {
 
             if (resp.getAckSource() == ComMsgCode.AckSource.SET_CMD) {
                 if (resp.getResult().equals(ComMsgCode.RespAck.ACK_RESULT_FAIL))
-                    SerialLedCtrl.setCmdFailLed(mSerialCtrl);
+                    SerialLedCtrl.setCmdFailLed(mContext, mSerialCtrl);
+                else if (CtrlCenter.isActiveState())
+                    SerialLedCtrl.setActiveLed(mContext, mSerialCtrl);
                 else
-                    SerialLedCtrl.setCmdSuccessLed(mSerialCtrl);
+                    SerialLedCtrl.setIdleLed(mContext, mSerialCtrl);
             }
 
             switch (resp.getAckSource()) {

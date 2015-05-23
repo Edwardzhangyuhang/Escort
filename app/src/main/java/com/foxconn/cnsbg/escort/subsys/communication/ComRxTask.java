@@ -53,9 +53,6 @@ public final class ComRxTask extends Thread {
         if (cmd.getCmdCode().equals(SerialCode.CMD_CODE_SET_CLEAR_ALARM))
             CtrlCenter.setDoorAlarm(false);
 
-        if (cmd.getCmdCode().equals(SerialCode.CMD_CODE_SET_LOCK))
-            SerialLedCtrl.setLockStartLed(mSerialCtrl);
-
         switch (cmd.getCmdTarget()) {
             case MCU:
                 return handleSerialCmd(cmd);
@@ -96,12 +93,23 @@ public final class ComRxTask extends Thread {
                     ackCode = ComMsgCode.ACK_STR_SET_DEACTIVATION_OK;
                 } else if (cmd.getCmdStr().equals(ComMsgCode.CMD_STR_SET_TASK_START)) {
                     CtrlCenter.setActiveState(true);
-                    SerialLedCtrl.setTaskStartLed(mSerialCtrl);
+                    SerialLedCtrl.setActiveLed(mContext, mSerialCtrl);
                     ackCode = ComMsgCode.ACK_STR_SET_TASK_START_OK;
                 } else if (cmd.getCmdStr().equals(ComMsgCode.CMD_STR_SET_TASK_END)) {
                     CtrlCenter.setActiveState(false);
-                    SerialLedCtrl.setTaskEndLed(mSerialCtrl);
+                    SerialLedCtrl.setIdleLed(mContext, mSerialCtrl);
                     ackCode = ComMsgCode.ACK_STR_SET_TASK_END_OK;
+                } else if (cmd.getCmdStr().equals(ComMsgCode.CMD_STR_SET_UPDATE)) {
+                    //if (SysUpdater.isUpdating()) {
+                        //ackCode = ComMsgCode.ACK_STR_SET_UPDATE_UPDATING;
+                    //} else {
+                        ackCode = ComMsgCode.ACK_STR_SET_UPDATE_OK;
+                        //SysUpdater.checkUpdate();
+                        //if (SysUpdater.checkUpdate())
+                        //    ackCode = ComMsgCode.ACK_STR_SET_UPDATE_OK;
+                        //else
+                        //    ackCode = ComMsgCode.ACK_STR_SET_UPDATE_FAIL;
+                    //}
                 } else {
                     return false;
                 }

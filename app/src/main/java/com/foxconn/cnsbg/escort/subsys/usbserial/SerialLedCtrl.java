@@ -1,5 +1,7 @@
 package com.foxconn.cnsbg.escort.subsys.usbserial;
 
+import android.content.Context;
+
 public class SerialLedCtrl {
     public static final String CMD_CODE_SET_LED_PREFIX = "sl_";
 
@@ -28,31 +30,24 @@ public class SerialLedCtrl {
         }
     }
 
-    public static void setLed(SerialCtrl sc, LedPattern gp, LedPattern ap, LedPattern rp) {
+    public static void setLed(Context context, SerialCtrl sc, LedPattern gp, LedPattern ap, LedPattern rp) {
         String greenPattern = getLedPatternStr(gp);
         String amberPattern = getLedPatternStr(ap);
         String redPattern = getLedPatternStr(rp);
 
         sc.write(CMD_CODE_SET_LED_PREFIX + greenPattern + amberPattern + redPattern + "\r\n");
+        //SysUtil.showToast(context, CMD_CODE_SET_LED_PREFIX + greenPattern + amberPattern + redPattern + "\r\n", Toast.LENGTH_SHORT);
     }
 
-    public static void setTaskStartLed(SerialCtrl sc) {
-        setLed(sc, LedPattern.STAY_OFF, LedPattern.BLINK_MEDIUM, LedPattern.STAY_OFF);
+    public static void setActiveLed(Context context, SerialCtrl sc) {
+        setLed(context, sc, LedPattern.STAY_OFF, LedPattern.BLINK_MEDIUM, LedPattern.STAY_OFF);
     }
 
-    public static void setTaskEndLed(SerialCtrl sc) {
-        setLed(sc, LedPattern.BLINK_LOW, LedPattern.STAY_OFF, LedPattern.STAY_OFF);
+    public static void setIdleLed(Context context, SerialCtrl sc) {
+        setLed(context, sc, LedPattern.BLINK_LOW, LedPattern.STAY_OFF, LedPattern.STAY_OFF);
     }
 
-    public static void setLockStartLed(SerialCtrl sc) {
-        setLed(sc, LedPattern.STAY_OFF, LedPattern.BLINK_HIGH, LedPattern.STAY_OFF);
-    }
-
-    public static void setCmdSuccessLed(SerialCtrl sc) {
-        setLed(sc, LedPattern.STAY_OFF, LedPattern.STAY_OFF, LedPattern.STAY_OFF);
-    }
-
-    public static void setCmdFailLed(SerialCtrl sc) {
-        setLed(sc, LedPattern.STAY_OFF, LedPattern.STAY_OFF, LedPattern.BLINK_MEDIUM);
+    public static void setCmdFailLed(Context context, SerialCtrl sc) {
+        setLed(context, sc, LedPattern.STAY_OFF, LedPattern.STAY_OFF, LedPattern.BLINK_MEDIUM);
     }
 }
