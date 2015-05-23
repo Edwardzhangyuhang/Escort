@@ -8,15 +8,17 @@ import android.util.Log;
 import com.foxconn.cnsbg.escort.common.SysPref;
 import com.foxconn.cnsbg.escort.subsys.cache.CacheDao;
 import com.foxconn.cnsbg.escort.subsys.communication.ComMQ;
-import com.foxconn.cnsbg.escort.subsys.controller.DeviceRoundTask;
 import com.foxconn.cnsbg.escort.subsys.communication.ComRxTask;
 import com.foxconn.cnsbg.escort.subsys.communication.ComTxTask;
+import com.foxconn.cnsbg.escort.subsys.controller.DeviceRoundTask;
 import com.foxconn.cnsbg.escort.subsys.location.AccelTask;
 import com.foxconn.cnsbg.escort.subsys.location.BLETask;
 import com.foxconn.cnsbg.escort.subsys.location.LocTask;
 import com.foxconn.cnsbg.escort.subsys.usbserial.SerialCtrl;
 import com.foxconn.cnsbg.escort.subsys.usbserial.SerialMonitorTask;
 import com.foxconn.cnsbg.escort.subsys.usbserial.SerialReadTask;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -26,6 +28,7 @@ public class CtrlCenter {
     private static final String TAG = CtrlCenter.class.getSimpleName();
 
     private static String UDID;
+    private static Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 
     private static CacheDao mDao;
     private static SerialCtrl mSc;
@@ -46,6 +49,10 @@ public class CtrlCenter {
 
     public static String getUDID() {
         return UDID;
+    }
+
+    public static Gson getGson() {
+        return gson;
     }
 
     public static CacheDao getDao() {
@@ -93,8 +100,8 @@ public class CtrlCenter {
             return;
         }
 
-        if (!TextUtils.isEmpty(SysPref.APP_UDID))
-            UDID = SysPref.APP_UDID;
+        if (!TextUtils.isEmpty(SysPref.APP_DEBUG_UDID))
+            UDID = SysPref.APP_DEBUG_UDID;
 
         //setup database for cache
         mDao = new CacheDao(context, SysPref.APP_DB_NAME);
@@ -111,6 +118,11 @@ public class CtrlCenter {
 
         List<String> subscribes = new ArrayList<String>();
         subscribes.add(SysPref.MQ_TOPIC_COMMAND + UDID);
+
+        // debug control
+        if (!TextUtils.isEmpty(SysPref.APP_DEBUG_UDID) && !SysPref.APP_DEBUG_UDID.equals(UDID))
+            subscribes.add(SysPref.MQ_TOPIC_COMMAND + SysPref.APP_DEBUG_UDID);
+
         if (mMQ.init(subscribes)) {
             setTrackingLocation(true);
             startTask();

@@ -14,7 +14,7 @@ public class SysPref {
     public static final String APP_CRASH_LOG_FILE = "escort_crash_log.txt";
 
     //Debug
-    public static String APP_UDID = "";
+    public static String APP_DEBUG_UDID = "";
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     //HTTP Server
@@ -72,8 +72,9 @@ public class SysPref {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
         String value;
 
-        value = pref.getString(context.getString(R.string.key_device_id), "");
-        APP_UDID = value;
+        value = String.valueOf(APP_DEBUG_UDID);
+        value = pref.getString(context.getString(R.string.key_debug_id), value);
+        APP_DEBUG_UDID = value;
 
         value = String.valueOf(HTTP_SERVER_HOST);
         value = pref.getString(context.getString(R.string.key_http_host), value);

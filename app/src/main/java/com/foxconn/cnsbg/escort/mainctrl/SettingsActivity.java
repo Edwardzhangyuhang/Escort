@@ -33,6 +33,7 @@ public class SettingsActivity extends PreferenceActivity
 
         String id = ((TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
         setPreference(R.string.key_device_id, id);
+        setPreference(R.string.key_debug_id, String.valueOf(SysPref.APP_DEBUG_UDID));
 
         setPreference(R.string.key_http_host, String.valueOf(SysPref.HTTP_SERVER_HOST));
         setPreference(R.string.key_http_port, String.valueOf(SysPref.HTTP_SERVER_PORT));
