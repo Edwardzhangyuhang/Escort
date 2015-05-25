@@ -96,9 +96,6 @@ public class SettingsActivity extends PreferenceActivity
         EditTextPreference pref = (EditTextPreference) preference;
         String value = String.valueOf(o);
 
-        if (pref.getKey().equals(getString(R.string.key_device_id)) && TextUtils.isEmpty(value))
-            value = ((TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
-
         pref.setSummary(value);
 
         Handler handler = new Handler();

@@ -4,16 +4,14 @@
         <EditTextPreference
             android:key="@string/key_device_id"
             android:title="@string/device_id"
-            android:enabled="true"
-            android:selectable="true"
-            android:selectAllOnFocus="true"
+            android:enabled="false"
+            android:selectable="false"
+            android:selectAllOnFocus="false"
             android:inputType="text"
             android:capitalize="characters"
             android:singleLine="true"
             android:maxLines="1" />
-    </PreferenceCategory>
 
-    <PreferenceCategory android:title="@string/sys_info_title">
         <EditTextPreference
             android:key="@string/key_debug_id"
             android:title="@string/debug_id"
