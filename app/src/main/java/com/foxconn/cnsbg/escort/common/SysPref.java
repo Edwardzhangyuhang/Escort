@@ -47,7 +47,7 @@ public class SysPref {
     public static int LOC_TASK_RUN_INTERVAL = 1000;
     //change these to fine tune the power consumption
     //minimal accuracy
-    public static float LOC_MIN_ACCURACY = 16.0F;
+    public static float LOC_MIN_ACCURACY = 31.0F;
     //minimal update distance
     public static float LOC_UPDATE_MIN_DISTANCE = 5.0F;
     //minimal update interval
