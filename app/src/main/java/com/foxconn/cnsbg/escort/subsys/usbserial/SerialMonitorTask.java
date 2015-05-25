@@ -4,6 +4,7 @@ import android.content.Context;
 import android.widget.Toast;
 
 import com.foxconn.cnsbg.escort.common.SysUtil;
+import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
 import com.foxconn.cnsbg.escort.subsys.communication.ComMQ;
 import com.foxconn.cnsbg.escort.subsys.communication.ComMsg;
 import com.foxconn.cnsbg.escort.subsys.communication.ComMsgCode;
@@ -54,7 +55,10 @@ public class SerialMonitorTask extends Thread {
                         SysUtil.showToast(mContext, "MCU configured!", Toast.LENGTH_SHORT);
                         mMCUConfigured = true;
 
-                        SerialLedCtrl.setIdleLed(mContext, mSerialCtrl);
+                        if (CtrlCenter.isActiveState())
+                            SerialLedCtrl.setActiveLed(mContext, mSerialCtrl);
+                        else
+                            SerialLedCtrl.setIdleLed(mContext, mSerialCtrl);
 
                         resp = ComMsgCode.getRespAck(ComMsgCode.ACK_STR_MCU_ATTACHED);
                     }
