@@ -100,16 +100,21 @@ public final class ComRxTask extends Thread {
                     SerialLedCtrl.setIdleLed(mContext, mSerialCtrl);
                     ackCode = ComMsgCode.ACK_STR_SET_TASK_END_OK;
                 } else if (cmd.getCmdStr().equals(ComMsgCode.CMD_STR_SET_UPDATE)) {
-                    //if (SysUpdater.isUpdating()) {
-                        //ackCode = ComMsgCode.ACK_STR_SET_UPDATE_UPDATING;
-                    //} else {
-                        ackCode = ComMsgCode.ACK_STR_SET_UPDATE_OK;
-                        //SysUpdater.checkUpdate();
-                        //if (SysUpdater.checkUpdate())
-                        //    ackCode = ComMsgCode.ACK_STR_SET_UPDATE_OK;
-                        //else
-                        //    ackCode = ComMsgCode.ACK_STR_SET_UPDATE_FAIL;
-                    //}
+                    ackCode = ComMsgCode.ACK_STR_SET_UPDATE_OK;
+                    /*
+                    switch (SysUpdater.checkUpdate()) {
+                        case RUNNING:
+                            ackCode = ComMsgCode.ACK_STR_SET_UPDATE_UPDATING;
+                            break;
+                        case SUCCESS:
+                            ackCode = ComMsgCode.ACK_STR_SET_UPDATE_OK;
+                            break;
+                        case FAIL:
+                        default:
+                            ackCode = ComMsgCode.ACK_STR_SET_UPDATE_FAIL;
+                            break;
+                    }
+                    */
                 } else {
                     return false;
                 }

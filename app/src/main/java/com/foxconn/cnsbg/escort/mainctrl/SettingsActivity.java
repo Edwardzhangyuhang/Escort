@@ -26,6 +26,7 @@ public class SettingsActivity extends PreferenceActivity
 
     private void setupSimplePreferencesScreen() {
         addPreferencesFromResource(R.xml.pref_sys);
+        addPreferencesFromResource(R.xml.pref_debug);
         addPreferencesFromResource(R.xml.pref_http);
         addPreferencesFromResource(R.xml.pref_mq);
         addPreferencesFromResource(R.xml.pref_loc);
@@ -33,7 +34,10 @@ public class SettingsActivity extends PreferenceActivity
 
         String id = ((TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
         setPreference(R.string.key_device_id, id);
+
         setPreference(R.string.key_debug_id, String.valueOf(SysPref.APP_DEBUG_UDID));
+        setPreference(R.string.key_debug_toast, String.valueOf(SysPref.APP_DEBUG_TOAST));
+        setPreference(R.string.key_debug_log, String.valueOf(SysPref.APP_DEBUG_LOG));
 
         setPreference(R.string.key_http_host, String.valueOf(SysPref.HTTP_SERVER_HOST));
         setPreference(R.string.key_http_port, String.valueOf(SysPref.HTTP_SERVER_PORT));

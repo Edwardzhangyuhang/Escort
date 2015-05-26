@@ -5,7 +5,11 @@
 
     <string name="sys_info_title">System Info</string>
     <string name="device_id">Device ID</string>
+
+    <string name="debug_settings_title">Debug Settings</string>
     <string name="debug_id">Debug ID</string>
+    <string name="debug_toast">Debug Toast</string>
+    <string name="debug_log">Debug Log</string>
 
     <string name="http_server_title">HTTP server</string>
     <string name="host">Host</string>

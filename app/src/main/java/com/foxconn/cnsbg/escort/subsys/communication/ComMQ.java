@@ -1,7 +1,6 @@
 package com.foxconn.cnsbg.escort.subsys.communication;
 
 import android.content.Context;
-import android.widget.Toast;
 
 import com.foxconn.cnsbg.escort.common.SysPref;
 import com.foxconn.cnsbg.escort.common.SysUtil;
@@ -75,7 +74,7 @@ public class ComMQ {
             return false;
         }
 
-        SysUtil.showToast(mContext, "MQ publish:" + payload, Toast.LENGTH_SHORT);
+        SysUtil.debug(mContext, "MQ publish:" + payload);
         return true;
     }
 
@@ -98,7 +97,7 @@ public class ComMQ {
             return null;
         }
 
-        SysUtil.showToast(mContext, "MQ receive:" + result, Toast.LENGTH_SHORT);
+        SysUtil.debug(mContext, "MQ receive:" + result);
         return result;
     }
 

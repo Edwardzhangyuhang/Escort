@@ -49,8 +49,6 @@ public final class SerialReadTask extends Thread {
         String ackStr = new String(ackBytes, 0, num);
         String acks[] = ackStr.split("\r\n");
 
-        //SysUtil.showToast(mContext, ackStr, Toast.LENGTH_SHORT);
-
         for (String ack : acks) {
             if (ack.length() == 0)
                 continue;

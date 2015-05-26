@@ -11,16 +11,5 @@
             android:capitalize="characters"
             android:singleLine="true"
             android:maxLines="1" />
-
-        <EditTextPreference
-            android:key="@string/key_debug_id"
-            android:title="@string/debug_id"
-            android:enabled="true"
-            android:selectable="true"
-            android:selectAllOnFocus="true"
-            android:inputType="text"
-            android:capitalize="characters"
-            android:singleLine="true"
-            android:maxLines="1" />
     </PreferenceCategory>
 </PreferenceScreen>

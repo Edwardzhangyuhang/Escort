@@ -36,7 +36,6 @@ public class SerialLedCtrl {
         String redPattern = getLedPatternStr(rp);
 
         sc.write(CMD_CODE_SET_LED_PREFIX + greenPattern + amberPattern + redPattern + "\r\n");
-        //SysUtil.showToast(context, CMD_CODE_SET_LED_PREFIX + greenPattern + amberPattern + redPattern + "\r\n", Toast.LENGTH_SHORT);
     }
 
     public static void setActiveLed(Context context, SerialCtrl sc) {

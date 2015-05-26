@@ -15,6 +15,9 @@ public class SysPref {
 
     //Debug
     public static String APP_DEBUG_UDID = "";
+    public static boolean APP_DEBUG_TOAST = true;
+    public static boolean APP_DEBUG_LOG = false;
+    public static final String APP_DEBUG_LOG_FILE = "escort_debug_log.txt";
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     //HTTP Server
@@ -75,6 +78,14 @@ public class SysPref {
         value = String.valueOf(APP_DEBUG_UDID);
         value = pref.getString(context.getString(R.string.key_debug_id), value);
         APP_DEBUG_UDID = value;
+
+        value = String.valueOf(APP_DEBUG_TOAST);
+        value = pref.getString(context.getString(R.string.key_debug_toast), value);
+        APP_DEBUG_TOAST = Boolean.parseBoolean(value);
+
+        value = String.valueOf(APP_DEBUG_LOG);
+        value = pref.getString(context.getString(R.string.key_debug_log), value);
+        APP_DEBUG_LOG = Boolean.parseBoolean(value);
 
         value = String.valueOf(HTTP_SERVER_HOST);
         value = pref.getString(context.getString(R.string.key_http_host), value);

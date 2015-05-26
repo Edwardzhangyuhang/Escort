@@ -7,7 +7,6 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.foxconn.cnsbg.escort.common.SysUtil;
 import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
@@ -28,7 +27,7 @@ public class AccelTask extends ComTxTask<AccelData> implements SensorEventListen
 
     public AccelTask(Context context) {
         if (!context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_SENSOR_ACCELEROMETER)) {
-            SysUtil.showToast(context, "FEATURE_SENSOR_ACCELEROMETER is not supported!", Toast.LENGTH_SHORT);
+            SysUtil.debug(context, "FEATURE_SENSOR_ACCELEROMETER is not supported!");
             accelerometerSupport = false;
             return;
         }

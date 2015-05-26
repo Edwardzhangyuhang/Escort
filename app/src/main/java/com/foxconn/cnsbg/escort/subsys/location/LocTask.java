@@ -9,9 +9,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.foxconn.cnsbg.escort.BuildConfig;
 import com.foxconn.cnsbg.escort.common.SysPref;
 import com.foxconn.cnsbg.escort.common.SysUtil;
 import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
@@ -49,7 +47,7 @@ public class LocTask extends ComTxTask<LocData> {
         mComMQ = mq;
 
         if (!context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_LOCATION)) {
-            SysUtil.showToast(context, "FEATURE_LOCATION is not supported!", Toast.LENGTH_SHORT);
+            SysUtil.debug(context, "FEATURE_LOCATION is not supported!");
             requestShutdown = true;
             return;
         }
@@ -140,12 +138,6 @@ public class LocTask extends ComTxTask<LocData> {
             }
 
             handleLocation(loc);
-
-            if (BuildConfig.DEBUG) {
-                String text = "Provider:" + loc.getProvider() + ", Accuracy:" + loc.getAccuracy()
-                        + ", Interval:" + (loc.getTime() - lastLocTime)/1000;
-                //SysUtil.showToast(mContext, "Updated Location:" + text, Toast.LENGTH_LONG);
-            }
 
             lastLocTime = loc.getTime();
         }
@@ -261,7 +253,7 @@ public class LocTask extends ComTxTask<LocData> {
             };
             handler.post(providerUpdateThread);
 
-            SysUtil.showToast(mContext, "Updated Provider:" + curProvider, Toast.LENGTH_LONG);
+            SysUtil.debug(mContext, "Updated Provider:" + curProvider);
         }
     }
 

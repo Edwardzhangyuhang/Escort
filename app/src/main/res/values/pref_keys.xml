@@ -2,7 +2,10 @@
 <resources>
 
     <string name="key_device_id">device_id</string>
+
     <string name="key_debug_id">debug_id</string>
+    <string name="key_debug_toast">debug_toast</string>
+    <string name="key_debug_log">debug_log</string>
 
     <string name="key_http_host">http_host</string>
     <string name="key_http_port">http_port</string>

@@ -1,7 +1,6 @@
 package com.foxconn.cnsbg.escort.subsys.usbserial;
 
 import android.content.Context;
-import android.widget.Toast;
 
 import com.foxconn.cnsbg.escort.common.SysUtil;
 import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
@@ -37,7 +36,7 @@ public class SerialMonitorTask extends Thread {
                 mStatus = status;
 
                 if (status == 2) {
-                    SysUtil.showToast(mContext, "MCU detached!", Toast.LENGTH_SHORT);
+                    SysUtil.debug(mContext, "MCU detached!");
                     mMCUConfigured = false;
 
                     SerialStatus.initStatus();
@@ -52,7 +51,7 @@ public class SerialMonitorTask extends Thread {
                                 SerialCtrl.PARITY_NONE,
                                 SerialCtrl.FLOW_CONTROL_NONE);
 
-                        SysUtil.showToast(mContext, "MCU configured!", Toast.LENGTH_SHORT);
+                        SysUtil.debug(mContext, "MCU configured!");
                         mMCUConfigured = true;
 
                         if (CtrlCenter.isActiveState())

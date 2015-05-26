@@ -1,7 +1,6 @@
 package com.foxconn.cnsbg.escort.subsys.controller;
 
 import android.content.Context;
-import android.widget.Toast;
 
 import com.foxconn.cnsbg.escort.common.SysUtil;
 import com.foxconn.cnsbg.escort.subsys.communication.ComMQ;
@@ -31,7 +30,7 @@ public class DeviceRoundTask extends Thread {
             boolean ready = mComMQ.isConnected();
             if (mMQReady != ready) {
                 mMQReady = ready;
-                SysUtil.showToast(mContext, "MQ Ready:" + ready, Toast.LENGTH_SHORT);
+                SysUtil.debug(mContext, "MQ Ready:" + ready);
 
                 if (ready) {
                     ComMsg.sendOnlineMsg(mComMQ, 500);

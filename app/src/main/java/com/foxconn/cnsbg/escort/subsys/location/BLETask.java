@@ -5,7 +5,6 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.widget.Toast;
 
 import com.foxconn.cnsbg.escort.common.SysPref;
 import com.foxconn.cnsbg.escort.common.SysUtil;
@@ -40,14 +39,14 @@ public class BLETask extends ComTxTask<BLEData> implements BluetoothAdapter.LeSc
         mComMQ = mq;
 
         if (!context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-            SysUtil.showToast(context, "FEATURE_BLUETOOTH_LE is not supported!", Toast.LENGTH_SHORT);
+            SysUtil.debug(context, "FEATURE_BLUETOOTH_LE is not supported!");
             requestShutdown = true;
             return;
         }
 
         mBluetoothAdapter = ((BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE)).getAdapter();
         if (mBluetoothAdapter == null) {
-            SysUtil.showToast(context, "BLUETOOTH_SERVICE is not supported!", Toast.LENGTH_SHORT);
+            SysUtil.debug(context, "BLUETOOTH_SERVICE is not supported!");
             requestShutdown = true;
             return;
         }
