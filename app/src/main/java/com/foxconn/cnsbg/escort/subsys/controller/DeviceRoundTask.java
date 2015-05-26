@@ -41,11 +41,22 @@ public class DeviceRoundTask extends Thread {
                 }
             }
 
-            ComMsgCode.RespAck resp = ComMsgCode.getRespAck(ComMsgCode.ACK_STR_GET_TEMPERATURE_OK);
+            boolean statusChanged;
+            ComMsgCode.RespAck resp;
+
+            resp = ComMsgCode.getRespAck(ComMsgCode.ACK_STR_GET_TEMPERATURE_OK);
             int temp = SysUtil.getBatteryTemperature(mContext);
             if (resp != null && temp != 0)
                 resp.setInfo(Integer.toString(temp / 10));
-            boolean statusChanged = DeviceStatus.setStatus(resp);
+            statusChanged = DeviceStatus.setStatus(resp);
+            if (statusChanged)
+                ComMsg.sendAlertMsg(mComMQ, resp, 500);
+
+            resp = ComMsgCode.getRespAck(ComMsgCode.ACK_STR_GET_BATTERY_OK);
+            int battery = SysUtil.getBatteryLevel(mContext);
+            if (resp != null)
+                resp.setInfo(Integer.toString(battery));
+            statusChanged = DeviceStatus.setStatus(resp);
             if (statusChanged)
                 ComMsg.sendAlertMsg(mComMQ, resp, 500);
 

@@ -99,6 +99,9 @@ public class ComMsg {
     }
 
     public static boolean sendAlertMsg(ComMQ mq, ComMsgCode.RespAck resp, long timeout) {
+        if (resp == null)
+            return false;
+
         AlertMsg msg = generateAlertMsg(resp);
 
         String json = gson.toJson(msg, AlertMsg.class);
@@ -106,6 +109,9 @@ public class ComMsg {
     }
 
     public static boolean sendRespMsg(ComMQ mq, ComMsgCode.RespAck resp, long timeout) {
+        if (resp == null)
+            return false;
+
         RespMsg msg = generateRespMsg(resp);
 
         String json = gson.toJson(msg, RespMsg.class);

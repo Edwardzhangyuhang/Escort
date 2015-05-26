@@ -6,9 +6,11 @@ import com.foxconn.cnsbg.escort.subsys.communication.ComMsgCode;
 
 public class DeviceStatus {
     private static String mTemperature = "";
+    private static String mBattery = "";
 
     public synchronized static void initStatus() {
         mTemperature = "";
+        mBattery = "";
     }
 
     public synchronized static boolean setStatus(ComMsgCode.RespAck resp) {
@@ -21,6 +23,13 @@ public class DeviceStatus {
                     return false;
 
                 mTemperature = temperature;
+                return true;
+            case DEV_BATTERY:
+                String battery = resp.getInfo();
+                if (battery.equals(mBattery))
+                    return false;
+
+                mBattery = battery;
                 return true;
             default:
                 return false;
@@ -39,6 +48,15 @@ public class DeviceStatus {
 
                 if (resp != null)
                     resp.setInfo(mTemperature);
+                break;
+            case DEV_BATTERY:
+                if (TextUtils.isEmpty(mBattery))
+                    resp = ComMsgCode.getRespAck(ComMsgCode.ACK_STR_GET_BATTERY_FAIL);
+                else
+                    resp = ComMsgCode.getRespAck(ComMsgCode.ACK_STR_GET_BATTERY_OK);
+
+                if (resp != null)
+                    resp.setInfo(mBattery);
                 break;
             default:
                 resp = null;

@@ -143,7 +143,7 @@ public class SysUtil {
         if (level == -1 || scale == -1)
             return 0;
 
-        return (int)((float)level / (float)scale * 100.0f);
+        return (int)((float)level * 100.0f / (float)scale);
     }
 
     public static int getBatteryTemperature(Context context) {
