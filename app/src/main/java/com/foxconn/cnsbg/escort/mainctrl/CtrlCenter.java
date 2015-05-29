@@ -3,9 +3,9 @@ package com.foxconn.cnsbg.escort.mainctrl;
 import android.content.Context;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.foxconn.cnsbg.escort.common.SysPref;
+import com.foxconn.cnsbg.escort.common.SysUtil;
 import com.foxconn.cnsbg.escort.subsys.cache.CacheDao;
 import com.foxconn.cnsbg.escort.subsys.communication.ComMQ;
 import com.foxconn.cnsbg.escort.subsys.communication.ComRxTask;
@@ -59,6 +59,10 @@ public class CtrlCenter {
         return mDao;
     }
 
+    public static SerialCtrl getSerialCtrl() {
+        return mSc;
+    }
+
     public static boolean isTrackingLocation() {
         return isTrackingLocation;
     }
@@ -93,13 +97,15 @@ public class CtrlCenter {
 
     public CtrlCenter(Context context) {
         SysPref.init(context);
+        SysUtil.debug(context, "CtrlCenter initialization...");
 
         UDID = ((TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
         if (TextUtils.isEmpty(UDID)) {
-            Log.e(TAG, "Can't get UDID, exiting...");
+            SysUtil.debug(context, "CtrlCenter exiting...Can't get UDID");
             return;
         }
 
+        //FIXME!! debug only, should be removed
         if (!TextUtils.isEmpty(SysPref.APP_DEBUG_UDID))
             UDID = SysPref.APP_DEBUG_UDID;
 
@@ -119,7 +125,7 @@ public class CtrlCenter {
         List<String> subscribes = new ArrayList<String>();
         subscribes.add(SysPref.MQ_TOPIC_COMMAND + UDID);
 
-        // debug control
+        //debug control
         if (!TextUtils.isEmpty(SysPref.APP_DEBUG_UDID) && !SysPref.APP_DEBUG_UDID.equals(UDID))
             subscribes.add(SysPref.MQ_TOPIC_COMMAND + SysPref.APP_DEBUG_UDID);
 

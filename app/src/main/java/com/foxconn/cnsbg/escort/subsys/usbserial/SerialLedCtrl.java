@@ -2,6 +2,8 @@ package com.foxconn.cnsbg.escort.subsys.usbserial;
 
 import android.content.Context;
 
+import com.foxconn.cnsbg.escort.common.SysUtil;
+
 public class SerialLedCtrl {
     public static final String CMD_CODE_SET_LED_PREFIX = "sl_";
 
@@ -35,7 +37,9 @@ public class SerialLedCtrl {
         String amberPattern = getLedPatternStr(ap);
         String redPattern = getLedPatternStr(rp);
 
-        sc.write(CMD_CODE_SET_LED_PREFIX + greenPattern + amberPattern + redPattern + "\r\n");
+        String ledCmd = CMD_CODE_SET_LED_PREFIX + greenPattern + amberPattern + redPattern;
+        sc.write(ledCmd + "\r\n");
+        SysUtil.debug(context, "setLed:" + ledCmd);
     }
 
     public static void setActiveLed(Context context, SerialCtrl sc) {

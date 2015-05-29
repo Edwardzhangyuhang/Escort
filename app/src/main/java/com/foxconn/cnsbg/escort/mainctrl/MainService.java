@@ -10,6 +10,7 @@ import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
 
+import com.foxconn.cnsbg.escort.common.SysPref;
 import com.foxconn.cnsbg.escort.common.SysUtil;
 
 public class MainService extends Service {
@@ -65,7 +66,7 @@ public class MainService extends Service {
 
         stopForeground(true);
 
-        sendBroadcast(new Intent("com.foxconn.cnsbg.escort.main.destroy"));
+        sendBroadcast(new Intent(SysPref.APP_SERVICE_DESTROY));
     }
 
     @Override

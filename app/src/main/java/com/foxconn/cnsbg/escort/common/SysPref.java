@@ -13,6 +13,8 @@ public class SysPref {
     public static final String APP_DB_NAME = "escort-db";
     public static final String APP_CRASH_LOG_FILE = "escort_crash_log.txt";
 
+    public static final String APP_SERVICE_DESTROY = "com.foxconn.cnsbg.escort.service.destroy";
+
     //Debug
     public static String APP_DEBUG_UDID = "";
     public static boolean APP_DEBUG_TOAST = true;
@@ -65,7 +67,7 @@ public class SysPref {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     public static int BLE_TASK_RUN_INTERVAL = 1000;
     public static String BLE_DEVICE_NAME_FILTER = "InFocus";
-    public static int BLE_RSSI_THRESHOLD = -80;
+    public static int BLE_RSSI_THRESHOLD = -90;
     public static long BLE_UPDATE_MIN_TIME = 5 * 1000L;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
