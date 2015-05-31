@@ -1,1 +1,1 @@
-include ':app', 'appDaoGenerator', ':mqtt-client'
+include ':app', 'appDaoGenerator', ':mqtt-client', ':usbSerialForAndroid', ':PhysicaloidLibrary'
