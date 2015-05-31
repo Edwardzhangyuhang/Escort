@@ -5,6 +5,7 @@ import android.content.Context;
 import com.foxconn.cnsbg.escort.common.SysPref;
 import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
 import com.foxconn.cnsbg.escort.subsys.controller.DeviceStatus;
+import com.foxconn.cnsbg.escort.subsys.updater.SysUpdater;
 import com.foxconn.cnsbg.escort.subsys.usbserial.SerialCode;
 import com.foxconn.cnsbg.escort.subsys.usbserial.SerialCtrl;
 import com.foxconn.cnsbg.escort.subsys.usbserial.SerialLedCtrl;
@@ -100,9 +101,7 @@ public final class ComRxTask extends Thread {
                     SerialLedCtrl.setIdleLed(mContext, mSerialCtrl);
                     ackCode = ComMsgCode.ACK_STR_SET_TASK_END_OK;
                 } else if (cmd.getCmdStr().equals(ComMsgCode.CMD_STR_SET_UPDATE)) {
-                    ackCode = ComMsgCode.ACK_STR_SET_UPDATE_OK;
-                    /*
-                    switch (SysUpdater.checkUpdate()) {
+                    switch (SysUpdater.checkUpdate(mContext)) {
                         case RUNNING:
                             ackCode = ComMsgCode.ACK_STR_SET_UPDATE_UPDATING;
                             break;
@@ -114,7 +113,6 @@ public final class ComRxTask extends Thread {
                             ackCode = ComMsgCode.ACK_STR_SET_UPDATE_FAIL;
                             break;
                     }
-                    */
                 } else {
                     return false;
                 }
