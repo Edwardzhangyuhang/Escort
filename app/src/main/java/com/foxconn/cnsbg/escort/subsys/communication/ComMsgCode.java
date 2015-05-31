@@ -536,7 +536,7 @@ public class ComMsgCode {
             info = "unlocked";
         } else if (ackCode.equals(SerialCode.ACK_CODE_GET_LOCK_NG)) {
             ackSource = AckSource.GET_CMD;
-            ackLevel = AckLevel.NORMAL;
+            ackLevel = AckLevel.URGENT;
             targetType = TargetType.MCU_LOCK_STATUS;
             targetTypeStr = RespAck.TYPE_STR_MCU_LOCK_STATUS;
             cmdStr = CMD_STR_GET_LOCK;
