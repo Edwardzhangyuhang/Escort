@@ -5,6 +5,8 @@ import android.content.Context;
 import com.foxconn.cnsbg.escort.common.SysPref;
 import com.foxconn.cnsbg.escort.common.SysUtil;
 import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
+import com.foxconn.cnsbg.escort.subsys.controller.DeviceStatus;
+import com.foxconn.cnsbg.escort.subsys.usbserial.SerialStatus;
 
 import org.fusesource.hawtdispatch.Dispatch;
 import org.fusesource.mqtt.client.Future;
@@ -23,6 +25,8 @@ public class ComMQ {
     private Context mContext;
     private FutureConnection mConn;
     Future<Message> mReceive = null;
+
+    private boolean mReady = false;
 
     public ComMQ(Context context) {
         mContext = context;
@@ -62,11 +66,25 @@ public class ComMQ {
         return true;
     }
 
-    public boolean isConnected() {
-        return mConn.isConnected();
+    public void checkConnection() {
+        boolean ready = mConn.isConnected();
+        if (mReady != ready) {
+            mReady = ready;
+            SysUtil.debug(mContext, "MQ Ready:" + ready);
+
+            if (ready) {
+                ComMsg.sendOnlineMsg(this, 500);
+
+                //trigger status reporting after connection is back
+                SerialStatus.initStatus();
+                DeviceStatus.initStatus();
+            }
+        }
     }
 
     public boolean publish(String topic, String payload, long milliseconds) {
+        checkConnection();
+
         try {
             mConn.publish(topic, payload.getBytes(), QoS.AT_MOST_ONCE, false)
                     .await(milliseconds, TimeUnit.MILLISECONDS);
@@ -79,6 +97,8 @@ public class ComMQ {
     }
 
     public boolean subscribe(String topic, QoS qos) {
+        checkConnection();
+
         Topic[] topics = {new Topic(topic, qos)};
         mConn.subscribe(topics);
 
@@ -87,6 +107,8 @@ public class ComMQ {
 
     public String receive(long milliseconds) {
         String result;
+
+        checkConnection();
 
         try {
             Message msg = mReceive.await(milliseconds, TimeUnit.MILLISECONDS);

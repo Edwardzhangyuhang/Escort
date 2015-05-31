@@ -7,7 +7,6 @@ import com.foxconn.cnsbg.escort.subsys.communication.ComMQ;
 import com.foxconn.cnsbg.escort.subsys.communication.ComMsg;
 import com.foxconn.cnsbg.escort.subsys.communication.ComMsgCode;
 import com.foxconn.cnsbg.escort.subsys.communication.ComRxTask;
-import com.foxconn.cnsbg.escort.subsys.usbserial.SerialStatus;
 
 public class DeviceRoundTask extends Thread {
     private static final String TAG = ComRxTask.class.getSimpleName();
@@ -17,8 +16,6 @@ public class DeviceRoundTask extends Thread {
     private Context mContext;
     private ComMQ mComMQ;
 
-    private static boolean mMQReady = false;
-
     public DeviceRoundTask(Context context, ComMQ mq) {
         mContext = context;
         mComMQ = mq;
@@ -27,19 +24,7 @@ public class DeviceRoundTask extends Thread {
     @Override
     public void run() {
         while (!requestShutdown) {
-            boolean ready = mComMQ.isConnected();
-            if (mMQReady != ready) {
-                mMQReady = ready;
-                SysUtil.debug(mContext, "MQ Ready:" + ready);
-
-                if (ready) {
-                    ComMsg.sendOnlineMsg(mComMQ, 500);
-
-                    //trigger status reporting after connection is back
-                    SerialStatus.initStatus();
-                    DeviceStatus.initStatus();
-                }
-            }
+            mComMQ.checkConnection();
 
             boolean statusChanged;
             ComMsgCode.RespAck resp;
