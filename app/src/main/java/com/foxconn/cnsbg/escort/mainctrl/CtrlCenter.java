@@ -97,11 +97,10 @@ public class CtrlCenter {
 
     public CtrlCenter(Context context) {
         SysPref.init(context);
-        SysUtil.debug(context, "CtrlCenter initialization...");
 
         UDID = ((TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
         if (TextUtils.isEmpty(UDID)) {
-            SysUtil.debug(context, "CtrlCenter exiting...Can't get UDID");
+            SysUtil.debug(context, "System exiting...");
             return;
         }
 
