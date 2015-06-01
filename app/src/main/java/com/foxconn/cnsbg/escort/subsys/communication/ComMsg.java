@@ -1,11 +1,8 @@
 package com.foxconn.cnsbg.escort.subsys.communication;
 
-import android.util.Log;
-
 import com.foxconn.cnsbg.escort.common.SysPref;
 import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
 import com.google.gson.Gson;
-import com.google.gson.JsonParseException;
 
 import java.util.Date;
 
@@ -88,10 +85,8 @@ public class ComMsg {
 
             ComMsgCode.setCmdId(msg.cmd_id);
             return msg.cmd;
-        } catch (JsonParseException e) {
-            Log.w("parseCmdMsg:", "JsonParseException");
-        } catch (NullPointerException e) {
-            Log.w("parseCmdMsg:", "NullPointerException");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         ComMsgCode.setCmdId(0);
