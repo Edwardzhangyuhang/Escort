@@ -26,6 +26,7 @@ public class ComMQ {
     private FutureConnection mConn;
     Future<Message> mReceive = null;
 
+    private static final String connectionTopic = SysPref.MQ_TOPIC_CONNECTION + CtrlCenter.getUDID();
     private boolean mReady = false;
 
     public ComMQ(Context context) {
@@ -50,7 +51,7 @@ public class ComMQ {
         mqtt.setReconnectDelayMax(SysPref.MQ_RECONNECT_MAX_DELAY);
         mqtt.setDispatchQueue(Dispatch.createQueue());
 
-        mqtt.setWillTopic(SysPref.MQ_TOPIC_CONNECTION + CtrlCenter.getUDID());
+        mqtt.setWillTopic(connectionTopic);
         mqtt.setWillMessage("offline");
 
         mConn = mqtt.futureConnection();
@@ -66,15 +67,33 @@ public class ComMQ {
         return true;
     }
 
+    private boolean sendAliveMessage(FutureConnection conn) {
+        String payload = "online";
+
+        try {
+            conn.publish(connectionTopic, payload.getBytes(), QoS.AT_MOST_ONCE, false)
+                    .await(500, TimeUnit.MILLISECONDS);
+        } catch (Exception e) {
+            return false;
+        }
+
+        SysUtil.debug(mContext, "MQ publish:" + payload);
+        return true;
+    }
+
     public void checkConnection() {
-        boolean ready = mConn.isConnected();
+        boolean ready;
+
+        if (mReady)
+            ready = mConn.isConnected();
+        else
+            ready = sendAliveMessage(mConn);
+
         if (mReady != ready) {
             mReady = ready;
             SysUtil.debug(mContext, "MQ Ready:" + ready);
 
             if (ready) {
-                ComMsg.sendOnlineMsg(this, 500);
-
                 //trigger status reporting after connection is back
                 SerialStatus.initStatus();
                 DeviceStatus.initStatus();
