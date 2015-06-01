@@ -26,7 +26,7 @@ public class UsbSerialInterface
     private UsbSerialPort mPort;
     private PendingIntent mPermissionIntent;
     private boolean mPermissionRequestPending = false;
-    private boolean accessory_attached = false;
+    private boolean device_attached = false;
     private Context global_context;
 
     public UsbSerialInterface(Context context){
@@ -107,21 +107,21 @@ public class UsbSerialInterface
 
         HashMap<String, UsbDevice> devices = usbmanager.getDeviceList();
         if (devices == null || devices.isEmpty()) {
-            accessory_attached = false;
+            device_attached = false;
             return 2;
         }
 
         // Find all available drivers from attached devices.
         List<UsbSerialDriver> availableDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(usbmanager);
         if (availableDrivers == null || availableDrivers.isEmpty()) {
-            accessory_attached = false;
+            device_attached = false;
             return 2;
         }
 
         // Open a connection to the first available driver.
         UsbSerialDriver driver = availableDrivers.get(0);
         if (driver == null) {
-            accessory_attached = false;
+            device_attached = false;
             return 2;
         }
 
@@ -131,10 +131,10 @@ public class UsbSerialInterface
             SysUtil.debug(global_context, device.toString());
 
             //"Manufacturer, Model & Version are matched!"
-            accessory_attached = true;
+            device_attached = true;
 
             IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
-            filter.addAction(UsbManager.ACTION_USB_ACCESSORY_DETACHED);
+            filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
             global_context.registerReceiver(mUsbReceiver, filter);
 
             if (usbmanager.hasPermission(device)) {
@@ -160,7 +160,7 @@ public class UsbSerialInterface
     public void DestroyAccessory(boolean bConfiged){
         CloseAccessory();
 
-        if (accessory_attached)
+        if (device_attached)
             global_context.unregisterReceiver(mUsbReceiver);
     }
 
@@ -232,9 +232,8 @@ public class UsbSerialInterface
                     mPermissionRequestPending = false;
                 }
             }
-            else if (UsbManager.ACTION_USB_ACCESSORY_DETACHED.equals(action))
+            else if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action))
             {
-                SysUtil.debug(global_context, "USB Accessory detached");
                 DestroyAccessory(true);
             }else
             {
