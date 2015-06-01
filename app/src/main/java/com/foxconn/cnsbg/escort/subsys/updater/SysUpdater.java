@@ -4,23 +4,25 @@ import android.app.DownloadManager;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Environment;
-import android.util.Log;
 
 import com.foxconn.cnsbg.escort.common.SysPref;
 import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
 import com.google.gson.Gson;
-import com.google.gson.JsonParseException;
 
+import java.io.File;
 import java.util.Date;
 
 import cn.trinea.android.common.entity.HttpRequest;
 import cn.trinea.android.common.util.DownloadManagerPro;
+import cn.trinea.android.common.util.FileUtils;
 import cn.trinea.android.common.util.HttpUtils;
 import cn.trinea.android.common.util.PackageUtils;
 import cn.trinea.android.common.util.ShellUtils;
 
 public class SysUpdater {
     private static Gson gson = CtrlCenter.getGson();
+    private static final String VERSION_URL = "http://" + SysPref.HTTP_SERVER_HOST + "/tracker/Escort/Appinfo";
+    private static final String DOWNLOAD_FILE = "escort.apk";
 
     public enum UpdateState {
         RUNNING,
@@ -43,8 +45,7 @@ public class SysUpdater {
         if (isUpdating)
             return UpdateState.RUNNING;
 
-        String verUri = "http://" + SysPref.HTTP_SERVER_HOST + "/tracker/Escort/Appinfo";
-        HttpRequest request = new HttpRequest(verUri);
+        HttpRequest request = new HttpRequest(VERSION_URL);
         request.setConnectTimeout(1000);
         request.setReadTimeout(1000);
         String newVerStr = HttpUtils.httpGetString(request);
@@ -59,10 +60,8 @@ public class SysUpdater {
             }
 
             return UpdateState.SUCCESS;
-        } catch (JsonParseException e) {
-            Log.w("checkUpdate:", "JsonParseException");
-        } catch (NullPointerException e) {
-            Log.w("checkUpdate:", "NullPointerException");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         return UpdateState.FAIL;
@@ -71,7 +70,6 @@ public class SysUpdater {
     private static class UpdateThread extends Thread {
         private Context mContext;
         private DownloadManagerPro mDownloadManagerPro;
-        private String mDownloadPath;
         private long mDownloadId;
 
         public UpdateThread(Context context, String url) {
@@ -80,11 +78,13 @@ public class SysUpdater {
             DownloadManager dm = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
             mDownloadManagerPro = new DownloadManagerPro(dm);
 
+            File file =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            String filename = file.getAbsolutePath() + "/" + DOWNLOAD_FILE;
+            FileUtils.deleteFile(filename);
+
             DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
             request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN);
-            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "escort.apk");
-            mDownloadPath = Environment.DIRECTORY_DOWNLOADS + "/" + "escort.apk";
-
+            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, DOWNLOAD_FILE);
             mDownloadId = dm.enqueue(request);
         }
 
@@ -105,7 +105,8 @@ public class SysUpdater {
                         isUpdating = false;
                         break;
                     case DownloadManager.STATUS_SUCCESSFUL:
-                        PackageUtils.install(mContext, mDownloadPath);
+                        String filePath = mDownloadManagerPro.getFileName(mDownloadId);
+                        PackageUtils.install(mContext, filePath);
                         isUpdating = false;
                         break;
                     default:
