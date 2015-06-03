@@ -16,6 +16,7 @@ import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
 import com.foxconn.cnsbg.escort.subsys.communication.ComMQ;
 import com.foxconn.cnsbg.escort.subsys.communication.ComMsgCode;
 import com.foxconn.cnsbg.escort.subsys.communication.ComTxTask;
+import com.foxconn.cnsbg.escort.subsys.model.LocData;
 import com.foxconn.cnsbg.escort.subsys.usbserial.SerialStatus;
 
 import java.util.ArrayList;

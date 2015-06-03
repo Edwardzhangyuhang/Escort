@@ -38,7 +38,5 @@
 #-keep class com.google.gson.stream.** { *; }
 
 # Application classes that will be serialized/deserialized over Gson
--keep class com.foxconn.cnsbg.escort.subsys.communication.** { *; }
--keep class com.foxconn.cnsbg.escort.subsys.location.** { *; }
--keep class com.foxconn.cnsbg.escort.subsys.updater.** { *; }
+-keep class com.foxconn.cnsbg.escort.subsys.model.** { *; }
 ##---------------End: proguard configuration for Gson  ------------------------

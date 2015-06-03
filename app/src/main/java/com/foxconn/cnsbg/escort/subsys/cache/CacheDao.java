@@ -10,8 +10,8 @@ import com.foxconn.cnsbg.escort.subsys.dao.CachedLocDataDao;
 import com.foxconn.cnsbg.escort.subsys.dao.DaoMaster;
 import com.foxconn.cnsbg.escort.subsys.dao.DaoMaster.DevOpenHelper;
 import com.foxconn.cnsbg.escort.subsys.dao.DaoSession;
-import com.foxconn.cnsbg.escort.subsys.location.BLEData;
-import com.foxconn.cnsbg.escort.subsys.location.LocData;
+import com.foxconn.cnsbg.escort.subsys.model.BLEData;
+import com.foxconn.cnsbg.escort.subsys.model.LocData;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.foxconn.cnsbg.escort.subsys.location;
+package com.foxconn.cnsbg.escort.subsys.model;
 
 import java.util.Date;
 

@@ -2,46 +2,22 @@ package com.foxconn.cnsbg.escort.subsys.communication;
 
 import com.foxconn.cnsbg.escort.common.SysPref;
 import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
+import com.foxconn.cnsbg.escort.subsys.model.AlertMsg;
+import com.foxconn.cnsbg.escort.subsys.model.CtrlMsg;
+import com.foxconn.cnsbg.escort.subsys.model.RespMsg;
 import com.google.gson.Gson;
 
 import java.util.Date;
 
 public class ComMsg {
-    public static class AlertMsg {
-        public String device_id;
-        public Date time;
-        public AlertData alert;
 
-        public static class AlertData {
-            public String type;
-            public String level;
-            public String info;
-        }
-    }
-
-    public static class CtrlMsg {
-        public String device_id;
-        public Date time;
-        public String cmd;
-        public int cmd_id;
-    }
-
-    public static class RespMsg {
-        public String device_id;
-        public Date time;
-        public String cmd;
-        public int cmd_id;
-        public String result;
-        public String reason;
-    }
-
-    public static ComMsg.AlertMsg generateAlertMsg(ComMsgCode.RespAck resp) {
-        ComMsg.AlertMsg msg = new ComMsg.AlertMsg();
+    public static AlertMsg generateAlertMsg(ComMsgCode.RespAck resp) {
+        AlertMsg msg = new AlertMsg();
 
         msg.device_id = CtrlCenter.getUDID();
         msg.time = new Date();
 
-        msg.alert = new ComMsg.AlertMsg.AlertData();
+        msg.alert = new AlertMsg.AlertData();
         msg.alert.type = resp.getTargetTypeStr();
 
         switch (resp.getAckLevel()) {
@@ -59,8 +35,8 @@ public class ComMsg {
         return msg;
     }
 
-    public static ComMsg.RespMsg generateRespMsg(ComMsgCode.RespAck resp) {
-        ComMsg.RespMsg msg = new ComMsg.RespMsg();
+    public static RespMsg generateRespMsg(ComMsgCode.RespAck resp) {
+        RespMsg msg = new RespMsg();
 
         msg.device_id = CtrlCenter.getUDID();
         msg.time = new Date();
@@ -79,7 +55,7 @@ public class ComMsg {
 
     public static String parseCmdMsg(String msgStr) {
         try {
-            CtrlMsg msg = gson.fromJson(msgStr, ComMsg.CtrlMsg.class);
+            CtrlMsg msg = gson.fromJson(msgStr, CtrlMsg.class);
             if (!msg.device_id.equals(CtrlCenter.getUDID()))
                 return null;
 

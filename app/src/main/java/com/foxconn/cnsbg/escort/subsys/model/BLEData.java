@@ -1,8 +1,8 @@
-package com.foxconn.cnsbg.escort.subsys.location;
+package com.foxconn.cnsbg.escort.subsys.model;
 
 import java.util.Date;
 
-public final class LocData {
+public final class BLEData {
     public String device_id;
     public Date time;
     public int battery_level;
@@ -10,23 +10,16 @@ public final class LocData {
     public int voltage_level;
     public String lock_status;
     public String door_status;
-    public GPSLoc location;
+    public BLELoc location;
 
-    public static class GPSLoc {
-        public final String type = "gps";
-        public GPSData data;
+    public static class BLELoc {
+        public final String type = "ibeacon";
+        public DeviceData data;
     }
 
-    public static class GPSData {
-        public double latitude;
-        public double longitude;
-
-        public String provider;
-        public float accuracy;
-        public double altitude;
-        public float bearing;
-        public float speed;
-        public boolean mock;
+    public static class DeviceData {
+        public String mac;
+        public int rssi;
     }
 
     @Override
@@ -40,7 +33,7 @@ public final class LocData {
         if (getClass() != obj.getClass())
             return false;
 
-        LocData data = LocData.class.cast(obj);
+        BLEData data = BLEData.class.cast(obj);
         if (!data.device_id.equals(device_id))
             return false;
 

@@ -11,6 +11,7 @@ import android.util.Log;
 import com.foxconn.cnsbg.escort.common.SysUtil;
 import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
 import com.foxconn.cnsbg.escort.subsys.communication.ComTxTask;
+import com.foxconn.cnsbg.escort.subsys.model.AccelData;
 
 import java.util.Date;
 

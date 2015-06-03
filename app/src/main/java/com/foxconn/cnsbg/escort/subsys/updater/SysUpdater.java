@@ -7,10 +7,10 @@ import android.os.Environment;
 
 import com.foxconn.cnsbg.escort.common.SysPref;
 import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
+import com.foxconn.cnsbg.escort.subsys.model.VerInfo;
 import com.google.gson.Gson;
 
 import java.io.File;
-import java.util.Date;
 
 import cn.trinea.android.common.entity.HttpRequest;
 import cn.trinea.android.common.util.DownloadManagerPro;
@@ -28,12 +28,6 @@ public class SysUpdater {
         RUNNING,
         SUCCESS,
         FAIL
-    }
-
-    public static class VerInfo {
-        public Date time;
-        public String version;
-        public String url;
     }
 
     private static boolean isUpdating = false;
