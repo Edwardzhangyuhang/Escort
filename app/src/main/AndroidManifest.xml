@@ -70,10 +70,19 @@
             android:exported="true" >
         </service>
 
-        <receiver android:name=".mainctrl.MainBroadcastReceiver">
+        <receiver
+            android:name=".mainctrl.MainBroadcastReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+
+            <intent-filter>
                 <action android:name="com.foxconn.cnsbg.escort.main.destroy" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_REPLACED" />
+                <data android:scheme="package" />
             </intent-filter>
         </receiver>
     </application>
