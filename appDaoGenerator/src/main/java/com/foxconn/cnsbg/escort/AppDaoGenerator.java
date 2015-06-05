@@ -40,6 +40,14 @@ public class AppDaoGenerator {
         ble.addStringProperty("lockStatus");
         ble.addStringProperty("doorStatus");
 
+        Entity alert = schema.addEntity("CachedAlertMsg");
+        alert.addIdProperty();
+        alert.addStringProperty("deviceID");
+        alert.addDateProperty("time");
+        alert.addStringProperty("type");
+        alert.addStringProperty("level");
+        alert.addStringProperty("info");
+
         new DaoGenerator().generateAll(schema, "app/src/main/java");
     }
 }

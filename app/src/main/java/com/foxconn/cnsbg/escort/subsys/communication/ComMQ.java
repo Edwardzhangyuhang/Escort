@@ -67,11 +67,11 @@ public class ComMQ {
         return true;
     }
 
-    private boolean sendAliveMessage(FutureConnection conn) {
+    private boolean sendAliveMessage() {
         String payload = "online";
 
         try {
-            conn.publish(connectionTopic, payload.getBytes(), QoS.AT_MOST_ONCE, false)
+            mConn.publish(connectionTopic, payload.getBytes(), QoS.AT_MOST_ONCE, false)
                     .await(500, TimeUnit.MILLISECONDS);
         } catch (Exception e) {
             return false;
@@ -81,19 +81,26 @@ public class ComMQ {
         return true;
     }
 
+    public boolean isConnected() {
+        return mConn.isConnected();
+    }
+
     public void checkConnection() {
         boolean ready;
 
         if (mReady)
-            ready = mConn.isConnected();
+            ready = isConnected();
         else
-            ready = sendAliveMessage(mConn);
+            ready = sendAliveMessage();
 
         if (mReady != ready) {
             mReady = ready;
             SysUtil.debug(mContext, "MQ Ready:" + ready);
 
             if (ready) {
+                //report cached message first
+                ComMsg.sendCachedAlertData(this);
+
                 //trigger status reporting after connection is back
                 SerialStatus.initStatus();
                 DeviceStatus.initStatus();

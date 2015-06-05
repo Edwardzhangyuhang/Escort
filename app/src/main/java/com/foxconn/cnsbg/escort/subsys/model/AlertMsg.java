@@ -12,4 +12,33 @@ public class AlertMsg {
         public String level;
         public String info;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+
+        if (obj == null)
+            return false;
+
+        if (getClass() != obj.getClass())
+            return false;
+
+        AlertMsg data = AlertMsg.class.cast(obj);
+        if (!data.device_id.equals(device_id))
+            return false;
+
+        if (data.time.getTime() != time.getTime())
+            return false;
+
+        if (!data.alert.type.equals(alert.type))
+            return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return (device_id.hashCode() + time.hashCode());
+    }
 }

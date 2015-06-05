@@ -7,7 +7,9 @@ import com.foxconn.cnsbg.escort.subsys.model.CtrlMsg;
 import com.foxconn.cnsbg.escort.subsys.model.RespMsg;
 import com.google.gson.Gson;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class ComMsg {
 
@@ -75,8 +77,46 @@ public class ComMsg {
 
         AlertMsg msg = generateAlertMsg(resp);
 
+        if (!mq.isConnected()) {
+            CtrlCenter.getDao().saveCachedAlertMsg(msg);
+            return false;
+        }
+
         String json = gson.toJson(msg, AlertMsg.class);
         return mq.publish(alertTopic, json, timeout);
+    }
+
+    private static boolean sendAlertData(ComMQ mq, AlertMsg data) {
+        if (data == null)
+            return false;
+
+        if (!mq.isConnected())
+            return false;
+
+        String json = gson.toJson(data, AlertMsg.class);
+        return mq.publish(alertTopic, json, SysPref.MQ_SEND_MAX_TIMEOUT);
+    }
+
+    public static boolean sendCachedAlertData(ComMQ mq) {
+        if (!mq.isConnected())
+            return false;
+
+        List<AlertMsg> dataList = CtrlCenter.getDao().queryCachedAlertMsg();
+        if (dataList == null || dataList.isEmpty())
+            return true;
+
+        List<AlertMsg> sentList = new ArrayList<AlertMsg>();
+        for (AlertMsg data : dataList) {
+            if (sendAlertData(mq, data))
+                sentList.add(data);
+            else
+                break;
+        }
+
+        //could delete one by one, bulk deletion is just for convenience
+        CtrlCenter.getDao().deleteCachedAlertMsg(sentList);
+
+        return (sentList.size() == dataList.size());
     }
 
     public static boolean sendRespMsg(ComMQ mq, ComMsgCode.RespAck resp, long timeout) {

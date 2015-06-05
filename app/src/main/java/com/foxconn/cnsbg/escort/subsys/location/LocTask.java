@@ -263,6 +263,9 @@ public class LocTask extends ComTxTask<LocData> {
         if (data == null)
             return false;
 
+        if (!mComMQ.isConnected())
+            return false;
+
         String dataStr = gson.toJson(data, LocData.class);
         return mComMQ.publish(gpsTopic, dataStr, SysPref.MQ_SEND_MAX_TIMEOUT);
     }

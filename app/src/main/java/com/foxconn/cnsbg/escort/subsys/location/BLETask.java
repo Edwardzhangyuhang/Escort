@@ -136,6 +136,9 @@ public class BLETask extends ComTxTask<BLEData> implements BluetoothAdapter.LeSc
         if (data == null)
             return false;
 
+        if (!mComMQ.isConnected())
+            return false;
+
         String dataStr = gson.toJson(data, BLEData.class);
         return mComMQ.publish(bleTopic, dataStr, SysPref.MQ_SEND_MAX_TIMEOUT);
     }
