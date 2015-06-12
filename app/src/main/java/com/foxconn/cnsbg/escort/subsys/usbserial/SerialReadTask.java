@@ -2,10 +2,12 @@ package com.foxconn.cnsbg.escort.subsys.usbserial;
 
 import android.content.Context;
 
+import com.foxconn.cnsbg.escort.common.SysUtil;
 import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
 import com.foxconn.cnsbg.escort.subsys.communication.ComMQ;
 import com.foxconn.cnsbg.escort.subsys.communication.ComMsg;
 import com.foxconn.cnsbg.escort.subsys.communication.ComMsgCode;
+import com.foxconn.cnsbg.escort.subsys.usbserial.SerialStatus;
 
 public final class SerialReadTask extends Thread {
     private static final String TAG = SerialReadTask.class.getSimpleName();
@@ -57,6 +59,12 @@ public final class SerialReadTask extends Thread {
             if (ack.length() < 2 || ack.charAt(1) != ':')
                 continue;
 
+            if (ack.equals("Z:hb set ok"))
+            {
+                SysUtil.debug(mContext,"Heartbeat set OK");
+                continue;
+            }
+
             String ackCode = ack.substring(0, 1);
             ComMsgCode.RespAck resp = ComMsgCode.getRespAck(ackCode);
 
@@ -91,6 +99,7 @@ public final class SerialReadTask extends Thread {
                     ComMsg.sendAlertMsg(mComMQ, resp, runInterval);
                     break;
                 case HEARTBEAT:
+                    SerialStatus.setRecieve_heartbeat(mContext);
                     mSerialCtrl.write(SerialCode.MCU_CODE_HEARTBEAT_ACK + "\r\n");
                     break;
                 default:

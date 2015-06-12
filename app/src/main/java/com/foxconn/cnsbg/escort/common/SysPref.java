@@ -71,6 +71,11 @@ public class SysPref {
     public static long BLE_UPDATE_MIN_TIME = 5 * 1000L;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
+    //MCU Parameter
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    public static long MCU_HEART_BEAT_TIMEOUT = 3 * 1000L;
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
     //Parameter Initialization
     ////////////////////////////////////////////////////////////////////////////////////////////////
     public static void init(Context context) {
@@ -196,5 +201,9 @@ public class SysPref {
         value = String.valueOf(BLE_UPDATE_MIN_TIME);
         value = pref.getString(context.getString(R.string.key_ble_update_min_time), value);
         BLE_UPDATE_MIN_TIME = Long.valueOf(value);
+
+        value = String.valueOf(MCU_HEART_BEAT_TIMEOUT);
+        value = pref.getString(context.getString(R.string.key_mcu_heartbeat_timeout), value);
+        MCU_HEART_BEAT_TIMEOUT = Long.valueOf(value);
     }
 }

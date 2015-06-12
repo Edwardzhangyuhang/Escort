@@ -1,7 +1,12 @@
 package com.foxconn.cnsbg.escort.subsys.usbserial;
 
+import android.content.Context;
+
+import com.foxconn.cnsbg.escort.common.SysPref;
+import com.foxconn.cnsbg.escort.common.SysUtil;
 import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
 import com.foxconn.cnsbg.escort.subsys.communication.ComMsgCode;
+import com.foxconn.cnsbg.escort.subsys.communication.ComMsg;
 
 public final class SerialStatus {
     private static String mLockStatusCode = ComMsgCode.ACK_STR_GET_LOCK_NONE;
@@ -10,6 +15,8 @@ public final class SerialStatus {
     private static String mBBoxStatusCode = ComMsgCode.ACK_STR_GET_BATTERY_BOX_NONE;
     private static String mCBoxStatusCode = ComMsgCode.ACK_STR_GET_CONTROL_BOX_NONE;
     private static String mVoltageStatusCode = ComMsgCode.ACK_STR_GET_VOLTAGE_NONE;
+    private static long recieve_heartbeat = 0;
+    private static int have_send_alert = 0;
 
     public synchronized static void initStatus() {
         mLockStatusCode = ComMsgCode.ACK_STR_GET_LOCK_NONE;
@@ -18,6 +25,8 @@ public final class SerialStatus {
         mBBoxStatusCode = ComMsgCode.ACK_STR_GET_BATTERY_BOX_NONE;
         mCBoxStatusCode = ComMsgCode.ACK_STR_GET_CONTROL_BOX_NONE;
         mVoltageStatusCode = ComMsgCode.ACK_STR_GET_VOLTAGE_NONE;
+        recieve_heartbeat = 0;
+        have_send_alert = 0;
     }
 
     public synchronized static void checkStatus(SerialCtrl sc) {
@@ -122,5 +131,26 @@ public final class SerialStatus {
             return 90;
         else
             return 0;
+    }
+
+    public synchronized static boolean checkHeartbeat(){
+
+        if((recieve_heartbeat + SysPref.MCU_HEART_BEAT_TIMEOUT) > System.currentTimeMillis() || recieve_heartbeat == 0) {
+            return false;
+        }
+        else {
+            if (have_send_alert == 0) {
+                have_send_alert = 1;
+                return true;
+            }
+            else
+                return false;
+        }
+    }
+
+    public synchronized static void setRecieve_heartbeat(Context context){
+        recieve_heartbeat = System.currentTimeMillis();
+        SysUtil.debug(context,"Recieve heart beat" + recieve_heartbeat);
+        have_send_alert = 0;
     }
 }

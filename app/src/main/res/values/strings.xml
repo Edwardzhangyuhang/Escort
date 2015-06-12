@@ -44,4 +44,7 @@
     <string name="ble_rssi_threshold">BLE RSSI Threshold</string>
     <string name="ble_update_min_time">BLE Update Min Time</string>
 
+    <string name="mcu_title">MCU Parameter</string>
+    <string name="mcu_heartbeat_timeout">MCU Heartbeat Timeout</string>
+
 </resources>

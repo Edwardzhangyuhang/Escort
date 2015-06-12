@@ -49,7 +49,8 @@ public class SysUpdater {
             int newVerCode = Integer.parseInt(newVerInfo.version);
             int curVerCode = PackageUtils.getAppVersionCode(context);
             if (curVerCode < newVerCode) {
-                new UpdateThread(context, newVerInfo.url).start();
+                String url = "http://" + SysPref.HTTP_SERVER_HOST + newVerInfo.url;
+                new UpdateThread(context, url).start();
                 return UpdateState.RUNNING;
             }
 

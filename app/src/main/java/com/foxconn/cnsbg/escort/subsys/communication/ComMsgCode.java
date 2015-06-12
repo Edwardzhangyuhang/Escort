@@ -27,7 +27,7 @@ public class ComMsgCode {
     public static final String CMD_STR_SET_UPDATE = "su";
     public static final String ACK_STR_SET_UPDATE_OK = "SU_OK";
     public static final String ACK_STR_SET_UPDATE_UPDATING = "SU_RUN";
-    public static final String ACK_STR_SET_UPDATE_FAIL = "SE_NG";
+    public static final String ACK_STR_SET_UPDATE_FAIL = "SU_NG";
 
     public static final String CMD_STR_GET_BATTERY = "ge";
     public static final String ACK_STR_GET_BATTERY_OK = "GE_OK";
@@ -44,10 +44,13 @@ public class ComMsgCode {
     public static final String CMD_STR_GET_BATTERY_BOX = "gb";
     public static final String CMD_STR_GET_CONTROL_BOX = "gc";
     public static final String CMD_STR_GET_VOLTAGE = "gv";
+    public static final String CMD_STR_SET_HEARTBEAT_ACK_TIME = "hb_";
 
     //Fake Ack
     public static final String ACK_STR_MCU_ATTACHED = "MCU_A";
     public static final String ACK_STR_MCU_DETACHED = "MCU_D";
+
+    public static final String ACK_STR_MCU_HEARTBEAT_TIMEOUT = "MCU_HTO";
 
     public static final String ACK_STR_GET_LOCK_NONE = "GL_N";
     public static final String ACK_STR_GET_DOOR_NONE = "GD_N";
@@ -84,6 +87,7 @@ public class ComMsgCode {
         MCU_BBOX_STATUS,
         MCU_CBOX_STATUS,
         MCU_BATTERY_LEVEL,
+        MCU_HEARTBEAT_ACK_TIME,
         DEV_TEMPERATURE,
         DEV_BATTERY
     }
@@ -245,7 +249,13 @@ public class ComMsgCode {
             cmdTarget = CmdTarget.MCU;
             targetType = TargetType.MCU_BATTERY_LEVEL;
             cmdCode = SerialCode.CMD_CODE_GET_VOLTAGE;
-        } else {
+        } else if (cmdStr.startsWith(CMD_STR_SET_HEARTBEAT_ACK_TIME)){
+            cmdType = CmdType.SET;
+            cmdTarget = CmdTarget.MCU;
+            targetType = TargetType.MCU_HEARTBEAT_ACK_TIME;
+            cmdCode = cmdStr;
+        }
+        else {
             return null;
         }
 
@@ -718,7 +728,15 @@ public class ComMsgCode {
             cmdStr = "";
             result = RespAck.ACK_RESULT_OK;
             info = "MCU detached";
-        } else {
+        } else if (ackCode.equals(ACK_STR_MCU_HEARTBEAT_TIMEOUT)) {
+            ackSource = AckSource.HEARTBEAT;
+            ackLevel = AckLevel.URGENT;
+            targetType = TargetType.OTHERS;
+            targetTypeStr = RespAck.TYPE_STR_OTHERS;
+            cmdStr = "";
+            result = RespAck.ACK_RESULT_OK;
+            info = "MCU heartbeat timeout";
+        }else {
             return null;
         }
 

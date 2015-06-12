@@ -66,6 +66,8 @@ public class SerialMonitorTask extends Thread {
 
             if (status == 1) {
                 //trigger serial read task to set status
+                if(SerialStatus.checkHeartbeat())
+                    resp = ComMsgCode.getRespAck(ComMsgCode.ACK_STR_MCU_HEARTBEAT_TIMEOUT);
                 SerialStatus.checkStatus(mSerialCtrl);
             }
 
