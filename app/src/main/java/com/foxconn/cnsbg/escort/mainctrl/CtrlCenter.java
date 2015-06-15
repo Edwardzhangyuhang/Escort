@@ -8,6 +8,8 @@ import com.foxconn.cnsbg.escort.common.SysPref;
 import com.foxconn.cnsbg.escort.common.SysUtil;
 import com.foxconn.cnsbg.escort.subsys.cache.CacheDao;
 import com.foxconn.cnsbg.escort.subsys.communication.ComMQ;
+import com.foxconn.cnsbg.escort.subsys.communication.ComMsg;
+import com.foxconn.cnsbg.escort.subsys.communication.ComMsgCode;
 import com.foxconn.cnsbg.escort.subsys.communication.ComRxTask;
 import com.foxconn.cnsbg.escort.subsys.communication.ComTxTask;
 import com.foxconn.cnsbg.escort.subsys.controller.DeviceRoundTask;
@@ -129,6 +131,10 @@ public class CtrlCenter {
             subscribes.add(SysPref.MQ_TOPIC_COMMAND + SysPref.APP_DEBUG_UDID);
 
         if (mMQ.init(subscribes)) {
+
+            ComMsgCode.RespAck resp = null;
+            resp = ComMsgCode.getRespAck(ComMsgCode.ACK_STR_SERVICE_BOOT_UP);
+            ComMsg.sendAlertMsg(mMQ,resp,SysPref.MQ_SEND_MAX_TIMEOUT);
             setTrackingLocation(true);
             startTask();
         }

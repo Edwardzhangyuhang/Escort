@@ -59,6 +59,8 @@ public class ComMsgCode {
     public static final String ACK_STR_GET_CONTROL_BOX_NONE = "GC_N";
     public static final String ACK_STR_GET_VOLTAGE_NONE = "GV_N";
 
+    public static final String ACK_STR_SERVICE_BOOT_UP = "SV_U";
+
     private static int mCmdId = 0;
 
     public static void setCmdId(int id) {
@@ -736,6 +738,14 @@ public class ComMsgCode {
             cmdStr = "";
             result = RespAck.ACK_RESULT_OK;
             info = "MCU heartbeat timeout";
+        } else if (ackCode.equals(ACK_STR_SERVICE_BOOT_UP)) {
+            ackSource = AckSource.ALERT;
+            ackLevel = AckLevel.NORMAL;
+            targetType = TargetType.OTHERS;
+            targetTypeStr = RespAck.TYPE_STR_OTHERS;
+            cmdStr = "";
+            result = RespAck.ACK_RESULT_OK;
+            info = "Service boot up";
         }else {
             return null;
         }
