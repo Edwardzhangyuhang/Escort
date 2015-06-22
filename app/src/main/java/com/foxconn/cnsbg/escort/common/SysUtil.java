@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.BatteryManager;
+import android.os.Debug;
 import android.os.Environment;
 import android.os.Handler;
 import android.telephony.CellInfo;
@@ -36,6 +37,9 @@ import java.util.Date;
 import java.util.List;
 
 public class SysUtil {
+
+    public static final long KB = 1024;
+
     public static boolean isServerReachable(Context context, Intent intent) {
         ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo;
@@ -187,4 +191,47 @@ public class SysUtil {
 
         return dbm;
     }
+
+    public static long getAvailMemory(Context context){
+
+        ActivityManager.MemoryInfo MemInfo = new ActivityManager.MemoryInfo();
+
+        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+
+        am.getMemoryInfo(MemInfo);
+
+        long avaliMem = MemInfo.availMem;
+
+        return avaliMem / KB;
+    }
+
+    public static long getTotalMemory(Context context){
+
+        ActivityManager.MemoryInfo MemInfo = new ActivityManager.MemoryInfo();
+
+        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+
+        am.getMemoryInfo(MemInfo);
+
+        long totalMem = MemInfo.totalMem;
+
+        return totalMem / KB;
+    }
+
+
+    public static int getPidMemorySize(int pid, Context context) {
+
+        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+
+        int[] myMempid = new int[] { pid };
+
+        Debug.MemoryInfo[] memoryInfo = am.getProcessMemoryInfo(myMempid);
+
+        memoryInfo[0].getTotalSharedDirty();
+
+        int memSize = memoryInfo[0].getTotalPss();
+
+        return memSize;
+    }
+
 }

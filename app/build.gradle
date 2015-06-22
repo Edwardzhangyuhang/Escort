@@ -29,4 +29,5 @@ dependencies {
     compile project(':mqtt-client')
     compile project(':usbSerialForAndroid')
     compile project(':PhysicaloidLibrary')
+    compile project(':deviceDiscovery')
 }

@@ -33,6 +33,10 @@ public class ComMsgCode {
     public static final String ACK_STR_GET_BATTERY_OK = "GE_OK";
     public static final String ACK_STR_GET_BATTERY_FAIL = "GE_NG";
 
+    public static final String CMD_STR_GET_SYSTEM_INFO = "gi";
+    public static final String ACK_STR_GET_SYSTEM_INFO_OK = "GI_OK";
+    public static final String ACK_STR_GET_SYSTEM_INFO_FAIL = "GI_NG";
+
     //Commands to MCU
     public static final String CMD_STR_SET_UNLOCK = "kf";
     public static final String CMD_STR_SET_UNLOCK_ONCE = "of";
@@ -60,6 +64,8 @@ public class ComMsgCode {
     public static final String ACK_STR_GET_VOLTAGE_NONE = "GV_N";
 
     public static final String ACK_STR_SERVICE_BOOT_UP = "SV_U";
+
+
 
     private static int mCmdId = 0;
 
@@ -91,7 +97,8 @@ public class ComMsgCode {
         MCU_BATTERY_LEVEL,
         MCU_HEARTBEAT_ACK_TIME,
         DEV_TEMPERATURE,
-        DEV_BATTERY
+        DEV_BATTERY,
+        DEV_SYSTEM_INFO
     }
 
     public enum AckSource {
@@ -192,6 +199,11 @@ public class ComMsgCode {
             cmdTarget = CmdTarget.DEVICE;
             targetType = TargetType.DEV_BATTERY;
             cmdCode = cmdStr;
+        } else if (cmdStr.equals(CMD_STR_GET_SYSTEM_INFO)){
+            cmdType = CmdType.GET;
+            cmdTarget = CmdTarget.DEVICE;
+            targetType = TargetType.DEV_SYSTEM_INFO;
+            cmdCode = cmdStr;
         } else if (cmdStr.startsWith("#")) { //backdoor for debug
             cmdType = CmdType.SET;
             cmdTarget = CmdTarget.MCU;
@@ -256,8 +268,7 @@ public class ComMsgCode {
             cmdTarget = CmdTarget.MCU;
             targetType = TargetType.MCU_HEARTBEAT_ACK_TIME;
             cmdCode = cmdStr;
-        }
-        else {
+        } else {
             return null;
         }
 
@@ -277,6 +288,7 @@ public class ComMsgCode {
         public static final String TYPE_STR_MCU_BATTERY_LEVEL = "main_battery_level";
         public static final String TYPE_STR_DEV_TEMPERATURE = "device_temperature";
         public static final String TYPE_STR_DEV_BATTERY = "device_battery";
+        public static final String TYPE_STR_DEV_SYSTEMINFO = "system_info";
 
         private AckSource mAckSource;
         private AckLevel mAckLevel;
@@ -746,7 +758,23 @@ public class ComMsgCode {
             cmdStr = "";
             result = RespAck.ACK_RESULT_OK;
             info = "Service boot up";
-        }else {
+        } else if (ackCode.equals(ACK_STR_GET_SYSTEM_INFO_FAIL)){
+            ackSource = AckSource.GET_CMD;
+            ackLevel = AckLevel.NORMAL;
+            targetType = TargetType.DEV_SYSTEM_INFO;
+            targetTypeStr = RespAck.TYPE_STR_DEV_SYSTEMINFO;
+            cmdStr = CMD_STR_GET_SYSTEM_INFO;
+            result = RespAck.ACK_RESULT_FAIL;
+            info = "";
+        } else if (ackCode.equals(ACK_STR_GET_SYSTEM_INFO_OK)){
+            ackSource = AckSource.GET_CMD;
+            ackLevel = AckLevel.NORMAL;
+            targetType = TargetType.DEV_SYSTEM_INFO;
+            targetTypeStr = RespAck.TYPE_STR_DEV_SYSTEMINFO;
+            cmdStr = CMD_STR_GET_SYSTEM_INFO;
+            result = RespAck.ACK_RESULT_OK;
+            info = "";
+        } else {
             return null;
         }
 

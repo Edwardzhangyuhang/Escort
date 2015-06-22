@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/dev_title">
+        <EditTextPreference
+            android:key="@string/key_mcu_heartbeat_timeout"
+            android:title="@string/mcu_heartbeat_timeout"
+            android:selectAllOnFocus="true"
+            android:inputType="number"
+            android:capitalize="words"
+            android:singleLine="true"
+            android:maxLines="1" />
+
+        <EditTextPreference
+            android:key="@string/key_dev_cpu_max_idle"
+            android:title="@string/dev_cpu_max_idle"
+            android:selectAllOnFocus="true"
+            android:inputType="number"
+            android:capitalize="words"
+            android:singleLine="true"
+            android:maxLines="1" />
+
+        <EditTextPreference
+            android:key="@string/key_dev_mem_max_idle"
+            android:title="@string/dev_mem_max_idle"
+            android:selectAllOnFocus="true"
+            android:inputType="number"
+            android:capitalize="words"
+            android:singleLine="true"
+            android:maxLines="1" />
+
+    </PreferenceCategory>
+</PreferenceScreen>

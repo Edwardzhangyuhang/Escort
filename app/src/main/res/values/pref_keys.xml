@@ -39,5 +39,7 @@
     <string name="key_ble_update_min_time">ble_update_min_time</string>
 
     <string name="key_mcu_heartbeat_timeout">mcu_heartbeat_timeout</string>
+    <string name="key_dev_cpu_max_idle">dev_cpu_max_idle</string>
+    <string name="key_dev_mem_max_idle">dev_mem_max_idle</string>
 
 </resources>

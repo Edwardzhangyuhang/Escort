@@ -31,7 +31,7 @@ public class SettingsActivity extends PreferenceActivity
         addPreferencesFromResource(R.xml.pref_mq);
         addPreferencesFromResource(R.xml.pref_loc);
         addPreferencesFromResource(R.xml.pref_ble);
-        addPreferencesFromResource(R.xml.pref_mcu);
+        addPreferencesFromResource(R.xml.pref_dev);
 
         String id = ((TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
         setPreference(R.string.key_device_id, id);
@@ -73,6 +73,8 @@ public class SettingsActivity extends PreferenceActivity
         setPreference(R.string.key_ble_update_min_time, String.valueOf(SysPref.BLE_UPDATE_MIN_TIME));
 
         setPreference(R.string.key_mcu_heartbeat_timeout, String.valueOf(SysPref.MCU_HEART_BEAT_TIMEOUT));
+        setPreference(R.string.key_dev_cpu_max_idle,String.valueOf(SysPref.DEV_CPU_USEAGE_WARNING));
+        setPreference(R.string.key_dev_mem_max_idle,String.valueOf(SysPref.DEV_MEMORY_USEAGE_WARNING));
     }
 
     private void setPreference(int keyId, String defaults) {

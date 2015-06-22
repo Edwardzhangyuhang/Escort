@@ -1,1 +1,2 @@
 include ':app', 'appDaoGenerator', ':mqtt-client', ':usbSerialForAndroid', ':PhysicaloidLibrary'
+include ':deviceDiscovery'

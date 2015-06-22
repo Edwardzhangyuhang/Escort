@@ -71,10 +71,11 @@ public class SysPref {
     public static long BLE_UPDATE_MIN_TIME = 5 * 1000L;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    //MCU Parameter
+    //DEV Parameter
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    public static long MCU_HEART_BEAT_TIMEOUT = 4 * 1000L;
-
+    public static long MCU_HEART_BEAT_TIMEOUT = 4 * 1000L;//if the time out is 3 seconds,we need set to 4 in fact
+    public static float DEV_CPU_USEAGE_WARNING = 10.0F;
+    public static int DEV_MEMORY_USEAGE_WARNING = 50;
     ////////////////////////////////////////////////////////////////////////////////////////////////
     //Parameter Initialization
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -205,5 +206,13 @@ public class SysPref {
         value = String.valueOf(MCU_HEART_BEAT_TIMEOUT);
         value = pref.getString(context.getString(R.string.key_mcu_heartbeat_timeout), value);
         MCU_HEART_BEAT_TIMEOUT = Long.valueOf(value);
+
+        value = String.valueOf(DEV_CPU_USEAGE_WARNING);
+        value = pref.getString(context.getString(R.string.key_dev_cpu_max_idle), value);
+        DEV_CPU_USEAGE_WARNING = Float.valueOf(value);
+
+        value = String.valueOf(DEV_MEMORY_USEAGE_WARNING);
+        value = pref.getString(context.getString(R.string.key_dev_mem_max_idle), value);
+        DEV_MEMORY_USEAGE_WARNING = Integer.valueOf(value);
     }
 }

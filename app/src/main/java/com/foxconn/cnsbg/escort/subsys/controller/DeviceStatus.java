@@ -7,10 +7,12 @@ import com.foxconn.cnsbg.escort.subsys.communication.ComMsgCode;
 public class DeviceStatus {
     private static String mTemperature = "";
     private static String mBattery = "";
+    private static String mSystemInfo = "";
 
     public synchronized static void initStatus() {
         mTemperature = "";
         mBattery = "";
+        mSystemInfo= "";
     }
 
     public synchronized static boolean setStatus(ComMsgCode.RespAck resp) {
@@ -30,6 +32,13 @@ public class DeviceStatus {
                     return false;
 
                 mBattery = battery;
+                return true;
+            case DEV_SYSTEM_INFO:
+                String systeminfo = resp.getInfo();
+                if (systeminfo.equals(mSystemInfo))
+                    return false;
+
+                mSystemInfo = systeminfo;
                 return true;
             default:
                 return false;
@@ -58,6 +67,16 @@ public class DeviceStatus {
                 if (resp != null)
                     resp.setInfo(mBattery);
                 break;
+            case DEV_SYSTEM_INFO:
+                if (TextUtils.isEmpty(mSystemInfo))
+                    resp = ComMsgCode.getRespAck(ComMsgCode.ACK_STR_GET_SYSTEM_INFO_FAIL);
+                else
+                    resp = ComMsgCode.getRespAck(ComMsgCode.ACK_STR_GET_SYSTEM_INFO_OK);
+
+                if (resp != null)
+                    resp.setInfo(mSystemInfo);
+                break;
+
             default:
                 resp = null;
                 break;

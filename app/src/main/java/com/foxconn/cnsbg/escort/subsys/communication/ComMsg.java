@@ -95,6 +95,7 @@ public class ComMsg {
 
         String json = gson.toJson(data, AlertMsg.class);
         return mq.publish(alertTopic, json, SysPref.MQ_SEND_MAX_TIMEOUT);
+
     }
 
     public static boolean sendCachedAlertData(ComMQ mq) {
