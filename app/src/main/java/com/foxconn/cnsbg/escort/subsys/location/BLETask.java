@@ -179,7 +179,7 @@ public class BLETask extends ComTxTask<BLEData> implements BluetoothAdapter.LeSc
             long currentTime = new Date().getTime();
             long motionDetectTime = CtrlCenter.getMotionDetectionTime();
 
-            if (currentTime - motionDetectTime < SysPref.LOC_UPDATE_PAUSE_IDLE_TIME)
+            if (currentTime - motionDetectTime < SysPref.LOC_UPDATE_PAUSE_IDLE_TIME || CtrlCenter.isActiveState())
                 setBleScanning(true);
         }
     }

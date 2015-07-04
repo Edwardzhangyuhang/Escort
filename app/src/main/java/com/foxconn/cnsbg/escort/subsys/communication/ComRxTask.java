@@ -3,6 +3,7 @@ package com.foxconn.cnsbg.escort.subsys.communication;
 import android.content.Context;
 
 import com.foxconn.cnsbg.escort.common.SysPref;
+import com.foxconn.cnsbg.escort.common.SysUtil;
 import com.foxconn.cnsbg.escort.mainctrl.CtrlCenter;
 import com.foxconn.cnsbg.escort.subsys.controller.DeviceStatus;
 import com.foxconn.cnsbg.escort.subsys.updater.SysUpdater;
@@ -34,6 +35,7 @@ public final class ComRxTask extends Thread {
                 continue;
 
             String cmd = ComMsg.parseCmdMsg(msgStr);
+            SysUtil.debug(mContext,cmd);
             handleCmd(cmd);
         }
     }
@@ -113,6 +115,9 @@ public final class ComRxTask extends Thread {
                             ackCode = ComMsgCode.ACK_STR_SET_UPDATE_FAIL;
                             break;
                     }
+                } else if (cmd.getCmdStr().equals(ComMsgCode.CMD_STR_SET_WARNING)){
+                    SerialLedCtrl.setTimeOutLed(mContext, mSerialCtrl);
+                    ackCode = ComMsgCode.ACK_STR_SET_WARNING_OK;
                 } else {
                     return false;
                 }

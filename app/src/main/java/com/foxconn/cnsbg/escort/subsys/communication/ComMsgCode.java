@@ -37,6 +37,10 @@ public class ComMsgCode {
     public static final String ACK_STR_GET_SYSTEM_INFO_OK = "GI_OK";
     public static final String ACK_STR_GET_SYSTEM_INFO_FAIL = "GI_NG";
 
+    public static final String CMD_STR_SET_WARNING = "sw";
+    public static final String ACK_STR_SET_WARNING_OK = "SW_OK";
+    public static final String ACK_STR_SET_WARNING_FAIL = "SW_NG";
+
     //Commands to MCU
     public static final String CMD_STR_SET_UNLOCK = "kf";
     public static final String CMD_STR_SET_UNLOCK_ONCE = "of";
@@ -49,6 +53,7 @@ public class ComMsgCode {
     public static final String CMD_STR_GET_CONTROL_BOX = "gc";
     public static final String CMD_STR_GET_VOLTAGE = "gv";
     public static final String CMD_STR_SET_HEARTBEAT_ACK_TIME = "hb_";
+
 
     //Fake Ack
     public static final String ACK_STR_MCU_ATTACHED = "MCU_A";
@@ -268,7 +273,12 @@ public class ComMsgCode {
             cmdTarget = CmdTarget.MCU;
             targetType = TargetType.MCU_HEARTBEAT_ACK_TIME;
             cmdCode = cmdStr;
-        } else {
+        } else if(cmdStr.equals(CMD_STR_SET_WARNING)){
+            cmdType = CmdType.SET;
+            cmdTarget = CmdTarget.DEVICE;
+            targetType = TargetType.OTHERS;
+            cmdCode = cmdStr;
+        }else {
             return null;
         }
 
@@ -749,7 +759,7 @@ public class ComMsgCode {
             targetTypeStr = RespAck.TYPE_STR_OTHERS;
             cmdStr = "";
             result = RespAck.ACK_RESULT_OK;
-            info = "MCU heartbeat timeout";
+            info = "MCU connection timeout";
         } else if (ackCode.equals(ACK_STR_SERVICE_BOOT_UP)) {
             ackSource = AckSource.ALERT;
             ackLevel = AckLevel.NORMAL;
@@ -774,7 +784,15 @@ public class ComMsgCode {
             cmdStr = CMD_STR_GET_SYSTEM_INFO;
             result = RespAck.ACK_RESULT_OK;
             info = "";
-        } else {
+        } else if (ackCode.equals(ACK_STR_SET_WARNING_OK)){
+            ackSource = AckSource.SET_CMD;
+            ackLevel = AckLevel.URGENT;
+            targetType = TargetType.OTHERS;
+            targetTypeStr = RespAck.TYPE_STR_OTHERS;
+            cmdStr = CMD_STR_SET_WARNING;
+            result = RespAck.ACK_RESULT_OK;
+            info = "Set Warning OK";
+        }else {
             return null;
         }
 

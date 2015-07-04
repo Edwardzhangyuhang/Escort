@@ -150,7 +150,7 @@ public final class SerialStatus {
 
     public synchronized static void setRecieve_heartbeat(Context context){
         recieve_heartbeat = System.currentTimeMillis();
-        SysUtil.debug(context,"Recieve heart beat" + recieve_heartbeat);
+        //SysUtil.debug(context,"Recieve heart beat" + recieve_heartbeat);
         have_send_alert = 0;
     }
 }

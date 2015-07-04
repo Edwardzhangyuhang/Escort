@@ -71,6 +71,9 @@ public final class SerialReadTask extends Thread {
             if (resp == null)
                 continue;
 
+            if (resp.getAckSource() != null)
+                SerialStatus.setRecieve_heartbeat(mContext);
+
             //set ALARM flag for lock status processing
             if (resp.getAckCode().equals(SerialCode.MCU_CODE_DOOR_ALARM))
                 CtrlCenter.setDoorAlarm(true);
@@ -99,7 +102,6 @@ public final class SerialReadTask extends Thread {
                     ComMsg.sendAlertMsg(mComMQ, resp, runInterval);
                     break;
                 case HEARTBEAT:
-                    SerialStatus.setRecieve_heartbeat(mContext);
                     mSerialCtrl.write(SerialCode.MCU_CODE_HEARTBEAT_ACK + "\r\n");
                     break;
                 default:

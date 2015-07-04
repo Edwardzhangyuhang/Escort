@@ -53,4 +53,8 @@ public class SerialLedCtrl {
     public static void setCmdFailLed(Context context, SerialCtrl sc) {
         setLed(context, sc, LedPattern.STAY_OFF, LedPattern.STAY_OFF, LedPattern.BLINK_MEDIUM);
     }
+
+    public static void setTimeOutLed(Context context, SerialCtrl sc) {
+        setLed(context, sc, LedPattern.STAY_OFF, LedPattern.STAY_OFF, LedPattern.BLINK_MEDIUM);
+    }
 }

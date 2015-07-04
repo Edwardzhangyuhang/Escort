@@ -227,7 +227,7 @@ public class LocTask extends ComTxTask<LocData> {
         long motionDetectTime = CtrlCenter.getMotionDetectionTime();
 
         if (currentTime - motionDetectTime > SysPref.LOC_UPDATE_PAUSE_IDLE_TIME
-                && !curProvider.equals(LocationManager.PASSIVE_PROVIDER)) {
+                && !curProvider.equals(LocationManager.PASSIVE_PROVIDER) && !CtrlCenter.isActiveState()) {
             System.out.println("Pause location tracking...");
             curProvider = LocationManager.PASSIVE_PROVIDER;
             setLocUpdating(false);
