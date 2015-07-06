@@ -184,15 +184,16 @@ public class CacheDao {
                 BLEData newData = new BLEData();
                 newData.device_id = data.getDeviceID();
                 newData.time = data.getTime();
+                /*
                 newData.battery_level = data.getBatteryLevel();
                 newData.signal_strength = data.getSignalStrength();
                 newData.lock_status = data.getLockStatus();
                 newData.door_status = data.getDoorStatus();
-
+*/
                 newData.location = new BLEData.BLELoc();
-                newData.location.data = new BLEData.DeviceData();
-                newData.location.data.mac = data.getMac();
-                newData.location.data.rssi = data.getRssi();
+                newData.location.data = new ArrayList<BLEData.DeviceData>();
+                //newData.location.data.mac = data.getMac();
+                //newData.location.data.rssi = data.getRssi();
 
                 cachedList.add(newData);
             }
@@ -206,6 +207,7 @@ public class CacheDao {
     }
 
     public synchronized void saveCachedBleData(BLEData data) {
+
         if (data == null)
             return;
 
@@ -213,12 +215,13 @@ public class CacheDao {
 
         newData.setDeviceID(data.device_id);
         newData.setTime(data.time);
+        /*
         newData.setBatteryLevel(data.battery_level);
         newData.setSignalStrength(data.signal_strength);
         newData.setLockStatus(data.lock_status);
-        newData.setDoorStatus(data.door_status);
-        newData.setMac(data.location.data.mac);
-        newData.setRssi(data.location.data.rssi);
+        newData.setDoorStatus(data.door_status);*/
+        //newData.setMac(data.location.data.mac);
+        //newData.setRssi(data.location.data.rssi);
 
         cachedBleDao.insert(newData);
     }
@@ -248,16 +251,16 @@ public class CacheDao {
         for (CachedBleData cachedData : cachedList) {
             BLEData deleteData = new BLEData();
             deleteData.device_id = cachedData.getDeviceID();
-            deleteData.time = cachedData.getTime();
+            deleteData.time = cachedData.getTime();/*
             deleteData.battery_level = cachedData.getBatteryLevel();
             deleteData.signal_strength = cachedData.getSignalStrength();
             deleteData.lock_status = cachedData.getLockStatus();
             deleteData.door_status = cachedData.getDoorStatus();
-
+            */
             deleteData.location = new BLEData.BLELoc();
-            deleteData.location.data = new BLEData.DeviceData();
-            deleteData.location.data.mac = cachedData.getMac();
-            deleteData.location.data.rssi = cachedData.getRssi();
+            deleteData.location.data = new ArrayList<BLEData.DeviceData>();
+            //deleteData.location.data.mac = cachedData.getMac();
+            //deleteData.location.data.rssi = cachedData.getRssi();
 
             //to avoid ConcurrentModificationException
             if (data.contains(deleteData))

@@ -27,7 +27,7 @@ public class BLETask extends ComTxTask<BLEData> implements BluetoothAdapter.LeSc
     private BluetoothAdapter mBluetoothAdapter;
     private boolean mScanning = false;
 
-    private List<BLEData.DeviceData> dataList = new ArrayList<BLEData.DeviceData>();
+    //private List<BLEData.DeviceData> dataList = new ArrayList<BLEData.DeviceData>();
     private long lastUpdateTime = 0L;
 
     private boolean bleDataUpdated = false;
@@ -56,9 +56,13 @@ public class BLETask extends ComTxTask<BLEData> implements BluetoothAdapter.LeSc
             mBluetoothAdapter.enable();
 
         runInterval = SysPref.BLE_TASK_RUN_INTERVAL;
+        setBleScanning(true);
+        bleData.location = new BLEData.BLELoc();
+        bleData.location.data = new ArrayList<BLEData.DeviceData>() ;
     }
 
     private void setBleScanning(boolean enable) {
+
         if (mScanning == enable)
             return;
 
@@ -78,36 +82,39 @@ public class BLETask extends ComTxTask<BLEData> implements BluetoothAdapter.LeSc
         if (!device.getName().contains(SysPref.BLE_DEVICE_NAME_FILTER))
             return;
 
-        if (rssi < SysPref.BLE_RSSI_THRESHOLD)
-            return;
+        //if (rssi < SysPref.BLE_RSSI_THRESHOLD)
+            //return;
 
         BLEData.DeviceData data = new BLEData.DeviceData();
         data.mac = device.getAddress();
         data.rssi = rssi;
-        dataList.add(data);
+        System.out.println("mac:" + data.mac + "  rssi:" + rssi);
+        bleData.location.data.add(data);
 
-        if (time - lastUpdateTime > SysPref.BLE_UPDATE_MIN_TIME) {
+
+
+        //if (time - lastUpdateTime > SysPref.BLE_UPDATE_MIN_TIME) {
             lastUpdateTime = time;
 
-            BLEData.DeviceData result = analyse(dataList);
-            dataList.clear();
+            //BLEData.DeviceData result = analyse(dataList);
+
 
             bleData.device_id = CtrlCenter.getUDID();
             bleData.time = new Date();
-
+            /*
             bleData.battery_level = SysUtil.getBatteryLevel(mContext);
             bleData.signal_strength = SysUtil.getSignalStrength(mContext);
             bleData.voltage_level = SerialStatus.getVoltageLevel();
             bleData.lock_status = SerialStatus.getStatusStr(ComMsgCode.TargetType.MCU_LOCK_STATUS);
             bleData.door_status = SerialStatus.getStatusStr(ComMsgCode.TargetType.MCU_DOOR_STATUS);
-
-            bleData.location = new BLEData.BLELoc();
+            */
+            /*bleData.location = new BLEData.BLELoc();
             bleData.location.data = new BLEData.DeviceData();
             bleData.location.data.mac = result.mac;
             bleData.location.data.rssi = result.rssi;
-
+            */
             bleDataUpdated = true;
-        }
+        //}
     }
 
     public BLEData.DeviceData analyse(List<BLEData.DeviceData> list) {
@@ -145,6 +152,7 @@ public class BLETask extends ComTxTask<BLEData> implements BluetoothAdapter.LeSc
 
     @Override
     protected boolean sendCachedData() {
+
         List<BLEData> dataList = CtrlCenter.getDao().queryCachedBleData();
         if (dataList == null || dataList.isEmpty())
             return true;
@@ -161,10 +169,12 @@ public class BLETask extends ComTxTask<BLEData> implements BluetoothAdapter.LeSc
         CtrlCenter.getDao().deleteCachedBleData(sentList);
 
         return (sentList.size() == dataList.size());
+
     }
 
     @Override
     protected void saveCachedData(BLEData data) {
+
         if (data == null)
             return;
 
@@ -173,14 +183,17 @@ public class BLETask extends ComTxTask<BLEData> implements BluetoothAdapter.LeSc
 
     @Override
     protected void checkTask() {
-        setBleScanning(false);
 
+        setBleScanning(false);
+        bleData.location.data.clear();
+        /*
         if (CtrlCenter.isTrackingLocation()) {
             long currentTime = new Date().getTime();
             long motionDetectTime = CtrlCenter.getMotionDetectionTime();
 
             if (currentTime - motionDetectTime < SysPref.LOC_UPDATE_PAUSE_IDLE_TIME || CtrlCenter.isActiveState())
                 setBleScanning(true);
-        }
+        }*/
+        setBleScanning(true);
     }
 }

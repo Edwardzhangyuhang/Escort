@@ -1,20 +1,21 @@
 package com.foxconn.cnsbg.escort.subsys.model;
 
 import java.util.Date;
+import java.util.List;
 
 public final class BLEData {
     public String device_id;
     public Date time;
-    public int battery_level;
-    public int signal_strength;
-    public int voltage_level;
-    public String lock_status;
-    public String door_status;
+    //public int battery_level;
+    //public int signal_strength;
+    //public int voltage_level;
+    //public String lock_status;
+    //public String door_status;
     public BLELoc location;
 
     public static class BLELoc {
         public final String type = "ibeacon";
-        public DeviceData data;
+        public List<DeviceData>data;
     }
 
     public static class DeviceData {

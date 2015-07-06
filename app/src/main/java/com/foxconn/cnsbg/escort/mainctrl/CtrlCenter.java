@@ -148,12 +148,12 @@ public class CtrlCenter {
     }
 
     private void startTask() {
-        mSerialMonitorTask.start();
-        mSerialReadTask.start();
-        mDeviceRoundTask.start();
+        //mSerialMonitorTask.start();
+        //mSerialReadTask.start();
+        //mDeviceRoundTask.start();
         mCmdTask.start();
-        mAccelTask.start();
-        mGPSTask.start();
+        //mAccelTask.start();
+        //mGPSTask.start();
         mBLETask.start();
     }
 
