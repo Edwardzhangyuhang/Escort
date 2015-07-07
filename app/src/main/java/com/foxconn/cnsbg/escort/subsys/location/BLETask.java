@@ -88,7 +88,7 @@ public class BLETask extends ComTxTask<BLEData> implements BluetoothAdapter.LeSc
         BLEData.DeviceData data = new BLEData.DeviceData();
         data.mac = device.getAddress();
         data.rssi = rssi;
-        System.out.println("mac:" + data.mac + "  rssi:" + rssi);
+        //System.out.println("mac:" + data.mac + "  rssi:" + rssi);
         bleData.location.data.add(data);
 
 
@@ -113,7 +113,7 @@ public class BLETask extends ComTxTask<BLEData> implements BluetoothAdapter.LeSc
             bleData.location.data.mac = result.mac;
             bleData.location.data.rssi = result.rssi;
             */
-            bleDataUpdated = true;
+            //bleDataUpdated = true;
         //}
     }
 
@@ -145,8 +145,10 @@ public class BLETask extends ComTxTask<BLEData> implements BluetoothAdapter.LeSc
 
         if (!mComMQ.isConnected())
             return false;
-
+        setBleScanning(false);
         String dataStr = gson.toJson(data, BLEData.class);
+        bleData.location.data.clear();
+        setBleScanning(true);
         return mComMQ.publish(bleTopic, dataStr, SysPref.MQ_SEND_MAX_TIMEOUT);
     }
 
@@ -184,8 +186,7 @@ public class BLETask extends ComTxTask<BLEData> implements BluetoothAdapter.LeSc
     @Override
     protected void checkTask() {
 
-        setBleScanning(false);
-        bleData.location.data.clear();
+        //setBleScanning(false);
         /*
         if (CtrlCenter.isTrackingLocation()) {
             long currentTime = new Date().getTime();
@@ -194,6 +195,7 @@ public class BLETask extends ComTxTask<BLEData> implements BluetoothAdapter.LeSc
             if (currentTime - motionDetectTime < SysPref.LOC_UPDATE_PAUSE_IDLE_TIME || CtrlCenter.isActiveState())
                 setBleScanning(true);
         }*/
-        setBleScanning(true);
+        //setBleScanning(true);
+        bleDataUpdated = true;
     }
 }
