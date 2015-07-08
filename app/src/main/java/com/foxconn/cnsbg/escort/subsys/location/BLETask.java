@@ -89,7 +89,8 @@ public class BLETask extends ComTxTask<BLEData> implements BluetoothAdapter.LeSc
         data.mac = device.getAddress();
         data.rssi = rssi;
         //System.out.println("mac:" + data.mac + "  rssi:" + rssi);
-        bleData.location.data.add(data);
+        if(check_mac(bleData.location.data,data.mac))
+            bleData.location.data.add(data);
 
 
 
@@ -124,8 +125,15 @@ public class BLETask extends ComTxTask<BLEData> implements BluetoothAdapter.LeSc
                 return data2.rssi - data1.rssi;
             }
         });
-
         return list.get(0);
+    }
+
+    public boolean check_mac(List<BLEData.DeviceData>list,String mac){
+        for(BLEData.DeviceData device : list){
+            if(mac.equals(device.mac))
+                return false;
+        }
+        return true;
     }
 
     @Override
