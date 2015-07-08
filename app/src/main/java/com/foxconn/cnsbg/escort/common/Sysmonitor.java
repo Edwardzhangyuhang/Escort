@@ -9,6 +9,8 @@ import com.foxconn.cnsbg.escort.subsys.model.SysInfo;
 import com.foxconn.cnsbg.escort.common.SysUtil;
 import com.google.gson.Gson;
 
+import cn.trinea.android.common.util.PackageUtils;
+
 /**
  * Created by Edward zhang on 2015/6/17.
  */
@@ -55,6 +57,10 @@ public class Sysmonitor {
         cpu_idle = cpuinfo.getIdle();
 
         sysinfo.idle_cpu = cpu_idle + "%";
+
+        sysinfo.version_code = PackageUtils.getAppVersionCode(mContext);
+
+        sysinfo.version_name = SysUtil.getAppVersionName(mContext);
 
        return true;
     }

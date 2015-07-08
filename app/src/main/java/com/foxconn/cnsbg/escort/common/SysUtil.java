@@ -4,6 +4,8 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.BatteryManager;
@@ -232,6 +234,23 @@ public class SysUtil {
         int memSize = memoryInfo[0].getTotalPss();
 
         return memSize;
+    }
+
+    public static String getAppVersionName(Context context) {
+        if(context != null) {
+            PackageManager pm = context.getPackageManager();
+            if(pm != null) {
+                try {
+                    PackageInfo pi = pm.getPackageInfo(context.getPackageName(), 0);
+                    if(pi != null) {
+                        return pi.versionName;
+                    }
+                } catch (PackageManager.NameNotFoundException var4) {
+                    var4.printStackTrace();
+                }
+            }
+        }
+        return null;
     }
 
 }

@@ -17,4 +17,8 @@ public class SysInfo {
 
     public String idle_cpu;
 
+    public int version_code;
+
+    public String version_name;
+
 }
