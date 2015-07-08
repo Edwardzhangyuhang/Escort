@@ -59,12 +59,6 @@ public final class SerialReadTask extends Thread {
             if (ack.length() < 2 || ack.charAt(1) != ':')
                 continue;
 
-            if (ack.equals("Z:hb set ok"))
-            {
-                SysUtil.debug(mContext,"Heartbeat set OK");
-                continue;
-            }
-
             String ackCode = ack.substring(0, 1);
             ComMsgCode.RespAck resp = ComMsgCode.getRespAck(ackCode);
 

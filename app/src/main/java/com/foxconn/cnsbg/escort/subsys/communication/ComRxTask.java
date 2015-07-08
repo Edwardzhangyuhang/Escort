@@ -12,6 +12,8 @@ import com.foxconn.cnsbg.escort.subsys.usbserial.SerialCtrl;
 import com.foxconn.cnsbg.escort.subsys.usbserial.SerialLedCtrl;
 import com.foxconn.cnsbg.escort.subsys.usbserial.SerialStatus;
 
+import java.util.Date;
+
 public final class ComRxTask extends Thread {
     private static final String TAG = ComRxTask.class.getSimpleName();
 
@@ -90,6 +92,7 @@ public final class ComRxTask extends Thread {
             case SET:
                 if (cmd.getCmdStr().equals(ComMsgCode.CMD_STR_SET_ACTIVATION)) {
                     CtrlCenter.setTrackingLocation(true);
+                    CtrlCenter.setMotionDetectionTime((new Date()).getTime());
                     ackCode = ComMsgCode.ACK_STR_SET_ACTIVATION_OK;
                 } else if (cmd.getCmdStr().equals(ComMsgCode.CMD_STR_SET_DEACTIVATION)) {
                     CtrlCenter.setTrackingLocation(false);

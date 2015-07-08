@@ -48,6 +48,7 @@ public interface SerialCode {
     public static final String ACK_CODE_GET_VOLTAGE_CRITICAL = "W";
     public static final String ACK_CODE_GET_VOLTAGE_LOW = "X";
     public static final String ACK_CODE_GET_VOLTAGE_NORMAL = "Y";
+    public static final String ACK_CODE_GET_VOLTAGE_NO_DC_12V = "b";
 
     public static final String CMD_CODE_GET_ALL_STATUS = "gs";
 }

@@ -728,7 +728,15 @@ public class ComMsgCode {
             cmdStr = CMD_STR_GET_VOLTAGE;
             result = RespAck.ACK_RESULT_OK;
             info = "normal";
-        } else if (ackCode.equals(ACK_STR_GET_VOLTAGE_NONE)) {
+        } else if (ackCode.equals(SerialCode.ACK_CODE_GET_VOLTAGE_NO_DC_12V)){
+            ackSource = AckSource.GET_CMD;
+            ackLevel = AckLevel.URGENT;
+            targetType = TargetType.MCU_BATTERY_LEVEL;
+            targetTypeStr = RespAck.TYPE_STR_MCU_BATTERY_LEVEL;
+            cmdStr = CMD_STR_GET_VOLTAGE;
+            result = RespAck.ACK_RESULT_OK;
+            info = "Using Back-up Power";
+        }else if (ackCode.equals(ACK_STR_GET_VOLTAGE_NONE)) {
             ackSource = AckSource.GET_CMD;
             ackLevel = AckLevel.NORMAL;
             targetType = TargetType.MCU_BATTERY_LEVEL;
