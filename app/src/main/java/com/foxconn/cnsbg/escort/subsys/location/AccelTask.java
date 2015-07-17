@@ -40,7 +40,7 @@ public class AccelTask extends ComTxTask<AccelData> implements SensorEventListen
 
         mSensorMgr = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         mAccelerometer = mSensorMgr.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        mRate = SensorManager.SENSOR_DELAY_NORMAL;
+        mRate = SensorManager.SENSOR_DELAY_GAME;
         //movement pattern identification requires getting sensor data as fast as possible
         //if (accelSampling.IDENTIFY_MOVEMENT_PATTERN)
         //    rate = SensorManager.SENSOR_DELAY_FASTEST;
